@@ -1,0 +1,110 @@
+.\"Modified from man(1) of FreeBSD, the NetBSD mdoc.template, and mdoc.samples.
+.\"See Also:
+.\"man mdoc.samples for a complete listing of options
+.\"man mdoc for the short list of editing options
+.\"/usr/share/misc/mdoc.template
+.Dd 10/13/10               \" DATE 
+.Dt Mandoline 1      \" Program name and manual section number 
+.Os Darwin
+.Sh NAME                 \" Section Header - required - don't modify 
+.Nm Mandoline
+.\" The following lines are read in generating the apropos(man -k) database. Use only key
+.\" words here as the database is built based on the words here and in the .ND line. 
+.\" .Nm Other_name_for_same_program(),
+.\" .Nm Yet another name for the same program.
+.\" Use .Nm macro to designate other names for the documented program.
+.Nd STL file slicer to generate gcode files for 3D FDM printing.
+.Sh SYNOPSIS             \" Section Header - required - don't modify
+.Nm
+.Op Fl c                 \" [-c]
+.Op Fl d Ar PREFIX       \" [-d PREFIX] 
+.Op Fl f Ar FLOAT        \" [-f FLOAT] 
+.Op Fl F Ar FLOAT        \" [-F FLOAT] 
+.Op Fl i Ar FLOAT        \" [-i FLOAT] 
+.Op Fl l Ar FLOAT        \" [-l FLOAT] 
+.Op Fl m Ar STRING       \" [-m STRING] 
+.Op Fl o Ar FILENAME     \" [-o FILENAME] 
+.Op Fl p Ar INT          \" [-p INT] 
+.Op Fl r Ar FLOAT        \" [-r FLOAT] 
+.Op Fl s Ar FLOAT        \" [-s FLOAT] 
+.Op Fl z Ar FLOAT        \" [-z path] 
+.Ar FILE                 \" [file]
+.\" .Op Ar                   \" [file ...]
+.\" .Ar arg0                 \" Underlined argument - use .Ar anywhere to underline
+.\" arg2 ...                 \" Arguments
+.Sh DESCRIPTION          \" Section Header - required - don't modify
+.Nm
+is used to slice an STL file into the tool paths needed by
+FDM type 3D printers like RepRap or MakerBot printers.
+.\" Underlining is accomplished with the .Ar macro like this:
+.\" .Ar underlined text .
+.\" .Pp                      \" Inserts a space
+.\" A list of items with descriptions:
+.\" .Bl -tag -width -indent  \" Begins a tagged list 
+.\" .It item a               \" Each item preceded by .It macro
+.\" Description of item a
+.\" .It item b
+.\" Description of item b
+.\" .El                      \" Ends the list
+.Pp
+A list of flags and their descriptions:
+.Bl -tag -width -indent  \" Differs from above in tag removed 
+.It Fl c                 \"-a flag as a list item
+Turns off automatic centering and placing on platform of the model.
+.It Fl d Ar PREFIX
+Causes each slice layer to be dumped to an SVG file with the given prefix.
+.It Fl f Ar FLOAT
+Input filament diameter in millimeters.
+.It Fl F Ar FLOAT
+Input filament feedrate in millimeters per second.
+.It Fl i Ar FLOAT
+Infill density.  0.0 to 1.0.
+.It Fl l Ar FLOAT
+Slice layer thickness, in millimeters.  (0.25 to 0.4 recommended.)
+.It Fl m Ar STRING
+Extruded material type to get default settings for. (Usually ABS.)
+.It Fl o Ar FILENAME
+Name of file to write output to.  Usually goes to stdout.
+.It Fl p Ar INT
+Number of perimeter shells to create. (1 to 3 recommended.)
+.It Fl r Ar FLOAT
+Extrusion width over thickness ratio. (1.2 to 2.0 recommended.)
+.It Fl s Ar FLOAT
+Scale model by the given factor.
+.It Fl z Ar FLOAT
+Slice only the layer at the given Z level.  Useful with -d for debugging.
+.El                      \" Ends the list
+.Pp
+.\" .Sh ENVIRONMENT      \" May not be needed
+.\" .Bl -tag -width "ENV_VAR_1" -indent \" ENV_VAR_1 is width of the string ENV_VAR_1
+.\" .It Ev ENV_VAR_1
+.\" Description of ENV_VAR_1
+.\" .It Ev ENV_VAR_2
+.\" Description of ENV_VAR_2
+.\" .El                      
+.Sh FILES                \" File used or created by the topic of the man page
+.Bl -tag -width "~/.mandoline/materials" -compact
+.It Pa ~/.mandoline/defaults
+The defaults for all the
+.Nm
+settings.
+.It Pa ~/.mandoline/materials
+Material specific settings for
+.Nm .
+.El                      \" Ends the list
+.\" .Sh DIAGNOSTICS       \" May not be needed
+.\" .Bl -diag
+.\" .It Diagnostic Tag
+.\" Diagnostic informtion here.
+.\" .It Diagnostic Tag
+.\" Diagnostic informtion here.
+.\" .El
+.Sh SEE ALSO 
+.\" List links in ascending order by section, alphabetically within a section.
+.\" Please do not reference files that do not exist without filing a bug report
+.Xr skeinforge.py 1 , 
+.Xr ReplicatorG 1
+.Sh BUGS              \" Document known, unremedied bugs 
+Numerous.
+Can't read ASCII STL files.
+.\" .Sh HISTORY           \" Document history if command behaves in a unique manner

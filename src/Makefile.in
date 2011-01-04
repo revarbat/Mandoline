@@ -1,0 +1,86 @@
+# Makefile for getStats
+CC = @CC@
+CXX = @CXX@
+CFLAGS =  @CFLAGS@
+CXXFLAGS = @CXXFLAGS@
+LDFLAGS = @LDFLAGS@
+LIBS = @LIBS@
+LIBTOOL = libtool
+
+# define where to find programs for various targets
+INSTALL = @INSTALL@
+DEPEND = makedepend
+TAGS = etags
+LINT = splint -DARRAY=
+
+# define where we'll install the binaries
+BINDIR = @prefix@/bin
+
+# create variables for the list of binaries and libraries
+BINS = mandoline
+SRCS = Stopwatch.cc SlicingContext.cc CarvedSlice.cc OpQueue.cc OpThread.cc \
+       CarveOp.cc InsetOp.cc InfillOp.cc SvgDumpOp.cc PathFinderOp.cc GCodeExportOp.cc \
+       Mandoline.cc
+OBJS = $(patsubst %.cc,%.o,$(SRCS))
+
+all: mandoline
+
+
+mandoline: BGL/libBGL.a $(OBJS)
+	$(CXX) -g $(CFLAGS) $(CXXFLAGS) $(OBJS) BGL/libBGL.a $(LIBS) $(LDFLAGS) -o $@
+
+
+.cc.o: %.d
+	$(CXX) -c $(CFLAGS) $(CXXFLAGS) -o $@ $<
+
+
+BGL/libBGL.a:
+	cd BGL && $(MAKE) CFLAGS="$(CFLAGS)" CXXFLAGS="$(CXXFLAGS)"
+
+
+# declare and define the .PHONY targets
+.PHONY: all distclean clean install uninstall depend lint
+
+# build emacs tags
+tags: $(SRCS)
+	cd BGL && $(MAKE) tags
+	$(TAGS) $(SRCS) *.h
+
+# check the code for errors/security holes
+# --> Can't get splint to work with typedefs
+#     stay tuned ...
+#lint: $(SRCS)
+#	$(LINT) $(SRCS)
+
+# build the dependency list (see end of this Makefile)
+depend: $(SRCS)
+	cd BGL && $(MAKE) depend
+	$(CXX) -E -MM $(SRCS) *.h > .depend
+
+# rm executibles and object files from the build directory
+clean:
+	cd BGL && $(MAKE) clean
+	$(RM) $(BINS) $(OBJS)
+
+# rm executibles and object files from the build directory
+distclean: clean
+	cd BGL && $(MAKE) distclean
+	$(RM) .depend gmon.out core.* core *~ TAGS
+	$(RM) config.h config.status config.log Makefile.bak Makefile
+	$(RM) -rf autom4te.cache
+
+# install the code in the binaries directory
+install:
+	@ echo "Installing" $(BINS)
+	$(INSTALL) $(BINS) $(BINDIR)
+
+# remove the binaries from the bin/ directory
+uninstall:
+	@ echo "Uninstalling" $(BINS)
+	cd $(BINDIR); $(RM) $(BINS);
+
+
+# when 'make depend' is run, it'll replace everything
+#  below this line with new object targets
+
+# DO NOT DELETE THIS LINE -- make depend depends on it.

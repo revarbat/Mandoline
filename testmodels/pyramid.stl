@@ -1,0 +1,30 @@
+solid Default
+  facet normal 0 0 0
+    outer loop
+      vertex -10 -10 0
+      vertex 10 -10 0
+      vertex 0 15 0
+    endloop
+  endfacet
+  facet normal 0 0 0
+    outer loop
+      vertex -10 -10 0
+      vertex 10 -10 0
+      vertex 0 0 15
+    endloop
+  endfacet
+  facet normal 0 0 0
+    outer loop
+      vertex 10 -10 0
+      vertex 0 10 0
+      vertex 0 0 15
+    endloop
+  endfacet
+  facet normal 0 0 0
+    outer loop
+      vertex 0 10 0
+      vertex -10 -10 0
+      vertex 0 0 15
+    endloop
+  endfacet
+endsolid Default
