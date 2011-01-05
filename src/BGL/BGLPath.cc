@@ -402,24 +402,22 @@ Paths &Path::repairUnclosedPaths(const Paths &paths, Paths &outPaths)
 
 void Path::splitSegmentsAtIntersectionsWithPath(const Path &path)
 {
-    Lines::iterator itera = segments.begin();
-    for (; itera != segments.end(); itera++) {
-	Line& seg1 = *itera;
-	Lines::const_iterator iterb = path.segments.begin();
-	for (; iterb != path.segments.end(); iterb++) {
-	    const Line& seg2 = *iterb;
-	    Intersection isect = seg1.intersectionWithSegment(seg2);
+    Lines::iterator itera;
+    for (itera = segments.begin(); itera != segments.end(); itera++) {
+	Lines::const_iterator iterb;
+	for (iterb = path.segments.begin(); iterb != path.segments.end(); iterb++) {
+	    Intersection isect = itera->intersectionWithSegment(*iterb);
 	    if (isect.type != NONE) {
-		if (!seg1.hasEndPoint(isect.p1)) {
-		    segments.insert(++itera, Line(isect.p1, seg1.endPt));
-		    seg1.endPt = isect.p1;
+		if (!itera->hasEndPoint(isect.p1)) {
+		    Point tempPt = itera->startPt;
+		    itera->startPt = isect.p1;
+		    itera = segments.insert(itera, Line(tempPt, isect.p1));
 		}
 		if (isect.type == SEGMENT) {
-		    if (!seg1.hasEndPoint(isect.p2)) {
-			if (seg1.contains(isect.p2)) {
-			    segments.insert(++itera, Line(isect.p2, seg1.endPt));
-			    seg1.endPt = isect.p2;
-			}
+		    if (!itera->hasEndPoint(isect.p2) && itera->contains(isect.p2)) {
+			Point tempPt = itera->startPt;
+			itera->startPt = isect.p2;
+			itera = segments.insert(itera, Line(tempPt, isect.p2));
 		    }
 		}
 	    }
