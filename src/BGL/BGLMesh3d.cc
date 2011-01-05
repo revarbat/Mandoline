@@ -11,7 +11,7 @@
 #include "BGLLine.h"
 #include "BGLPath.h"
 #include "BGLCompoundRegion.h"
-#include "BGLTriangle3D.h"
+#include "BGLTriangle3d.h"
 
 namespace BGL {
 

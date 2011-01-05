@@ -8,7 +8,7 @@
 #include "CarveOp.h"
 #include "InfillOp.h"
 #include "InsetOp.h"
-#include "SVGDumpOp.h"
+#include "SvgDumpOp.h"
 #include "PathFinderOp.h"
 #include "GCodeExportOp.h"
 #include "BGL/BGL.h"
