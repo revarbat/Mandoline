@@ -34,7 +34,6 @@ Calibration:
   printing on a MakerBot CupcakeCNC with a Mk5 extruder.  Machines vary a
   lot, though, so you'll need to calibrate for your machine.
 
-  //TODO: Come up with a good calibration scheme.
 
 Usage:
 Mandoline is a lightning-fast command-line program that slices 3D files into toolpaths for home-build thermoplastic-extrusion 3D printers like the RepRap or MakerBot. It can currently parse 3D input files in .STL binary or ASCII formats. Output will be in G-Code or .S3G formatted files. (Not yet implemented)
@@ -59,3 +58,30 @@ Options include:
   -r FLOAT    Rotate by X degrees around Z axis.
   -t INT      Number of Threads in threadpool.
   -d STRING   For every layer, saves an SVG file with the given prefix.
+
+
+
+TODO: 
+From Revar on 2010-12-30:
+Things that are implemented:
+ Multithreading.  Uses a thread pool with configurable thread count.
+ Simple geometry code.
+ CompoundRegion constructive boolean geometry.
+ STL reading.  (ASCII and binary)
+ Carving.  Slices the STL into CompoundRegions.
+ Interior Infill.  Generates rectangular infill paths of appropriate density.
+ SVG Dumping.  Generates an SVG file per layer to show what is going on.
+
+Things to do:
+Come up with a good calibration scheme.
+ Debug the CompoundRegion constructive boolean geometry code.
+ Raft/Raftless.
+ Inset.  Write the Inset code to inset CompoundRegions, so we can make shells.
+ Support.  I want to have it handle multiple tool heads, or same-material support structures.
+ Bridging/Surface Infill.  Look ahead and behind to determine what areas need 100% infill.
+ PathFinder.  (with Comb) Join and optimize the isolated paths into contiguous tool paths.
+ Export. I'd like it to generate either GCode or .s3g files.
+
+When the Inset code is done, and the CompoundRegion union/difference/intersection code is debugged, most of the rest of the to-do list becomes simpler.  Inset obviously needs inset code.  Surface Infill/Bridging uses the boolean geometry code to figure out what needs surfacing.
+
+I've been concentrating on the geometry library and the infill code so far.  If someone wants to take on the Comb, PathFinder and Export subsystems, that'd be awesome.
