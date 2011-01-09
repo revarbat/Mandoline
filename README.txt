@@ -37,5 +37,25 @@ Calibration:
   //TODO: Come up with a good calibration scheme.
 
 Usage:
-  //TODO: document settings.
+Mandoline is a lightning-fast command-line program that slices 3D files into toolpaths for home-build thermoplastic-extrusion 3D printers like the RepRap or MakerBot. It can currently parse 3D input files in .STL binary or ASCII formats. Output will be in G-Code or .S3G formatted files. (Not yet implemented)
 
+At the moment it doesn't yet output toolpaths of any sort, so it's far less than useful. It's an alpha state progress demo, really.
+
+You can dump SVG files for each layer, for debugging purposes. What is implemented is the basic carve and interior infill. And that's buggy. It won't do multiple shells and insets and rafts and comb yet.
+
+What is implemented, though, is extremely fast. I mean OMGWTFBBQ fast. Don't take my word for it. Download the code and compile it, and slice a complex STL file with it. If comparing it to another slicer, compare the Carve and Infill times.
+
+Usage:
+mandoline [OPTIONS] FILE.stl
+Options include:
+
+  -i FLOAT    Infill density.  From 0.0 to 1.0.
+  -l FLOAT    Layer thickness. (mm)
+  -f FLOAT    Filament diameter. (mm)
+  -F FLOAT    Filament feedrate. (mm/sec)
+  -r FLOAT    Width/Thickness ratio.
+  -p INT      Number of perimeter shells. (Not implemented yet)
+  -s FLOAT    Scale model by factor.
+  -r FLOAT    Rotate by X degrees around Z axis.
+  -t INT      Number of Threads in threadpool.
+  -d STRING   For every layer, saves an SVG file with the given prefix.
