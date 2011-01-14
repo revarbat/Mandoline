@@ -88,6 +88,9 @@ public:
     bool hasEdgeWithPoint(const Point &pt) const;
     bool contains(const Point &pt) const;
 
+    void setTemperature(float val);
+    void setWidth(float val);
+
     Lines::const_iterator begin() const { return segments.begin(); }
     Lines::const_reverse_iterator rbegin() const { return segments.rbegin(); }
     Lines::const_iterator end() const { return segments.begin(); }
@@ -118,6 +121,9 @@ public:
 
     Lines &containedSegments(const Line &line, Lines &outSegs) const;
     Paths &containedSubpathsOfPath(Path &path, Paths outPaths) const;
+
+    Paths &leftOffset(float offsetby, Paths& outPaths);
+    Paths &inset(float offsetby, Paths& outPaths);
 
     // Friend functions
     friend ostream& operator <<(ostream &os,const Path &pt);

@@ -158,6 +158,12 @@ public:
 	return atan2f(delta.y,delta.x);
     }
 
+    Point &polarOffset(float ang, float rad) {
+        x += rad*cos(ang);
+	y += rad*sin(ang);
+	return *this;
+    }
+
     // Friend functions
     friend ostream& operator <<(ostream &os,const Point &pt);
 };

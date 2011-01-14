@@ -274,6 +274,19 @@ Intersection Line::intersectionWithExtendedLine(const Line &ln) const
 
 
 
+Line& Line::leftOffset(float offsetby)
+{
+    float ang = angle();
+    float pang = ang + M_PI_2;  /* 90 degs ccw */
+    Point offPt;
+    offPt.polarOffset(pang, offsetby);
+    startPt += offPt;
+    endPt += offPt;
+    return *this;
+}
+
+
+
 ostream& operator <<(ostream &os, const Line &ln)
 {
     os << "[" << ln.startPt << " - " << ln.endPt << "]";

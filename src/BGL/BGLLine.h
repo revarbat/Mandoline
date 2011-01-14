@@ -30,17 +30,45 @@ public:
     Point startPt;
     Point endPt;
     int16_t flags;
+    float temperature;
+    float extrusionWidth;
 
     // Constructors
-    Line() : startPt(), endPt() {}
-    Line(const Point& p1, const Point& p2) : startPt(p1), endPt(p2) {}
-    Line(const Line& ln) : startPt(ln.startPt), endPt(ln.endPt) {}
+    Line() :
+        startPt(),
+	endPt(),
+	flags(0),
+	temperature(0),
+	extrusionWidth(0)
+    {
+    }
+
+    Line(const Point& p1, const Point& p2) :
+        startPt(p1),
+	endPt(p2),
+	flags(0),
+	temperature(0),
+	extrusionWidth(0)
+    {
+    }
+
+    Line(const Line& ln) :
+        startPt(ln.startPt),
+        endPt(ln.endPt),
+	flags(ln.flags),
+        temperature(ln.temperature),
+	extrusionWidth(ln.extrusionWidth)
+    {
+    }
 
     // Assignment operator
     Line& operator=(const Line &rhs) {
 	if (this != &rhs) {
 	    startPt = rhs.startPt;
 	    endPt = rhs.endPt;
+	    flags = rhs.flags;
+	    temperature = rhs.temperature;
+	    extrusionWidth = rhs.extrusionWidth;
 	}
 	return *this;
     }
@@ -140,7 +168,7 @@ public:
         return startPt.angleToPoint(endPt);
     }
     float angleDelta(const Line& ln) const {
-        float delta = angle() - ln.angle();
+        float delta = ln.angle() - angle();
 	if (delta < -M_PI) {
 	    delta += M_PI * 2.0f;
 	} else if (delta > M_PI) {
@@ -165,6 +193,8 @@ public:
     float minimumExtendedLineDistanceFromPoint(const Point &pt) const;
     Intersection intersectionWithSegment(const Line &ln) const;
     Intersection intersectionWithExtendedLine(const Line &ln) const;
+
+    Line& leftOffset(float offsetby);
 
     // Friend functions
     friend ostream& operator <<(ostream &os,const Line &pt);

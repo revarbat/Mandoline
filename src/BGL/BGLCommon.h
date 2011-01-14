@@ -26,6 +26,12 @@ typedef enum {
 } Relation;
 
 
+typedef enum {
+    VALID = 0,
+    INVALID = 1,
+    CONSECUTIVELY_INVALID = 2
+} Validity;
+
 }
 #endif
 

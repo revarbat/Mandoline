@@ -72,6 +72,26 @@ float Path::area() const
 
 
 
+void Path::setTemperature(float val)
+{
+    Lines::iterator itera = segments.begin();
+    for (; itera != segments.end(); itera++) {
+        itera->temperature = val;
+    }
+}
+
+
+
+void Path::setWidth(float val)
+{
+    Lines::iterator itera = segments.begin();
+    for (; itera != segments.end(); itera++) {
+        itera->extrusionWidth = val;
+    }
+}
+
+
+
 Bounds Path::bounds() const
 {
     Bounds bnds;
@@ -728,6 +748,151 @@ Paths &Path::containedSubpathsOfPath(Path &path, Paths outPaths) const
     }
     
     return assemblePathsFromSegments(outSegs, outPaths);
+}
+
+
+
+Paths &Path::leftOffset(float offsetby, Paths& outPaths)
+{
+    Path offsetPath;
+    Lines offsetLines;
+    Lines::iterator itera;
+    Lines::iterator iterb;
+    Lines::iterator iterc;
+    Lines::iterator prevValid;
+    int lastValidity = VALID;
+    Point prevPt;
+    bool closed = isClosed();
+
+    if (segments.size() == 0) {
+        return outPaths;
+    }
+    if (segments.size() == 1) {
+	Line ln(segments.front());
+	ln.leftOffset(offsetby);
+	Path outPath;
+        outPath.attach(ln);
+	outPaths.push_back(outPath);
+        return outPaths;
+    }
+
+    // Make raw insets lines.
+    if (closed) {
+        // TODO: handle closure
+    } else {
+	prevPt = segments.front().startPt;
+    }
+    for (iterb = segments.begin(), itera = iterb++, iterc = itera;
+         iterb != segments.end();
+	 itera++, iterb++
+    ) {
+        float ang = itera->angle();
+        float deltaAng = itera->angleDelta(*iterb);
+	float bisectAng = (M_PI-deltaAng)/2.0f + ang;
+
+	Point bisectPt(itera->endPt);
+	bisectPt.polarOffset(bisectAng, offsetby);
+
+	Line ln(prevPt, bisectPt);
+	if (fabs(itera->angleDelta(ln)) > M_PI_2) {
+	    // Line got reversed by insetting.  Mark it invalid.
+	    if (lastValidity != VALID) {
+		ln.flags = CONSECUTIVELY_INVALID;
+		if (iterc->flags == INVALID) {
+		    iterc->flags = CONSECUTIVELY_INVALID;
+		}
+	    } else {
+		ln.flags = INVALID;
+	    }
+	} else {
+	    ln.flags = VALID;
+	    prevValid = itera;
+	}
+	lastValidity = ln.flags;
+	offsetLines.push_back(ln);
+
+	prevPt = bisectPt;
+	iterc = itera;
+    }
+    if (closed) {
+        // TODO: handle closure
+    } else {
+	Line ln(prevPt, itera->endPt);
+	if (fabs(itera->angleDelta(ln)) > M_PI_2) {
+	    // Line got reversed by insetting.  Mark it invalid.
+	    if (lastValidity == INVALID) {
+		ln.flags = CONSECUTIVELY_INVALID;
+	    } else {
+		ln.flags = INVALID;
+	    }
+	} else {
+	    ln.flags = VALID;
+	}
+	lastValidity = ln.flags;
+	offsetLines.push_back(ln);
+    }
+
+    // Start pruning invalid segments.
+    Lines::iterator nextValid = offsetLines.end();
+    for (itera = offsetLines.begin(), iterb = segments.begin();
+         itera != offsetLines.end();
+	 itera++, iterb++
+    ) {
+        if (itera->flags != VALID) {
+	    bool didUpdate = false;
+
+	    // Find next valid line.
+	    nextValid = itera;
+	    for (int limit = 2; limit-->0;) {
+		while (nextValid != offsetLines.end() && nextValid->flags != VALID) {
+		    nextValid++;
+		}
+		if (nextValid == offsetLines.end()) {
+		    if (limit>0) {
+			nextValid = offsetLines.begin();
+			continue;
+		    }
+		}
+		break;
+	    }
+	    if (nextValid == offsetLines.end()) {
+	        // No valid segments!  We have a null path.
+		offsetLines.clear();
+		break;
+	    }
+
+	    if (itera->flags == INVALID) {
+	        // case I
+		Intersection isect = prevValid->intersectionWithExtendedLine(*nextValid);
+		prevValid->endPt = isect.p1;
+		nextValid->startPt = isect.p1;
+	        itera = offsetLines.erase(itera);
+		iterb++;
+		didUpdate = true;
+	    } else {
+	        // case II
+		// TODO: find matching non-offset segments
+		// TODO: do pairwise intersections of offsets from segments
+	    }
+	    if (!didUpdate) {
+	        // TODO: Connect forward and backwards edge.
+	    }
+	} else {
+	    prevValid = itera;
+	}
+    }
+    // TODO: finish this.
+    return outPaths;
+}
+
+
+
+Paths &Path::inset(float insetby, Paths& outPaths)
+{
+    if (isClockwise()) {
+        insetby = -insetby;
+    }
+    return leftOffset(insetby, outPaths);
 }
 
 
