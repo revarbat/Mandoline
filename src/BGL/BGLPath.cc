@@ -14,6 +14,19 @@ using namespace BGL;
 namespace BGL {
 
 
+Path::Path(int cnt, const Point* pts)
+{
+    Point prev = pts[0];
+    flags = 0;
+    for (int i = 1; i < cnt; i++) {
+        Line ln(prev,pts[i]);
+	attach(ln);
+	prev = pts[i];
+    }
+}
+
+
+
 // Comparison operators
 bool Path::operator==(const Path &rhs) const
 {
@@ -107,7 +120,7 @@ Bounds Path::bounds() const
 
 bool Path::couldAttach(const Line& ln) const
 {
-    if (size() > 0) return true;
+    if (size() < 1) return true;
     if (hasEndPoint(ln.startPt)) return true;
     if (hasEndPoint(ln.endPt)) return true;
     return false;
@@ -117,7 +130,7 @@ bool Path::couldAttach(const Line& ln) const
 
 bool Path::couldAttach(const Path& path) const
 {
-    if (size() <= 0) return true;
+    if (size() < 1) return true;
     if (hasEndPoint(path.startPoint())) return true;
     if (hasEndPoint(path.endPoint())) return true;
     return false;
@@ -201,6 +214,46 @@ string Path::svgPathWithOffset(float dx, float dy) const
     return out;
 }
 
+
+
+
+ostream &Path::svgPathDataWithOffset(ostream& os, float dx, float dy) const
+{
+    if (size() == 0) {
+	return os;
+    }
+    os.setf(ios::fixed);
+    os.precision(3);
+    float mult = 90.0f / 25.4f;
+    Line prev;
+    Lines::const_iterator itera = segments.begin();
+    bool isfirst = true;
+    for (; itera != segments.end(); itera++) {
+	if (!isfirst) {
+	    os << endl << "    ";
+	}
+	if (isfirst || prev.endPt != itera->startPt) {
+	    os << "M" << ((itera->startPt.x+dx)*mult);
+	    os << "," << ((itera->startPt.y+dy)*mult);
+	    os << endl << "    ";
+	    isfirst = false;
+	}
+	os << "L" << ((itera->endPt.x+dx)*mult);
+	os << "," << ((itera->endPt.y+dy)*mult);
+	prev = *itera;
+    }
+    return os;
+}
+
+
+
+ostream &Path::svgPathWithOffset(ostream& os, float dx, float dy) const
+{
+    os << "<path fill=\"none\" d=\"";
+    svgPathDataWithOffset(os, dx, dy);
+    os << "\" />" << endl;
+    return os;
+}
 
 
 
@@ -577,10 +630,12 @@ Paths& Path::assembleTaggedPaths(Path &path1, uint32_t flags1, Path &path2, uint
     Path* outPath = &outPaths.back();
     while (remaining > 0) {
 	Line &seg = *currseg;
+	cerr << seg << " {" << seg.flags << "}?" << endl;
 	if (seg.flags != USED && outPath->couldAttach(seg)) {
 	    // Found a connected unused segment.
 	    // Attach it to the current path.
 	    seg.flags = USED;
+	    cerr << "  Attach!" << endl;
 	    outPath->attach(seg);
 	    remaining--;
 	    pathLimit = 0;
@@ -591,6 +646,10 @@ Paths& Path::assembleTaggedPaths(Path &path1, uint32_t flags1, Path &path2, uint
 	    
 	    // If path was closed by this segment, remember it and start a new path.
 	    if (outPath->isClosed()) {
+		// DEBUGGING:
+		cerr << "C: ";
+		outPath->svgPathWithOffset(cerr, 10, 10);
+
 		outPaths.push_back(Path());
 		outPath = &outPaths.back();
 		pathLimit = 0;
@@ -609,20 +668,28 @@ Paths& Path::assembleTaggedPaths(Path &path1, uint32_t flags1, Path &path2, uint
 	    
 	    // Find a connected unused segment in the new path.
 	    // Stop looking if we completely circumnavigate the path.
-	    int32_t limit;
-	    for (limit = patha->size(); limit >= 0; limit--) {
+	    int32_t limit = 0;
+	    for (limit = patha->size(); limit > 0; limit--) {
 		currseg++;
 		if (currseg == patha->segments.end()) {
 		    currseg = patha->segments.begin();
 		}
+		cerr << "  Advance: " << *currseg << " {" << currseg->flags << "}" << endl;
 		if (currseg->flags != USED && outPath->couldAttach(*currseg)) {
+		    cerr << "    Could!" << endl;
 		    break;
 		}
 	    }
+	    cerr << "  blah!" << endl;
 	    
-	    if (limit == 0 && remaining > 0 && pathLimit == 2) {
+	    if (limit == 0 && remaining > 0 && pathLimit >= 2) {
 		// Failed to find another connected segment in either path.
 		// Remember this path, and start a new one.
+
+		// DEBUGGING:
+		cerr << "A: ";
+		outPath->svgPathWithOffset(cerr, 10, 10);
+
 		outPaths.push_back(Path());
 		outPath = &outPaths.back();
 		pathLimit = 0;
@@ -630,8 +697,12 @@ Paths& Path::assembleTaggedPaths(Path &path1, uint32_t flags1, Path &path2, uint
 	}
     }
     if (outPath->size() == 0) {
-	// Remember the final path.
+	// Drop final path if empty.
 	outPaths.pop_back();
+    } else {
+	// DEBUGGING:
+	cerr << "B: ";
+	outPath->svgPathWithOffset(cerr, 10, 10);
     }
     
     return outPaths;

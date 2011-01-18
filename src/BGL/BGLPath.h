@@ -32,6 +32,7 @@ public:
 
     // Constructors
     Path() : flags(0), segments() {}
+    Path(int cnt, const Point* pts);
     Path(const Lines& x) : flags(0), segments(x) {}
     Path(const Path& x) : flags(x.flags), segments(x.segments) {}
 
@@ -80,6 +81,8 @@ public:
     bool attach(const Path& path);
 
     string svgPathWithOffset(float dx, float dy) const;
+    ostream &svgPathDataWithOffset(ostream& os, float dx, float dy) const;
+    ostream &svgPathWithOffset(ostream& os, float dx, float dy) const;
 
     bool intersects(const Line &ln) const;
     bool intersects(const Path &path) const;

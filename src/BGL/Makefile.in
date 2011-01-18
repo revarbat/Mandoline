@@ -39,6 +39,9 @@ libBGL.a: $(OBJS)
 tags: $(SRCS)
 	$(TAGS) $(SRCS) *.h
 
+test: libBGL.a test.o
+	$(CXX) -o testbools $(CFLAGS) $(CPPFLAGS) test.o libBGL.a
+
 # check the code for errors/security holes
 # --> Can't get splint to work with typedefs
 #     stay tuned ...
@@ -51,7 +54,7 @@ depend: $(SRCS)
 
 # rm executibles and object files from the build directory
 clean:
-	$(RM) $(BINS) $(OBJS)
+	$(RM) $(BINS) $(OBJS) testbools test.o
 
 # rm executibles and object files from the build directory
 distclean: clean
