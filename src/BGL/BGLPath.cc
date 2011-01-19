@@ -316,9 +316,9 @@ Intersections &Path::intersectionsWith(const Line &ln, Intersections &outISects)
 
 bool Path::hasEdgeWithPoint(const Point &pt) const
 {
-    Lines::const_iterator itera = segments.begin();
-    for (; itera != segments.end(); itera++) {
-	if (itera->isLinearWith(pt)) {
+    Lines::const_iterator itera;
+    for (itera = segments.begin(); itera != segments.end(); itera++) {
+	if (itera->contains(pt)) {
 	    return true;
 	}
     }
@@ -591,13 +591,13 @@ void Path::tagSegmentsRelativeToClosedPath(const Path &path)
 
 Paths& Path::assembleTaggedPaths(Path &path1, uint32_t flags1, Path &path2, uint32_t flags2, Paths &outPaths)
 {
-    uint32_t remaining = path1.size() + path2.size();
-    
     // Tag segments for insideness, outsideness, or sharedness.
     path1.untag();
     path1.tagSegmentsRelativeToClosedPath(path2);
     path2.untag();
     path2.tagSegmentsRelativeToClosedPath(path1);
+    
+    uint32_t remaining = path1.size() + path2.size();
     
     // Mark all unwanted segments in path1 as used.
     Lines::iterator itera = path1.segments.begin();
@@ -611,7 +611,7 @@ Paths& Path::assembleTaggedPaths(Path &path1, uint32_t flags1, Path &path2, uint
     // Mark all unwanted segments in path2 as used.
     Lines::iterator iterb = path2.segments.begin();
     for (; iterb != path2.segments.end(); iterb++) {
-	if ((iterb->flags & flags1) == 0) {
+	if ((iterb->flags & flags2) == 0) {
 	    iterb->flags = USED;
 	    remaining--;
 	}
@@ -630,12 +630,10 @@ Paths& Path::assembleTaggedPaths(Path &path1, uint32_t flags1, Path &path2, uint
     Path* outPath = &outPaths.back();
     while (remaining > 0) {
 	Line &seg = *currseg;
-	cerr << seg << " {" << seg.flags << "}?" << endl;
 	if (seg.flags != USED && outPath->couldAttach(seg)) {
 	    // Found a connected unused segment.
 	    // Attach it to the current path.
 	    seg.flags = USED;
-	    cerr << "  Attach!" << endl;
 	    outPath->attach(seg);
 	    remaining--;
 	    pathLimit = 0;
@@ -646,10 +644,6 @@ Paths& Path::assembleTaggedPaths(Path &path1, uint32_t flags1, Path &path2, uint
 	    
 	    // If path was closed by this segment, remember it and start a new path.
 	    if (outPath->isClosed()) {
-		// DEBUGGING:
-		cerr << "C: ";
-		outPath->svgPathWithOffset(cerr, 10, 10);
-
 		outPaths.push_back(Path());
 		outPath = &outPaths.back();
 		pathLimit = 0;
@@ -674,22 +668,14 @@ Paths& Path::assembleTaggedPaths(Path &path1, uint32_t flags1, Path &path2, uint
 		if (currseg == patha->segments.end()) {
 		    currseg = patha->segments.begin();
 		}
-		cerr << "  Advance: " << *currseg << " {" << currseg->flags << "}" << endl;
 		if (currseg->flags != USED && outPath->couldAttach(*currseg)) {
-		    cerr << "    Could!" << endl;
 		    break;
 		}
 	    }
-	    cerr << "  blah!" << endl;
 	    
 	    if (limit == 0 && remaining > 0 && pathLimit >= 2) {
 		// Failed to find another connected segment in either path.
 		// Remember this path, and start a new one.
-
-		// DEBUGGING:
-		cerr << "A: ";
-		outPath->svgPathWithOffset(cerr, 10, 10);
-
 		outPaths.push_back(Path());
 		outPath = &outPaths.back();
 		pathLimit = 0;
@@ -699,10 +685,6 @@ Paths& Path::assembleTaggedPaths(Path &path1, uint32_t flags1, Path &path2, uint
     if (outPath->size() == 0) {
 	// Drop final path if empty.
 	outPaths.pop_back();
-    } else {
-	// DEBUGGING:
-	cerr << "B: ";
-	outPath->svgPathWithOffset(cerr, 10, 10);
     }
     
     return outPaths;
@@ -710,16 +692,16 @@ Paths& Path::assembleTaggedPaths(Path &path1, uint32_t flags1, Path &path2, uint
 
 
 
-Paths &Path::differenceOf(Path &path1, Path &path2, Paths &outPaths)
+Paths &Path::unionOf(Path &path1, Path &path2, Paths &outPaths)
 {
-    return assembleTaggedPaths(path1, INSIDE, path2, (OUTSIDE|UNSHARED), outPaths);
+    return assembleTaggedPaths(path1, (OUTSIDE|SHARED), path2, OUTSIDE, outPaths);
 }
 
 
 
-Paths &Path::unionOf(Path &path1, Path &path2, Paths &outPaths)
+Paths &Path::differenceOf(Path &path1, Path &path2, Paths &outPaths)
 {
-    return assembleTaggedPaths(path1, (OUTSIDE|SHARED), path2, OUTSIDE, outPaths);
+    return assembleTaggedPaths(path1, (OUTSIDE|UNSHARED), path2, INSIDE, outPaths);
 }
 
 

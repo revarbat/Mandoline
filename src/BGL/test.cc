@@ -16,7 +16,7 @@ ostream &svgHeader(ostream &os, float width, float height)
     os << " height=\"" << height << "mm\"";
     os << " viewport=\"0 0 " << pwidth << " " << pheight << "\"";
     os << " stroke=\"black\"";
-    os << " >" << endl;
+    os << ">" << endl;
 
     return os;
 } 
@@ -31,82 +31,105 @@ ostream &svgFooter(ostream& os)
 
 
 
-BGL::Point testPath1[] = {
+// Squiggle
+BGL::Point squigglePoints[] = {
+    BGL::Point(15.0, 25.0),
     BGL::Point( 0.0, 15.0),
-    BGL::Point(20.0, 30.0),
+    BGL::Point(15.0,  0.0),
+    BGL::Point(25.0,  0.0),
+    BGL::Point(25.0,  5.0),
+    BGL::Point(20.0,  5.0),
+    BGL::Point(20.0,  2.5),
+    BGL::Point(12.5, 10.0),
     BGL::Point(40.0, 15.0),
-    BGL::Point(20.0,  0.0),
-    BGL::Point( 0.0, 15.0)
+    BGL::Point(40.0, 25.0),
+    BGL::Point(15.0, 25.0)
 };
 
 
-BGL::Point testPath2[] = {
-    BGL::Point( 5.0, 25.0),
+// Rectangle, mostly
+BGL::Point rectPoints[] = {
     BGL::Point( 5.0,  5.0),
-    BGL::Point(35.0,  5.0),
+    BGL::Point( 5.0, 25.0),
+    BGL::Point(20.0, 25.0),
+    BGL::Point(22.5, 30.0),
+    BGL::Point(25.0, 20.0),
+    BGL::Point(27.5, 25.0),
     BGL::Point(35.0, 25.0),
-    BGL::Point( 5.0, 25.0)
+    BGL::Point(35.0,  5.0),
+    BGL::Point( 5.0,  5.0)
 };
 
 
 int main(int argc, char**argv)
 {
-    BGL::Path path1(sizeof(testPath1)/sizeof(BGL::Point), testPath1);
-    BGL::Path path2(sizeof(testPath2)/sizeof(BGL::Point), testPath2);
+    BGL::Path squigglePath(sizeof(squigglePoints)/sizeof(BGL::Point), squigglePoints);
+    BGL::Path rectPath(sizeof(rectPoints)/sizeof(BGL::Point), rectPoints);
 
     fstream fout;
 
-    fout.open("test_orig.svg", fstream::out | fstream::trunc);
+    fout.open("test001-orig.svg", fstream::out | fstream::trunc);
     if (fout.good()) {
-	svgHeader(fout, 300, 300);
-	path1.svgPathWithOffset(fout, 10, 10);
-	path2.svgPathWithOffset(fout, 10, 10);
+	svgHeader(fout, 100, 100);
+
+	fout << "<g stroke=\"blue\" stroke-width=\"3\">" << endl;
+	squigglePath.svgPathWithOffset(fout, 10, 10);
+	fout << "</g>" << endl;
+
+	fout << "<g stroke=\"green\">" << endl;
+	rectPath.svgPathWithOffset(fout, 10, 10);
+	fout << "</g>" << endl;
+
 	svgFooter(fout);
+	fout.sync();
 	fout.close();
     }
 
-    fout.open("test_union.svg", fstream::out | fstream::trunc);
+    fout.open("test002-union.svg", fstream::out | fstream::trunc);
     if (fout.good()) {
-	svgHeader(fout, 300, 300);
+	svgHeader(fout, 100, 100);
 
 	BGL::Paths outPaths;
-	BGL::Path::unionOf(path1, path2, outPaths);
 	BGL::Paths::iterator pit;
+	BGL::Path::unionOf(squigglePath, rectPath, outPaths);
 	for (pit = outPaths.begin(); pit != outPaths.end(); pit++) {
 	    pit->svgPathWithOffset(fout, 10, 10);
 	}
 
 	svgFooter(fout);
+	fout.sync();
 	fout.close();
     }
 
-    fout.open("test_diff.svg", fstream::out | fstream::trunc);
+    fout.open("test003-diff.svg", fstream::out | fstream::trunc);
     if (fout.good()) {
-	svgHeader(fout, 300, 300);
+	svgHeader(fout, 100, 100);
 
 	BGL::Paths outPaths;
-	BGL::Path::differenceOf(path1, path2, outPaths);
 	BGL::Paths::iterator pit;
+	BGL::Path::differenceOf(squigglePath, rectPath, outPaths);
 	for (pit = outPaths.begin(); pit != outPaths.end(); pit++) {
 	    pit->svgPathWithOffset(fout, 10, 10);
 	}
 
 	svgFooter(fout);
+	fout.sync();
 	fout.close();
     }
 
-    fout.open("test_isect.svg", fstream::out | fstream::trunc);
+    fout.open("test004-intersection.svg", fstream::out | fstream::trunc);
     if (fout.good()) {
-	svgHeader(fout, 300, 300);
+	svgHeader(fout, 100, 100);
 
 	BGL::Paths outPaths;
-	BGL::Path::intersectionOf(path1, path2, outPaths);
 	BGL::Paths::iterator pit;
+	BGL::Path::intersectionOf(squigglePath, rectPath, outPaths);
 	for (pit = outPaths.begin(); pit != outPaths.end(); pit++) {
 	    pit->svgPathWithOffset(fout, 10, 10);
 	}
 
 	svgFooter(fout);
+	fout.sync();
 	fout.close();
     }
 
