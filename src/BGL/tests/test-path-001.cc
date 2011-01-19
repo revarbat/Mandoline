@@ -1,5 +1,5 @@
 #include <fstream>
-#include "BGL.h"
+#include "../BGL.h"
 
 ostream &svgHeader(ostream &os, float width, float height)
 {
@@ -68,15 +68,15 @@ int main(int argc, char**argv)
 
     fstream fout;
 
-    fout.open("test001-orig.svg", fstream::out | fstream::trunc);
+    fout.open("output/test-path-001-orig.svg", fstream::out | fstream::trunc);
     if (fout.good()) {
 	svgHeader(fout, 100, 100);
 
-	fout << "<g stroke=\"blue\" stroke-width=\"3\">" << endl;
+	fout << "<g stroke=\"#77f\" stroke-width=\"3\">" << endl;
 	squigglePath.svgPathWithOffset(fout, 10, 10);
 	fout << "</g>" << endl;
 
-	fout << "<g stroke=\"green\">" << endl;
+	fout << "<g stroke=\"#4f4\">" << endl;
 	rectPath.svgPathWithOffset(fout, 10, 10);
 	fout << "</g>" << endl;
 
@@ -85,7 +85,7 @@ int main(int argc, char**argv)
 	fout.close();
     }
 
-    fout.open("test002-union.svg", fstream::out | fstream::trunc);
+    fout.open("output/test-path-001-union.svg", fstream::out | fstream::trunc);
     if (fout.good()) {
 	svgHeader(fout, 100, 100);
 
@@ -101,7 +101,7 @@ int main(int argc, char**argv)
 	fout.close();
     }
 
-    fout.open("test003-diff.svg", fstream::out | fstream::trunc);
+    fout.open("output/test-path-001-diff.svg", fstream::out | fstream::trunc);
     if (fout.good()) {
 	svgHeader(fout, 100, 100);
 
@@ -117,7 +117,7 @@ int main(int argc, char**argv)
 	fout.close();
     }
 
-    fout.open("test004-intersection.svg", fstream::out | fstream::trunc);
+    fout.open("output/test-path-001-intersection.svg", fstream::out | fstream::trunc);
     if (fout.good()) {
 	svgHeader(fout, 100, 100);
 
@@ -133,7 +133,7 @@ int main(int argc, char**argv)
 	fout.close();
     }
 
-    return 1;
+    return 0;
 }
 
 

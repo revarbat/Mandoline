@@ -9,6 +9,7 @@ AC_CONFIG_HEADER([config.h])
 # Checks for programs.
 AC_PROG_CXX
 AC_PROG_CC
+AC_PROG_INSTALL
 
 # Checks for libraries.
 
@@ -41,4 +42,6 @@ AC_ARG_WITH([gprof],
 # Checks for library functions.
 AC_CHECK_FUNCS([floor strcasecmp strncasecmp])
 
-AC_OUTPUT([Makefile])
+AC_CONFIG_FILES([Makefile
+                 tests/Makefile])
+AC_OUTPUT

@@ -17,20 +17,20 @@ LINT = splint -DARRAY=
 BINDIR = @prefix@/bin
 
 # create variables for the list of binaries and libraries
-BINS = libBGL.a
-SRCS = BGLCommon.cc BGLIntersection.cc BGLAffine.cc BGLBounds.cc \
-        BGLPoint.cc BGLLine.cc BGLPath.cc BGLSimpleRegion.cc BGLCompoundRegion.cc \
-	BGLPoint3d.cc BGLTriangle3d.cc BGLMesh3d.cc
+SRCS = test-path-001.cc
 OBJS = $(patsubst %.cc,%.o,$(SRCS))
+BINS = $(patsubst %.cc,%,$(SRCS))
 
-all: libBGL.a
+all: $(BINS)
 
-libBGL.a: $(OBJS)
-	$(LIBTOOL) -static -o $@ $(OBJS)
-
+$(BINS): $(OBJS)
+	$(CXX) $(CFLAGS) $(CPPFLAGS) -o $@ $< ../libBGL.a
+	
 .cc.o:
 	$(CXX) -c $(CFLAGS) $(CPPFLAGS) -o $@ $<
 
+output:
+	mkdir output
 
 # declare and define the .PHONY targets
 .PHONY: all distclean clean depend lint test
@@ -39,8 +39,8 @@ libBGL.a: $(OBJS)
 tags: $(SRCS)
 	$(TAGS) $(SRCS) *.h
 
-test: libBGL.a
-	cd tests && $(MAKE) CFLAGS="$(CFLAGS)" CXXFLAGS="$(CXXFLAGS)" test
+test: output $(BINS)
+	for bin in $(BINS) ; do ./$$bin ; done
 
 # check the code for errors/security holes
 # --> Can't get splint to work with typedefs
@@ -54,15 +54,13 @@ depend: $(SRCS)
 
 # rm executibles and object files from the build directory
 clean:
-	$(RM) $(BINS) $(OBJS) testbools test.o
-	cd tests && $(MAKE) clean
+	$(RM) -rf $(BINS) $(OBJS) output
 
 # rm executibles and object files from the build directory
 distclean: clean
 	$(RM) .depend gmon.out core.* core *~ TAGS
 	$(RM) config.h config.status config.log Makefile.bak Makefile
 	$(RM) -rf autom4te.cache
-	cd tests && $(MAKE) distclean
 
 # when 'make depend' is run, it'll replace everything
 #  below this line with new object targets
