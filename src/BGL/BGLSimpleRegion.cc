@@ -82,10 +82,35 @@ string SimpleRegion::svgPathWithOffset(float dx, float dy)
     out.append(outerPath.svgPathWithOffset(dx, dy));
     Paths::iterator pit = subpaths.begin();
     for ( ; pit != subpaths.end(); pit++) {
+	out.append(" ");
         out.append(pit->svgPathWithOffset(dx, dy));
     }
     return out;
 }
+
+
+
+ostream &SimpleRegion::svgPathDataWithOffset(ostream& os, float dx, float dy) const
+{
+    outerPath.svgPathDataWithOffset(os, dx, dy);
+    Paths::const_iterator pit;
+    for (pit = subpaths.begin(); pit != subpaths.end(); pit++) {
+	os << " ";
+	pit->svgPathDataWithOffset(os, dx, dy);
+    }
+    return os;
+}
+
+
+ostream &SimpleRegion::svgPathWithOffset(ostream& os, float dx, float dy) const
+{
+    os << "<path fill=\"none\" d=\"";
+    svgPathDataWithOffset(os, dx, dy);
+    os << "\" />" << endl;
+    return os;
+}
+
+
 
 
 
@@ -146,23 +171,6 @@ SimpleRegions &SimpleRegion::assembleSimpleRegionsFrom(const Paths &outerPaths, 
 
 
 
-/*
- * Union:
- *   new.outerPaths = r1.outerPath.union(r2.outerPath)
- *   foreach p1 r1.innerPaths {
- *     foreach p2 r2.innerPaths {
- *       new.innerPaths += p1.intersection(p2)
- *     }
- *   }
- *   foreach p1 r1.innerPaths {
- *     new.innerPaths += p1.diff(r2.outerPath)
- *   }
- *   foreach p2 r2.innerPaths {
- *     new.innerPaths += p2.diff(r1.outerPath)
- *   }
- *   unionize all new.innerPaths
- *   sort new innerpaths into SimpleRegions with new outerPaths
- */
 SimpleRegions &SimpleRegion::unionOf(SimpleRegion &r1, SimpleRegion &r2, SimpleRegions &outRegs)
 {
     Paths outerPaths;
@@ -193,22 +201,6 @@ SimpleRegions &SimpleRegion::unionOf(SimpleRegion &r1, SimpleRegion &r2, SimpleR
 
 
 
-/*
- * Difference:
- *   new.outerPaths = r1.outerPath.diff(r2.outerPath)
- *   foreach p2 r2.innerPaths {
- *     new.innerPaths += p2.diff(r1.outerPath)
- *   }
- *   foreach p2 r2.innerPaths {
- *     tempPaths.clear()
- *     foreach p1 new.innerPaths {
- *       tempPaths += p1.diff(p2)
- *     }
- *     new.innerPaths = tempPaths;
- *   }
- *   unionize all new.innerPaths
- *   sort new innerpaths into SimpleRegions with new outerPaths
- */
 SimpleRegions &SimpleRegion::differenceOf(SimpleRegion &r1, SimpleRegion &r2, SimpleRegions &outRegs)
 {
     Paths outerPaths;
@@ -219,9 +211,9 @@ SimpleRegions &SimpleRegion::differenceOf(SimpleRegion &r1, SimpleRegion &r2, Si
 
     Paths newInnerPaths;
     for (it2 = r2.subpaths.begin(); it2 != r2.subpaths.end(); it2++) {
-	Path::differenceOf(*it2, r1.outerPath, newInnerPaths);
+	Path::intersectionOf(*it2, r1.outerPath, newInnerPaths);
     }
-    for (it2 = r2.subpaths.begin(); it2 != r2.subpaths.end(); it2++) {
+    for (it2 = r1.subpaths.begin(); it2 != r1.subpaths.end(); it2++) {
         Paths tempPaths;
 	for (it1 = newInnerPaths.begin(); it1 != newInnerPaths.end(); it1++) {
 	    Path::differenceOf(*it1, *it2, tempPaths);
@@ -261,35 +253,47 @@ SimpleRegions &SimpleRegion::intersectionOf(SimpleRegion &r1, SimpleRegion &r2, 
     Paths::iterator it1;
     Paths::iterator it2;
 
-    Paths newInnerPaths1;
     for (it1 = r1.subpaths.begin(); it1 != r1.subpaths.end(); it1++) {
-	Path::differenceOf(*it1, r2.outerPath, newInnerPaths1);
-    }
-
-    Paths newInnerPaths2;
-    for (it1 = r2.subpaths.begin(); it1 != r2.subpaths.end(); it1++) {
-	Path::differenceOf(*it1, r1.outerPath, newInnerPaths2);
-    }
-
-    Paths innerPaths;
-    Path::unionOf(newInnerPaths1, innerPaths);
-    Path::unionOf(newInnerPaths2, innerPaths);
-
-    Paths innerPaths2;
-    for (it1 = innerPaths.begin(); it1 != innerPaths.end(); it1++) {
-        bool doesIntersect = false;
+	Paths tempPaths;
 	for (it2 = outerPaths.begin(); it2 != outerPaths.end(); it2++) {
-	    if (it1->intersects(*it2)) {
-		Path::differenceOf(*it2, *it1, outerPaths);
-		it2 = outerPaths.erase(it2);
-	        doesIntersect = true;
+	    Path::differenceOf(*it2, *it1, tempPaths);
+	}
+	outerPaths = tempPaths;
+    }
+
+    for (it1 = r2.subpaths.begin(); it1 != r2.subpaths.end(); it1++) {
+	Paths tempPaths;
+	for (it2 = outerPaths.begin(); it2 != outerPaths.end(); it2++) {
+	    Path::differenceOf(*it2, *it1, tempPaths);
+	}
+	outerPaths = tempPaths;
+    }
+
+    bool found;
+    do {
+	found = false;
+	for (it1 = outerPaths.begin(); !found && it1 != outerPaths.end(); it1++) {
+	    for (it2 = it1; !found && it2 != outerPaths.end(); it2++) {
+		if (it1 != it2) {
+		    if (it1->intersects(*it2)) {
+			Paths tempPaths;
+			Path::unionOf(*it1, *it2, tempPaths);
+			if (tempPaths.size() < 2) {
+			    Paths::iterator it3;
+			    for (it3 = tempPaths.begin(); it3 != tempPaths.end(); it3++) {
+				outerPaths.push_back(*it3);
+			    }
+			    it2 = outerPaths.erase(it2);
+			    it1 = outerPaths.erase(it1);
+			    found = true;
+			}
+		    }
+		}
 	    }
 	}
-	if (!doesIntersect) {
-	    innerPaths2.push_back(*it1);
-	}
-    }
-    assembleSimpleRegionsFrom(outerPaths, innerPaths2, outRegs);
+    } while (found);
+
+    assembleSimpleRegionsFrom(outerPaths, outRegs);
     return outRegs;
 }
 

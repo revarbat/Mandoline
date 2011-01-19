@@ -36,6 +36,8 @@ public:
     bool intersects(const SimpleRegion& path) const;
 
     string svgPathWithOffset(float dx, float dy);
+    ostream &svgPathDataWithOffset(ostream& os, float dx, float dy) const;
+    ostream &svgPathWithOffset(ostream& os, float dx, float dy) const;
 
     static SimpleRegions &assembleSimpleRegionsFrom(Paths &paths, SimpleRegions &outRegs);
     static SimpleRegions &assembleSimpleRegionsFrom(const Paths &outerPaths, const Paths &innerPaths, SimpleRegions &outRegs);
