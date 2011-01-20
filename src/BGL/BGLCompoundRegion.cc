@@ -56,12 +56,35 @@ string CompoundRegion::svgPathWithOffset(float dx, float dy)
 
 
 
+ostream &CompoundRegion::svgPathDataWithOffset(ostream& os, float dx, float dy) const
+{
+    SimpleRegions::const_iterator rit;
+    for (rit = subregions.begin(); rit != subregions.end(); rit++) {
+        rit->svgPathDataWithOffset(os, dx, dy);
+    }
+    return os;
+}
+
+
+
+ostream &CompoundRegion::svgPathWithOffset(ostream& os, float dx, float dy) const
+{
+    os << "<path fill=\"none\" d=\"";
+    svgPathDataWithOffset(os, dx, dy);
+    os << "\" />" << endl;
+    return os;
+}
+
+
+
 CompoundRegion &CompoundRegion::unionWith(SimpleRegion &reg)
 {
     SimpleRegion currReg(reg);
     SimpleRegions::iterator rit;
     for (rit = subregions.begin(); rit != subregions.end(); ) {
-        if (reg.intersects(*rit)) {
+	cerr << "unionize?" << endl;
+        if (currReg.intersects(*rit)) {
+	    cerr << "  Intersects!!!" << endl;
 	    SimpleRegions tempRegs;
 	    SimpleRegion::unionOf(currReg, *rit, tempRegs);
 	    currReg = tempRegs.front();
@@ -108,7 +131,7 @@ CompoundRegion &CompoundRegion::intersectionWith(SimpleRegion &reg)
 CompoundRegion &CompoundRegion::unionWith(CompoundRegion &reg)
 {
     SimpleRegions::iterator rit;
-    for (rit = reg.subregions.begin(); rit != reg.subregions.end(); ) {
+    for (rit = reg.subregions.begin(); rit != reg.subregions.end(); rit++) {
         unionWith(*rit);
     }
     return *this;
@@ -119,7 +142,7 @@ CompoundRegion &CompoundRegion::unionWith(CompoundRegion &reg)
 CompoundRegion &CompoundRegion::differenceWith(CompoundRegion &reg)
 {
     SimpleRegions::iterator rit;
-    for (rit = reg.subregions.begin(); rit != reg.subregions.end(); ) {
+    for (rit = reg.subregions.begin(); rit != reg.subregions.end(); rit++) {
         differenceWith(*rit);
     }
     return *this;

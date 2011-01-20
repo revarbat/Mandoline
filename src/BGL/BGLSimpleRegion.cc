@@ -47,9 +47,12 @@ bool SimpleRegion::intersects(const Path &path) const
     if (path.contains(outerPath.startPoint())) {
 	return true;
     }
-    Lines::const_iterator it1;
-    for (it1 = path.begin(); it1 != path.end(); it1++) {
-	if (contains(it1->endPt)) {
+    if (contains(path.startPoint())) {
+	return true;
+    }
+    Paths::const_iterator it1;
+    for (it1 = subpaths.begin(); it1 != subpaths.end(); it1++) {
+	if (it1->intersects(path)) {
 	    return true;
 	}
     }
@@ -60,15 +63,32 @@ bool SimpleRegion::intersects(const Path &path) const
 
 bool SimpleRegion::intersects(const SimpleRegion &reg) const
 {
-    Lines::const_iterator it1;
-    for (it1 = outerPath.begin(); it1 != outerPath.end(); it1++) {
-	if (reg.contains(it1->endPt)) {
+    Paths::const_iterator pit1;
+    Paths::const_iterator pit2;
+    if (contains(reg.outerPath.startPoint())) {
+	return true;
+    }
+    if (reg.contains(outerPath.startPoint())) {
+	return true;
+    }
+    if (outerPath.intersects(reg.outerPath)) {
+	return true;
+    }
+    for (pit1 = subpaths.begin(); pit1 != subpaths.end(); pit1++) {
+	if (pit1->intersects(reg.outerPath)) {
 	    return true;
 	}
     }
-    for (it1 = reg.outerPath.begin(); it1 != reg.outerPath.end(); it1++) {
-	if (contains(it1->endPt)) {
+    for (pit2 = reg.subpaths.begin(); pit2 != reg.subpaths.end(); pit2++) {
+	if (pit2->intersects(outerPath)) {
 	    return true;
+	}
+    }
+    for (pit1 = subpaths.begin(); pit1 != subpaths.end(); pit1++) {
+	for (pit2 = reg.subpaths.begin(); pit2 != reg.subpaths.end(); pit2++) {
+	    if (pit1->intersects(*pit2)) {
+		return true;
+	    }
 	}
     }
     return false;

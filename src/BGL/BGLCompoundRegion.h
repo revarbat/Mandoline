@@ -30,7 +30,10 @@ public:
 
     int32_t size() const;
     bool contains(const Point &pt) const;
+
     string svgPathWithOffset(float dx, float dy);
+    ostream &svgPathDataWithOffset(ostream& os, float dx, float dy) const;
+    ostream &svgPathWithOffset(ostream& os, float dx, float dy) const;
 
     CompoundRegion &unionWith(SimpleRegion &reg);
     CompoundRegion &differenceWith(SimpleRegion &reg);
