@@ -68,7 +68,7 @@ int main(int argc, char**argv)
 
     fstream fout;
 
-    fout.open("output/test-path-001-orig.svg", fstream::out | fstream::trunc);
+    fout.open("output/test-001a-path-orig.svg", fstream::out | fstream::trunc);
     if (fout.good()) {
 	svgHeader(fout, 100, 100);
 
@@ -76,7 +76,7 @@ int main(int argc, char**argv)
 	squigglePath.svgPathWithOffset(fout, 10, 10);
 	fout << "</g>" << endl;
 
-	fout << "<g stroke=\"#4f4\">" << endl;
+	fout << "<g stroke=\"#0c0\">" << endl;
 	rectPath.svgPathWithOffset(fout, 10, 10);
 	fout << "</g>" << endl;
 
@@ -85,7 +85,7 @@ int main(int argc, char**argv)
 	fout.close();
     }
 
-    fout.open("output/test-path-001-union.svg", fstream::out | fstream::trunc);
+    fout.open("output/test-001b-path-union.svg", fstream::out | fstream::trunc);
     if (fout.good()) {
 	svgHeader(fout, 100, 100);
 
@@ -101,7 +101,7 @@ int main(int argc, char**argv)
 	fout.close();
     }
 
-    fout.open("output/test-path-001-diff.svg", fstream::out | fstream::trunc);
+    fout.open("output/test-001c-path-diff.svg", fstream::out | fstream::trunc);
     if (fout.good()) {
 	svgHeader(fout, 100, 100);
 
@@ -117,7 +117,7 @@ int main(int argc, char**argv)
 	fout.close();
     }
 
-    fout.open("output/test-path-001-intersection.svg", fstream::out | fstream::trunc);
+    fout.open("output/test-001d-path-intsect.svg", fstream::out | fstream::trunc);
     if (fout.good()) {
 	svgHeader(fout, 100, 100);
 

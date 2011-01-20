@@ -142,7 +142,7 @@ int main(int argc, char**argv)
 
     fstream fout;
 
-    fout.open("output/test-simpreg-001-orig.svg", fstream::out | fstream::trunc);
+    fout.open("output/test-002a-simpreg-orig.svg", fstream::out | fstream::trunc);
     if (fout.good()) {
 	svgHeader(fout, 100, 100);
 
@@ -150,7 +150,7 @@ int main(int argc, char**argv)
 	regA.svgPathWithOffset(fout, 10, 10);
 	fout << "</g>" << endl;
 
-	fout << "<g stroke=\"#4f4\">" << endl;
+	fout << "<g stroke=\"#0c0\">" << endl;
 	regB.svgPathWithOffset(fout, 10, 10);
 	fout << "</g>" << endl;
 
@@ -159,7 +159,7 @@ int main(int argc, char**argv)
 	fout.close();
     }
 
-    fout.open("output/test-simpreg-001-union.svg", fstream::out | fstream::trunc);
+    fout.open("output/test-002b-simpreg-union.svg", fstream::out | fstream::trunc);
     if (fout.good()) {
 	svgHeader(fout, 100, 100);
 
@@ -175,7 +175,7 @@ int main(int argc, char**argv)
 	fout.close();
     }
 
-    fout.open("output/test-simpreg-001-diff.svg", fstream::out | fstream::trunc);
+    fout.open("output/test-002c-simpreg-diff.svg", fstream::out | fstream::trunc);
     if (fout.good()) {
 	svgHeader(fout, 100, 100);
 
@@ -191,7 +191,7 @@ int main(int argc, char**argv)
 	fout.close();
     }
 
-    fout.open("output/test-simpreg-001-intsect.svg", fstream::out | fstream::trunc);
+    fout.open("output/test-002d-simpreg-intsect.svg", fstream::out | fstream::trunc);
     if (fout.good()) {
 	svgHeader(fout, 100, 100);
 

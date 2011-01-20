@@ -17,7 +17,7 @@ LINT = splint -DARRAY=
 BINDIR = @prefix@/bin
 
 # create variables for the list of binaries and libraries
-SRCS = test-path-001.cc test-simpleregion-001.cc
+SRCS = $(wildcard test-[0-9]*.cc)
 OBJS = $(patsubst %.cc,%.o,$(SRCS))
 BINS = $(patsubst %.cc,%,$(SRCS))
 
