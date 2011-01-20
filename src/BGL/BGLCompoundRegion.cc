@@ -82,9 +82,7 @@ CompoundRegion &CompoundRegion::unionWith(SimpleRegion &reg)
     SimpleRegion currReg(reg);
     SimpleRegions::iterator rit;
     for (rit = subregions.begin(); rit != subregions.end(); ) {
-	cerr << "unionize?" << endl;
         if (currReg.intersects(*rit)) {
-	    cerr << "  Intersects!!!" << endl;
 	    SimpleRegions tempRegs;
 	    SimpleRegion::unionOf(currReg, *rit, tempRegs);
 	    currReg = tempRegs.front();
