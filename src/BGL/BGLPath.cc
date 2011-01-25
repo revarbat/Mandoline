@@ -501,6 +501,67 @@ void Path::splitSegmentsAtIntersectionsWithPath(const Path &path)
 
 
 
+Paths &Path::separateSelfIntersectingSubpaths(Paths &outPaths)
+{
+    splitSegmentsAtIntersectionsWithPath(*this);
+    Path subpath1;
+    Path subpath2;
+    Lines::iterator it1;
+    Lines::iterator it2;
+    Lines::iterator it3;
+    bool found = false;
+    for (it1 = segments.begin(); !found && it1 != segments.end(); it1++) {
+	subpath1.push_back(*it1);
+	for (it2 = it1; it2 != segments.end(); it2++) {
+	    if (it1 != it2 && it1->endPt == it2->endPt) {
+		it3 = it1;
+		for (it3++; it3 != segments.end(); it3++) {
+		    subpath2.push_back(*it3);
+		    if (it3 == it2) {
+			break;
+		    }
+		}
+		it3 = it2;
+		for (it3++; it3 != segments.end(); it3++) {
+		    subpath1.push_back(*it3);
+		}
+		found = true;
+		break;
+	    }
+	}
+    }
+    if (!found) {
+        outPaths.push_back(*this);
+	return outPaths;
+    }
+
+    subpath1.separateSelfIntersectingSubpaths(outPaths)
+    subpath2.separateSelfIntersectingSubpaths(outPaths)
+    return outPaths;
+}
+
+
+
+void Path::reorderByPoint(const Point &pt)
+{
+    int limit = segments.size();
+    while (limit-->0) {
+	Line &ln = segments.front();
+        if (ln.startPt == pt) {
+	    return;
+	}
+	if (ln.endPt != pt && ln.contains(pt)) {
+	    ln.startPt = pt;
+	    segments.push_back(Line(endPoint(),pt));
+	    return;
+	}
+	segments.push_back(segments.front());
+	segments.pop_front();
+    }
+}
+
+
+
 void Path::untag()
 {
     flags = OUTSIDE;
@@ -917,15 +978,19 @@ Paths &Path::leftOffset(float offsetby, Paths& outPaths)
 	    if (itera->flags == INVALID) {
 	        // case I
 		Intersection isect = prevValid->intersectionWithExtendedLine(*nextValid);
-		prevValid->endPt = isect.p1;
-		nextValid->startPt = isect.p1;
-	        itera = offsetLines.erase(itera);
-		iterb++;
-		didUpdate = true;
+		if (isect.type != NONE) {
+		    prevValid->endPt = isect.p1;
+		    nextValid->startPt = isect.p1;
+		    itera = offsetLines.erase(itera);
+		    iterb++;
+		    didUpdate = true;
+		}
 	    } else {
 	        // case II
 		// TODO: find matching non-offset segments
 		// TODO: do pairwise intersections of offsets from segments
+		// set aside list of invalid segment's original segments.
+		// for each original segment, trim off intersections from offset path
 	    }
 	    if (!didUpdate) {
 	        // TODO: Connect forward and backwards edge.

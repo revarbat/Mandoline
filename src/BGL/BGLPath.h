@@ -107,6 +107,8 @@ public:
     // Strips out segments that are shorter than the given length.
     void stripSegmentsShorterThan(float minlen);
     void splitSegmentsAtIntersectionsWithPath(const Path &path);
+    Paths &separateSelfIntersectingSubpaths(Paths &outPaths);
+    void reorderByPoint(const Point &pt);
 
     void untag();
     void tagSegmentsRelativeToClosedPath(const Path &path);
