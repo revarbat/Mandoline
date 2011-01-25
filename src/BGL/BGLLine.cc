@@ -15,7 +15,7 @@ namespace BGL {
 bool Line::isLinearWith(const Point& pt) const
 {
     if (startPt == endPt) {
-         // Line segment is 0 length.
+        // Line segment is 0 length.
         if (pt == startPt) {
             return true; // Point is coincident.
         }

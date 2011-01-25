@@ -297,10 +297,10 @@ int32_t Mesh3d::loadFromSTLFile(const char *fileName)
 
 
 
-CompoundRegion& Mesh3d::regionForSliceAtZ(float Z, CompoundRegion &outReg)
+CompoundRegion& Mesh3d::regionForSliceAtZ(float Z, CompoundRegion &outReg) const
 {
     Lines lines;
-    Triangles3d::iterator trit;
+    Triangles3d::const_iterator trit;
     for (trit = triangles.begin(); trit != triangles.end(); trit++) {
 	Line ln;
 	if (trit->sliceAtZ(Z, ln)) {

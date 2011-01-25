@@ -200,14 +200,14 @@ string Path::svgPathWithOffset(float dx, float dy) const
 	}
 	if (isfirst || prev.endPt != itera->startPt) {
 	    snprintf(buf,sizeof(buf),"M%.3f,%.3f ",
-		     (itera->startPt.x+dx)*mult,
-		     (itera->startPt.y+dy)*mult);
+                (itera->startPt.x+dx)*mult,
+                (itera->startPt.y+dy)*mult);
 	    out.append(buf);
 	    isfirst = false;
 	}
 	snprintf(buf,sizeof(buf),"L%.3f,%.3f",
-		 (itera->endPt.x+dx)*mult,
-		 (itera->endPt.y+dy)*mult);
+            (itera->endPt.x+dx)*mult,
+            (itera->endPt.y+dy)*mult);
 	out.append(buf);
 	prev = *itera;
     }
@@ -302,7 +302,7 @@ Intersections &Path::intersectionsWith(const Line &ln, Intersections &outISects)
 	    if (isect.type != POINT ||
 		isect.p1 != itera->startPt ||
 		(segnum == 0 && !isclosed)
-	    ) {
+                ) {
 		isect.segment = segnum;
 		outISects.push_back(isect);
 	    }
@@ -511,19 +511,19 @@ Paths &Path::separateSelfIntersectingSubpaths(Paths &outPaths)
     Lines::iterator it3;
     bool found = false;
     for (it1 = segments.begin(); !found && it1 != segments.end(); it1++) {
-	subpath1.push_back(*it1);
+	subpath1.segments.push_back(*it1);
 	for (it2 = it1; it2 != segments.end(); it2++) {
 	    if (it1 != it2 && it1->endPt == it2->endPt) {
 		it3 = it1;
 		for (it3++; it3 != segments.end(); it3++) {
-		    subpath2.push_back(*it3);
+		    subpath2.segments.push_back(*it3);
 		    if (it3 == it2) {
 			break;
 		    }
 		}
 		it3 = it2;
 		for (it3++; it3 != segments.end(); it3++) {
-		    subpath1.push_back(*it3);
+		    subpath1.segments.push_back(*it3);
 		}
 		found = true;
 		break;
@@ -535,8 +535,8 @@ Paths &Path::separateSelfIntersectingSubpaths(Paths &outPaths)
 	return outPaths;
     }
 
-    subpath1.separateSelfIntersectingSubpaths(outPaths)
-    subpath2.separateSelfIntersectingSubpaths(outPaths)
+    subpath1.separateSelfIntersectingSubpaths(outPaths);
+    subpath2.separateSelfIntersectingSubpaths(outPaths);
     return outPaths;
 }
 
@@ -597,48 +597,48 @@ void Path::tagSegmentsRelativeToClosedPath(const Path &path)
 	    if (isInPath == isInSelf) {
 		// tweak sharedness, for use in checking against multiple paths.
 		switch (seg.flags) {
-		    case USED:
-		    case OUTSIDE:
-		    case SHARED:
-		    case UNSHARED:
-			seg.flags = SHARED;
-			break;
-		    case INSIDE:
-			seg.flags = UNSHARED;
-			break;
+                case USED:
+                case OUTSIDE:
+                case SHARED:
+                case UNSHARED:
+                    seg.flags = SHARED;
+                    break;
+                case INSIDE:
+                    seg.flags = UNSHARED;
+                    break;
 		}
 	    } else {
 		// tweak unsharedness, for use in checking against multiple paths.
 		switch (seg.flags) {
-		    case USED:
-		    case OUTSIDE:
-		    case UNSHARED:
-			seg.flags = UNSHARED;
-			break;
-		    case SHARED:
-		    case INSIDE:
-			seg.flags = SHARED;
-			break;
+                case USED:
+                case OUTSIDE:
+                case UNSHARED:
+                    seg.flags = UNSHARED;
+                    break;
+                case SHARED:
+                case INSIDE:
+                    seg.flags = SHARED;
+                    break;
 		}
 	    }
 	} else if (path.contains(midpt) == !invert) {
 	    // toggle insideness, for use in checking against multiple paths.
 	    switch (seg.flags) {
-		case USED:
-		    seg.flags = INSIDE;
-		    break;
-		case INSIDE:
-		    seg.flags = OUTSIDE;
-		    break;
-		case OUTSIDE:
-		    seg.flags = INSIDE;
-		    break;
-		case SHARED:
-		    seg.flags = UNSHARED;
-		    break;
-		case UNSHARED:
-		    seg.flags = SHARED;
-		    break;
+            case USED:
+                seg.flags = INSIDE;
+                break;
+            case INSIDE:
+                seg.flags = OUTSIDE;
+                break;
+            case OUTSIDE:
+                seg.flags = INSIDE;
+                break;
+            case SHARED:
+                seg.flags = UNSHARED;
+                break;
+            case UNSHARED:
+                seg.flags = SHARED;
+                break;
 	    }
 	} else {
 	    if (seg.flags == USED) {
@@ -899,7 +899,7 @@ Paths &Path::leftOffset(float offsetby, Paths& outPaths)
     for (iterb = segments.begin(), itera = iterb++, iterc = itera;
          iterb != segments.end();
 	 itera++, iterb++
-    ) {
+        ) {
         float ang = itera->angle();
         float deltaAng = itera->angleDelta(*iterb);
 	float bisectAng = (M_PI-deltaAng)/2.0f + ang;
@@ -951,7 +951,7 @@ Paths &Path::leftOffset(float offsetby, Paths& outPaths)
     for (itera = offsetLines.begin(), iterb = segments.begin();
          itera != offsetLines.end();
 	 itera++, iterb++
-    ) {
+        ) {
         if (itera->flags != VALID) {
 	    bool didUpdate = false;
 

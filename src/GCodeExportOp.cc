@@ -12,7 +12,7 @@
 
 
 GCodeExportOp::GCodeExportOp(SlicingContext* ctx)
-  : Operation(), context(ctx)
+    : Operation(), context(ctx)
 {
 }
 

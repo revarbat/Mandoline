@@ -95,55 +95,55 @@ int main (int argc, char * const argv[])
     optreset = opterr = optind = 1;
     while ((ch = getopt_long(argc, argv, shortopts, longopts, NULL)) != -1) {
         switch (ch) {
-            case 'c':
-                doCenter = false;
-                break;
-            case 'd':
-                doDumpSVG = true;
-                ctx.dumpPrefix = optarg;
-                break;
-            case 'f':
-                ctx.filamentDiameter = atof(optarg);
-                break;
-            case 'F':
-                ctx.filamentFeedRate = atof(optarg);
-                break;
-            case 'i':
-                ctx.infillDensity = atof(optarg);
-                break;
-            case 'l':
-                ctx.layerThickness = atof(optarg);
-                break;
-            case 'p':
-                ctx.perimeterShells = atoi(optarg);
-                break;
-            case 'w':
-                ctx.widthOverHeightRatio = atof(optarg);
-                break;
-            case 'r':
-                rotation = atof(optarg);
-                break;
-            case 's':
-                scaling = atof(optarg);
-                break;
-            case 't': {
-		    int cnt = atoi(optarg);
-		    if (cnt < 1) {
-			fprintf(stderr, "Error: Thread count cannot be less than 1.\n");
-		    }
-		    threadcount = cnt;
-		}
-                break;
-            case 'Z':
-                onlyAtZ = atof(optarg);
-                break;
-            case 'm':
-		// We already parsed this one out.  Ignore.
-                break;
-            case '?':
-            case 'h':
-            default:
-                usage(progName, ctx);
+        case 'c':
+            doCenter = false;
+            break;
+        case 'd':
+            doDumpSVG = true;
+            ctx.dumpPrefix = optarg;
+            break;
+        case 'f':
+            ctx.filamentDiameter = atof(optarg);
+            break;
+        case 'F':
+            ctx.filamentFeedRate = atof(optarg);
+            break;
+        case 'i':
+            ctx.infillDensity = atof(optarg);
+            break;
+        case 'l':
+            ctx.layerThickness = atof(optarg);
+            break;
+        case 'p':
+            ctx.perimeterShells = atoi(optarg);
+            break;
+        case 'w':
+            ctx.widthOverHeightRatio = atof(optarg);
+            break;
+        case 'r':
+            rotation = atof(optarg);
+            break;
+        case 's':
+            scaling = atof(optarg);
+            break;
+        case 't': {
+            int cnt = atoi(optarg);
+            if (cnt < 1) {
+                fprintf(stderr, "Error: Thread count cannot be less than 1.\n");
+            }
+            threadcount = cnt;
+        }
+            break;
+        case 'Z':
+            onlyAtZ = atof(optarg);
+            break;
+        case 'm':
+            // We already parsed this one out.  Ignore.
+            break;
+        case '?':
+        case 'h':
+        default:
+            usage(progName, ctx);
         }
     }
     argc -= optind;
@@ -247,11 +247,11 @@ int main (int argc, char * const argv[])
     // Export toolpaths to apropriate output format.
     Operation* expOp = NULL;
     switch (exportType) {
-        case GCODE:
-	    expOp = new GCodeExportOp(&ctx);
-	    break;
-	default:
-	    break;
+    case GCODE:
+        expOp = new GCodeExportOp(&ctx);
+        break;
+    default:
+        break;
     }
     if (expOp) {
 	opQ.addOperation(expOp);

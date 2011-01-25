@@ -128,7 +128,7 @@ public:
     // Comparison operators
     bool operator==(const Line &rhs) const {
         return ((startPt == rhs.startPt && endPt == rhs.endPt) ||
-                (startPt == rhs.endPt && endPt == rhs.startPt));
+            (startPt == rhs.endPt && endPt == rhs.startPt));
     }
     bool operator!=(const Line &rhs) const {
         return !(*this == rhs);

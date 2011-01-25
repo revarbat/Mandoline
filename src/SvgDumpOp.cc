@@ -34,7 +34,7 @@ void SvgDumpOp::main()
     fstream fout;
     fout.open(dumpFileName, fstream::out | fstream::trunc);
     if (!fout.good()) {
-       return;
+        return;
     }
     slice->svgPathWithSizeAndOffset(fout, context->svgWidth, context->svgHeight, context->svgXOff, context->svgYOff, extrusionWidth);
     fout.close();
