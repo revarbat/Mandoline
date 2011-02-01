@@ -67,6 +67,8 @@ public:
     ostream &svgPathDataWithOffset(ostream& os, float dx, float dy) const;
     ostream &svgPathWithOffset(ostream& os, float dx, float dy) const;
 
+    void simplify(float minErr);
+
     static SimpleRegions &assembleSimpleRegionsFrom(Paths &paths, SimpleRegions &outRegs);
     static SimpleRegions &assembleSimpleRegionsFrom(const Paths &outerPaths, const Paths &innerPaths, SimpleRegions &outRegs);
 

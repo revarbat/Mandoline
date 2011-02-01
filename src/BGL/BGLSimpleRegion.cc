@@ -202,6 +202,17 @@ ostream &SimpleRegion::svgPathWithOffset(ostream& os, float dx, float dy) const
 
 
 
+void SimpleRegion::simplify(float minErr)
+{
+    Paths::iterator it;
+    for (it = subpaths.begin(); it != subpaths.end(); it++) {
+	it->simplify(minErr);
+    }
+    outerPath.simplify(minErr);
+}
+
+
+
 SimpleRegions &SimpleRegion::assembleSimpleRegionsFrom(Paths &paths, SimpleRegions &outRegs)
 {
     Paths::iterator it1;

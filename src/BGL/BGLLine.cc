@@ -14,43 +14,7 @@ namespace BGL {
 
 bool Line::isLinearWith(const Point& pt) const
 {
-    if (startPt == endPt) {
-        // Line segment is 0 length.
-        if (pt == startPt) {
-            return true; // Point is coincident.
-        }
-        return false;
-    }
-    if (pt == startPt || pt == endPt) {
-        // Point is one of this line's endpoints.
-        return true;
-    }
-
-    float x1 = startPt.x;
-    float y1 = startPt.y;
-    float x2 = endPt.x;
-    float y2 = endPt.y;
-    
-    float dx1 = x2 - x1;
-    float dy1 = y2 - y1;
-    
-    float dx2 = x2 - pt.x;
-    float dy2 = y2 - pt.y;
-    
-    float dx3 = x1 - pt.x;
-    float dy3 = y1 - pt.y;
-    
-    float d  = dy2 * dx1 - dx2 * dy1;
-    float na = dx2 * dy3 - dy2 * dx3;
-    float nb = dx1 * dy3 - dy1 * dx3;
-    
-    if (d == 0) {
-        if (fabsf(na) < EPSILON && fabsf(nb) < EPSILON) {
-            return true;  // Lines are coincident.
-        }
-        return false; // Lines are parallel but not coincident.
-    }
-    return false;
+    return (minimumExtendedLineDistanceFromPoint(pt) < CLOSEENOUGH);
 }
 
 
@@ -64,16 +28,16 @@ bool Line::hasInBounds(const Point &pt) const
     float ex = endPt.x;
     float ey = endPt.y;
     
-    if (px > sx && px > ex) {
+    if (px > sx+EPSILON && px > ex+EPSILON) {
         return false;
     }
-    if (px < sx && px < ex) {
+    if (px < sx-EPSILON && px < ex-EPSILON) {
         return false;
     }
-    if (py > sy && py > ey) {
+    if (py > sy+EPSILON && py > ey+EPSILON) {
         return false;
     }
-    if (py < sy && py < ey) {
+    if (py < sy-EPSILON && py < ey-EPSILON) {
         return false;
     }
     return true;
@@ -83,8 +47,8 @@ bool Line::hasInBounds(const Point &pt) const
 
 bool Line::contains(const Point &pt) const
 {
-    if (minimumSegmentDistanceFromPoint(pt) < CLOSEENOUGH) {
-	return true;
+    if (hasInBounds(pt)) {
+	return (minimumSegmentDistanceFromPoint(pt) < CLOSEENOUGH);
     }
     return false;
 }
@@ -178,15 +142,18 @@ Intersection Line::intersectionWithSegment(const Line &ln) const
     float na = dx2 * dy3 - dy2 * dx3;
     float nb = dx1 * dy3 - dy1 * dx3;
     
-    if (d == 0) {
+    if (fabs(d) <= EPSILON) {
 	if (startPt == endPt) {
             // Line is actually a zero length directionless line. (AKA a point.)
             return Intersection();
 	} else if (ln.startPt == ln.endPt) {
             // ln is actually a zero length directionless line. (AKA a point.)
             return Intersection();
-        } else if (fabsf(na) < EPSILON && fabsf(nb) < EPSILON) {
-            // Lines are coincident.  Check for overlap.
+	} else if (
+	    minimumExtendedLineDistanceFromPoint(ln.startPt) < CLOSEENOUGH &&
+	    minimumExtendedLineDistanceFromPoint(ln.endPt) < CLOSEENOUGH
+	) {
+            // Lines are coincident (or very close to).  Check for overlap.
 	    Point p0(startPt);
 	    Point p1(endPt);
 	    Point p2(ln.startPt);
@@ -253,10 +220,13 @@ Intersection Line::intersectionWithExtendedLine(const Line &ln) const
     
     float d  = dy2 * dx1 - dx2 * dy1;
     float na = dx2 * dy3 - dy2 * dx3;
-    float nb = dx1 * dy3 - dy1 * dx3;
+    //float nb = dx1 * dy3 - dy1 * dx3;
     
-    if (d == 0) {
-        if (na == 0.0 && nb == 0.0) {
+    if (fabs(d) <= EPSILON) {
+        if (
+	    minimumExtendedLineDistanceFromPoint(ln.startPt) < CLOSEENOUGH &&
+	    minimumExtendedLineDistanceFromPoint(ln.endPt) < CLOSEENOUGH
+	) {
 	    // Lines are coincident.
 	    return Intersection(0);
         } else {

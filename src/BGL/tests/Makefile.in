@@ -41,6 +41,14 @@ tags: $(SRCS)
 
 test: output $(BINS)
 	for bin in $(BINS) ; do ./$$bin ; done
+	cd output && md5 test-[0-9]*.svg > RunResults.txt
+	@echo ""
+	@echo ""
+	@echo "***********************************************"
+	@echo "***********  CHECKING TEST RESULTS  ***********"
+	@echo "***********************************************"
+	@echo ""
+	@if diff -y --suppress-common-lines ExpectedResults.txt output/RunResults.txt; then echo "\nAll tests \033[32mPASSED\033[0m\n\n" ; else echo "\nSome tests \033[31mFAILED\033[0m\n\n"; fi
 
 # check the code for errors/security holes
 # --> Can't get splint to work with typedefs

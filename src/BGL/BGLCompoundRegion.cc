@@ -100,6 +100,16 @@ bool CompoundRegion::contains(const Point &pt) const
 
 
 
+void CompoundRegion::simplify(float minErr)
+{
+    SimpleRegions::iterator it;
+    for (it = subregions.begin(); it != subregions.end(); it++) {
+	it->simplify(minErr);
+    }
+}
+
+
+
 CompoundRegion &CompoundRegion::assembleCompoundRegionFrom(Paths &paths, CompoundRegion &outReg)
 {
     SimpleRegion::assembleSimpleRegionsFrom(paths, outReg.subregions);

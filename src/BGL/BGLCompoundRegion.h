@@ -68,6 +68,8 @@ public:
     ostream &svgPathDataWithOffset(ostream& os, float dx, float dy) const;
     ostream &svgPathWithOffset(ostream& os, float dx, float dy) const;
 
+    void simplify(float minErr);
+
     CompoundRegion &unionWith(SimpleRegion &reg);
     CompoundRegion &differenceWith(SimpleRegion &reg);
     CompoundRegion &intersectionWith(SimpleRegion &reg);

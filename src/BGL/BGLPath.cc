@@ -467,7 +467,7 @@ void Path::simplify(float minErr)
     Lines::iterator iterb = itera;
     for (iterb++; iterb != segments.end(); itera++, iterb++) {
 	Line ln(itera->startPt, iterb->endPt);
-	while (ln.minimumSegmentDistanceFromPoint(itera->endPt) <= minErr) {
+        while (ln.minimumExtendedLineDistanceFromPoint(itera->endPt) <= minErr) {
 	    itera->endPt = iterb->endPt;
 	    iterb = segments.erase(iterb);
 	    if (iterb == segments.end()) {
@@ -582,16 +582,23 @@ void Path::splitSegmentsAtIntersectionsWithPath(const Path &path)
 	for (iterb = path.segments.begin(); iterb != path.segments.end(); iterb++) {
 	    Intersection isect = itera->intersectionWithSegment(*iterb);
 	    if (isect.type != NONE) {
+		Lines::iterator iterc = itera;
 		if (!itera->hasEndPoint(isect.p1)) {
 		    Point tempPt = itera->startPt;
 		    itera->startPt = isect.p1;
 		    itera = segments.insert(itera, Line(tempPt, isect.p1));
 		}
 		if (isect.type == SEGMENT) {
-		    if (!itera->hasEndPoint(isect.p2) && itera->contains(isect.p2)) {
-			Point tempPt = itera->startPt;
-			itera->startPt = isect.p2;
-			itera = segments.insert(itera, Line(tempPt, isect.p2));
+		    if (!itera->hasEndPoint(isect.p2) && !iterc->hasEndPoint(isect.p2)) {
+			if (itera->contains(isect.p2)) {
+			    Point tempPt = itera->startPt;
+			    itera->startPt = isect.p2;
+			    itera = segments.insert(itera, Line(tempPt, isect.p2));
+			} else if (iterc->contains(isect.p2)) {
+			    Point tempPt = iterc->startPt;
+			    iterc->startPt = isect.p2;
+			    iterc = segments.insert(iterc, Line(tempPt, isect.p2));
+			}
 		    }
 		}
 	    }
