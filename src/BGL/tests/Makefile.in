@@ -41,14 +41,19 @@ tags: $(SRCS)
 
 test: output $(BINS)
 	for bin in $(BINS) ; do ./$$bin ; done
-	cd output && md5 test-[0-9]*.svg > RunResults.txt
+	@cd output && md5 test-[0-9]*.svg > RunResults.txt
 	@echo ""
 	@echo ""
 	@echo "***********************************************"
 	@echo "***********  CHECKING TEST RESULTS  ***********"
 	@echo "***********************************************"
 	@echo ""
-	@if diff -y --suppress-common-lines ExpectedResults.txt output/RunResults.txt; then echo "\nAll tests \033[32mPASSED\033[0m\n\n" ; else echo "\nSome tests \033[31mFAILED\033[0m\n\n"; fi
+	@diff -U 0 ExpectedResults.txt output/RunResults.txt > output/RunResults.diff || echo "The following files did not match their checksum:"
+	@cat output/RunResults.diff | grep -- '^-MD5' | sed 's/ = / should be /'
+	@echo ""
+	@if [ -s output/RunResults.diff ]; then echo "One or more tests \033[31mFAILED\033[0m"; else echo "All tests \033[32mPASSED\033[0m"; fi
+	@echo ""
+	@echo ""
 
 # check the code for errors/security holes
 # --> Can't get splint to work with typedefs
