@@ -248,6 +248,75 @@ int main(int argc, char**argv)
 	fout.close();
     }
 
+    fout.open("output/test-003e-compreg-insetA-by5.svg", fstream::out | fstream::trunc);
+    if (fout.good()) {
+	svgHeader(fout, 100, 100);
+
+	BGL::CompoundRegion outRegs;
+	compregA.insetRegion(5.0f, outRegs);
+	outRegs.svgPathWithOffset(fout, 10, 10);
+
+	svgFooter(fout);
+	fout.sync();
+	fout.close();
+    }
+
+    fout.open("output/test-003f-compreg-insetA-by1.svg", fstream::out | fstream::trunc);
+    if (fout.good()) {
+	svgHeader(fout, 100, 100);
+
+	BGL::CompoundRegion outRegs;
+	compregA.insetRegion(1.0f, outRegs);
+	outRegs.svgPathWithOffset(fout, 10, 10);
+
+	svgFooter(fout);
+	fout.sync();
+	fout.close();
+    }
+
+    fout.open("output/test-003g-compreg-insetB-by5.svg", fstream::out | fstream::trunc);
+    if (fout.good()) {
+	svgHeader(fout, 100, 100);
+
+	BGL::CompoundRegion outRegs;
+	compregB.insetRegion(5.0f, outRegs);
+	outRegs.svgPathWithOffset(fout, 10, 10);
+
+	svgFooter(fout);
+	fout.sync();
+	fout.close();
+    }
+
+    fout.open("output/test-003h-compreg-insetB-by1.svg", fstream::out | fstream::trunc);
+    if (fout.good()) {
+	svgHeader(fout, 100, 100);
+
+	BGL::CompoundRegion outRegs;
+	compregB.insetRegion(1.0f, outRegs);
+	outRegs.svgPathWithOffset(fout, 10, 10);
+
+	svgFooter(fout);
+	fout.sync();
+	fout.close();
+    }
+
+    fout.open("output/test-003i-compreg-diff.svg", fstream::out | fstream::trunc);
+    if (fout.good()) {
+	svgHeader(fout, 100, 100);
+
+	float dx = cos(M_PI/8.0f);
+	float dy = sin(M_PI/8.0f);
+	BGL::CompoundRegion outReg(compregB);
+	BGL::CompoundRegion offReg(compregB);
+	offReg += BGL::Point(dx,dy);
+	outReg.differenceWith(offReg);
+	outReg.svgPathWithOffset(fout, 10, 10);
+
+	svgFooter(fout);
+	fout.sync();
+	fout.close();
+    }
+
     return 0;
 }
 

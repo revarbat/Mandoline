@@ -6,6 +6,9 @@
 //  Copyright 2010 Belfry Software. All rights reserved.
 //
 
+#include <iostream>
+#include <iomanip>
+
 #include "BGLPath.h"
 
 using namespace std;
@@ -42,6 +45,67 @@ bool Path::operator==(const Path &rhs) const
 	itera++, iterb++;
     }
     return true;
+}
+
+
+
+// Compound assignment operators
+Path& Path::operator+=(const Point &rhs) {
+    Lines::iterator it;
+    for (it = segments.begin(); it != segments.end(); it++) {
+	*it += rhs;
+    }
+    return *this;
+}
+
+
+
+Path& Path::operator-=(const Point &rhs) {
+    Lines::iterator it;
+    for (it = segments.begin(); it != segments.end(); it++) {
+	*it -= rhs;
+    }
+    return *this;
+}
+
+
+
+Path& Path::operator*=(float rhs) {
+    Lines::iterator it;
+    for (it = segments.begin(); it != segments.end(); it++) {
+	*it *= rhs;
+    }
+    return *this;
+}
+
+
+
+Path& Path::operator*=(const Point &rhs) {
+    Lines::iterator it;
+    for (it = segments.begin(); it != segments.end(); it++) {
+	*it *= rhs;
+    }
+    return *this;
+}
+
+
+
+Path& Path::operator/=(float rhs) {
+    Lines::iterator it;
+    for (it = segments.begin(); it != segments.end(); it++) {
+	*it /= rhs;
+    }
+    return *this;
+}
+
+
+
+Path& Path::operator/=(const Point &rhs) {
+    Lines::iterator it;
+    for (it = segments.begin(); it != segments.end(); it++) {
+	*it /= rhs;
+    }
+    return *this;
 }
 
 
@@ -191,6 +255,7 @@ string Path::svgPathWithOffset(float dx, float dy) const
 	return out;
     }
     Line prev;
+    Point start;
     float mult = 90.0f / 25.4f;
     Lines::const_iterator itera = segments.begin();
     bool isfirst = true;
@@ -199,15 +264,21 @@ string Path::svgPathWithOffset(float dx, float dy) const
 	    out.append(" ");
 	}
 	if (isfirst || prev.endPt != itera->startPt) {
-	    snprintf(buf,sizeof(buf),"M%.3f,%.3f ",
+	    start = itera->startPt;
+	    snprintf(buf,sizeof(buf),"M%5.1f,%5.1f ",
                 (itera->startPt.x+dx)*mult,
                 (itera->startPt.y+dy)*mult);
 	    out.append(buf);
 	    isfirst = false;
 	}
-	snprintf(buf,sizeof(buf),"L%.3f,%.3f",
-            (itera->endPt.x+dx)*mult,
-            (itera->endPt.y+dy)*mult);
+	if (itera->endPt == start) {
+	    snprintf(buf,sizeof(buf),"Z");
+	    isfirst = true;
+	} else {
+	    snprintf(buf,sizeof(buf),"L%5.1f,%5.1f",
+		(itera->endPt.x+dx)*mult,
+		(itera->endPt.y+dy)*mult);
+	}
 	out.append(buf);
 	prev = *itera;
     }
@@ -223,9 +294,10 @@ ostream &Path::svgPathDataWithOffset(ostream& os, float dx, float dy) const
 	return os;
     }
     os.setf(ios::fixed);
-    os.precision(3);
+    os.precision(1);
     float mult = 90.0f / 25.4f;
     Line prev;
+    Point start;
     Lines::const_iterator itera = segments.begin();
     bool isfirst = true;
     for (; itera != segments.end(); itera++) {
@@ -233,13 +305,19 @@ ostream &Path::svgPathDataWithOffset(ostream& os, float dx, float dy) const
 	    os << endl << "    ";
 	}
 	if (isfirst || prev.endPt != itera->startPt) {
-	    os << "M" << ((itera->startPt.x+dx)*mult);
-	    os << "," << ((itera->startPt.y+dy)*mult);
+	    start = itera->startPt;
+	    os << "M" << setw(6) << ((itera->startPt.x+dx)*mult);
+	    os << "," << setw(6) << ((itera->startPt.y+dy)*mult);
 	    os << endl << "    ";
 	    isfirst = false;
 	}
-	os << "L" << ((itera->endPt.x+dx)*mult);
-	os << "," << ((itera->endPt.y+dy)*mult);
+	if (itera->endPt == start) {
+	    os << "Z";
+	    isfirst = true;
+	} else {
+	    os << "L" << setw(6) << ((itera->endPt.x+dx)*mult);
+	    os << "," << setw(6) << ((itera->endPt.y+dy)*mult);
+	}
 	prev = *itera;
     }
     return os;
@@ -340,12 +418,12 @@ bool Path::contains(const Point &pt) const
     Lines::const_iterator itera = segments.begin();
     for (; itera != segments.end(); itera++) {
 	sp = itera->startPt;
-	if (sp.y == pt.y) {
-	    sp.y += 10*EPSILON;
+	if (fabs(sp.y-pt.y) < CLOSEENOUGH) {
+	    sp.y += 1.5 * CLOSEENOUGH;
 	}
 	ep = itera->endPt;
-	if (ep.y == pt.y) {
-	    ep.y += 10*EPSILON;
+	if (fabs(ep.y-pt.y) < CLOSEENOUGH) {
+	    ep.y += 1.5 * CLOSEENOUGH;
 	}
 	Intersection isect = testLine.intersectionWithSegment(longLine);
 	if (isect.type != NONE) {
@@ -373,6 +451,29 @@ void Path::stripSegmentsShorterThan(float minlen)
 	    }
 	} else {
 	    itera++;
+	}
+    }
+}
+
+
+
+// Strips out segments that are shorter than the given length.
+void Path::simplify(float minErr)
+{
+    if (segments.size() < 2) {
+        return;
+    }
+    Lines::iterator itera = segments.begin();
+    Lines::iterator iterb = itera;
+    for (iterb++; iterb != segments.end(); itera++, iterb++) {
+	Line ln(itera->startPt, iterb->endPt);
+	while (ln.minimumSegmentDistanceFromPoint(itera->endPt) <= minErr) {
+	    itera->endPt = iterb->endPt;
+	    iterb = segments.erase(iterb);
+	    if (iterb == segments.end()) {
+		return;
+	    }
+	    ln.endPt = iterb->endPt;
 	}
     }
 }
@@ -576,6 +677,7 @@ void Path::untag()
 void Path::tagSegmentsRelativeToClosedPath(const Path &path)
 {
     bool invert = (flags == INSIDE);
+    simplify(2*EPSILON);
     splitSegmentsAtIntersectionsWithPath(path);
     Point midpt;
     Lines::iterator itera = segments.begin();
@@ -621,30 +723,37 @@ void Path::tagSegmentsRelativeToClosedPath(const Path &path)
                     break;
 		}
 	    }
-	} else if (path.contains(midpt) == !invert) {
-	    // toggle insideness, for use in checking against multiple paths.
-	    switch (seg.flags) {
-            case USED:
-                seg.flags = INSIDE;
-                break;
-            case INSIDE:
-                seg.flags = OUTSIDE;
-                break;
-            case OUTSIDE:
-                seg.flags = INSIDE;
-                break;
-            case SHARED:
-                seg.flags = UNSHARED;
-                break;
-            case UNSHARED:
-                seg.flags = SHARED;
-                break;
-	    }
 	} else {
-	    if (seg.flags == USED) {
-		seg.flags = OUTSIDE;
+	    bool isinside = path.contains(midpt);
+	    if (invert) {
+	        isinside = !isinside;
+	    }
+	    if (isinside) {
+		// toggle insideness, for use in checking against multiple paths.
+		switch (seg.flags) {
+		case USED:
+		    seg.flags = INSIDE;
+		    break;
+		case INSIDE:
+		    seg.flags = OUTSIDE;
+		    break;
+		case OUTSIDE:
+		    seg.flags = INSIDE;
+		    break;
+		case SHARED:
+		    seg.flags = UNSHARED;
+		    break;
+		case UNSHARED:
+		    seg.flags = SHARED;
+		    break;
+		}
+	    } else {
+		if (seg.flags == USED) {
+		    seg.flags = OUTSIDE;
+		}
 	    }
 	}
+	cerr << "Tagged: " << seg << "  " << seg.flags << endl;
     }
 }
 
@@ -653,10 +762,14 @@ void Path::tagSegmentsRelativeToClosedPath(const Path &path)
 Paths& Path::assembleTaggedPaths(Path &path1, uint32_t flags1, Path &path2, uint32_t flags2, Paths &outPaths)
 {
     // Tag segments for insideness, outsideness, or sharedness.
+    cerr << endl << endl;
+    cerr << "-----------------" << endl;
     path1.untag();
     path1.tagSegmentsRelativeToClosedPath(path2);
+    cerr << "-----------------" << endl;
     path2.untag();
     path2.tagSegmentsRelativeToClosedPath(path1);
+    cerr << "-----------------" << endl;
     
     uint32_t remaining = path1.size() + path2.size();
     
@@ -705,6 +818,7 @@ Paths& Path::assembleTaggedPaths(Path &path1, uint32_t flags1, Path &path2, uint
 	    
 	    // If path was closed by this segment, remember it and start a new path.
 	    if (outPath->isClosed()) {
+		outPath->simplify(2*EPSILON);
 		outPaths.push_back(Path());
 		outPath = &outPaths.back();
 		pathLimit = 0;
@@ -737,6 +851,7 @@ Paths& Path::assembleTaggedPaths(Path &path1, uint32_t flags1, Path &path2, uint
 	    if (limit == 0 && remaining > 0 && pathLimit >= 2) {
 		// Failed to find another connected segment in either path.
 		// Remember this path, and start a new one.
+		outPath->simplify(2*EPSILON);
 		outPaths.push_back(Path());
 		outPath = &outPaths.back();
 		pathLimit = 0;

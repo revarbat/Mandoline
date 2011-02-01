@@ -7,6 +7,7 @@
 //
 
 #include <sstream>
+#include <fstream>
 #include "BGLCommon.h"
 #include "BGLPoint.h"
 #include "BGLCompoundRegion.h"
@@ -14,6 +15,69 @@
 
 
 namespace BGL {
+
+
+// Compound assignment operators
+CompoundRegion& CompoundRegion::operator+=(const Point &rhs) {
+    SimpleRegions::iterator it;
+    for (it = subregions.begin(); it != subregions.end(); it++) {
+	*it += rhs;
+    }
+    return *this;
+}
+
+
+
+CompoundRegion& CompoundRegion::operator-=(const Point &rhs) {
+    SimpleRegions::iterator it;
+    for (it = subregions.begin(); it != subregions.end(); it++) {
+	*it -= rhs;
+    }
+    return *this;
+}
+
+
+
+CompoundRegion& CompoundRegion::operator*=(float rhs) {
+    SimpleRegions::iterator it;
+    for (it = subregions.begin(); it != subregions.end(); it++) {
+	*it *= rhs;
+    }
+    return *this;
+}
+
+
+
+CompoundRegion& CompoundRegion::operator*=(const Point &rhs) {
+    SimpleRegions::iterator it;
+    for (it = subregions.begin(); it != subregions.end(); it++) {
+	*it *= rhs;
+    }
+    return *this;
+}
+
+
+
+CompoundRegion& CompoundRegion::operator/=(float rhs) {
+    SimpleRegions::iterator it;
+    for (it = subregions.begin(); it != subregions.end(); it++) {
+	*it /= rhs;
+    }
+    return *this;
+}
+
+
+
+CompoundRegion& CompoundRegion::operator/=(const Point &rhs) {
+    SimpleRegions::iterator it;
+    for (it = subregions.begin(); it != subregions.end(); it++) {
+	*it /= rhs;
+    }
+    return *this;
+}
+
+
+
 
 
 int32_t CompoundRegion::size() const
@@ -184,6 +248,82 @@ CompoundRegion &CompoundRegion::intersectionOf(CompoundRegion &r1, CompoundRegio
 
 
 
+ostream &ssvgHeader(ostream &os, float width, float height)
+{
+    width *= 2;
+    height *=2;
+    float pwidth  = width * 90.0f / 25.4f;
+    float pheight = height * 90.0f / 25.4f;
+
+    os << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
+    os << "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">\n";
+    os << "<svg xmlns=\"http://www.w3.org/2000/svg\"";
+    os << " xml:space=\"preserve\"";
+    os << " style=\"shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd\"";
+    os << " xmlns:xlink=\"http://www.w3.org/1999/xlink\"";
+    os << " width=\"" << width << "mm\"";
+    os << " height=\"" << height << "mm\"";
+    os << " viewport=\"0 0 " << pwidth << " " << pheight << "\"";
+    os << " stroke=\"black\"";
+    os << ">" << endl;
+    os << "<g transform=\"scale(2.0)\">";
+
+    return os;
+} 
+
+
+
+ostream &ssvgFooter(ostream& os)
+{
+    os << "</g>" << endl;
+    os << "</svg>" << endl;
+    return os;
+}
+
+
+
+CompoundRegion &CompoundRegion::insetRegion(float insetBy, CompoundRegion &outReg)
+{
+    // This is a HACK.  But I got frustrated trying to handle proper insets.
+    char buf[128];
+    const int angles = 16;
+    CompoundRegion circumReg;
+    for (float ang = 0.0f; ang < M_PI*2.0f; ang += M_PI*2.0f/angles) {
+        float dx = insetBy * cos(ang);
+        float dy = insetBy * sin(ang);
+	CompoundRegion offReg(*this);
+	CompoundRegion tempReg(*this);
+	offReg += Point(dx,dy);
+	tempReg.differenceWith(offReg);
+	circumReg.unionWith(tempReg);
+
+	fstream fout;
+	snprintf(buf, sizeof(buf), "output/temp-%.2f.svg", ang);
+	fout.open(buf, fstream::out | fstream::trunc);
+	if (fout.good()) {
+	    ssvgHeader(fout, 100, 100);
+	    tempReg.svgPathWithOffset(fout, 10, 10);
+	    ssvgFooter(fout);
+	    fout.sync();
+	    fout.close();
+	}
+	snprintf(buf, sizeof(buf), "output/circum-%.2f.svg", ang);
+	fout.open(buf, fstream::out | fstream::trunc);
+	if (fout.good()) {
+	    ssvgHeader(fout, 100, 100);
+	    circumReg.svgPathWithOffset(fout, 10, 10);
+	    ssvgFooter(fout);
+	    fout.sync();
+	    fout.close();
+	}
+    }
+    outReg = *this;
+    outReg.differenceWith(circumReg);
+    return outReg;
+}
+
+
+
 Lines &CompoundRegion::containedSegmentsOfLine(Line &line, Lines &outSegs)
 {
     SimpleRegions::iterator rit;
@@ -214,6 +354,7 @@ Paths &CompoundRegion::infillPathsForRegionWithDensity(float density, float extr
     }
     return outPaths;
 }
+
 
 
 }

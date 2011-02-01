@@ -83,8 +83,8 @@ bool Line::hasInBounds(const Point &pt) const
 
 bool Line::contains(const Point &pt) const
 {
-    if (this->hasInBounds(pt) && this->isLinearWith(pt)) {
-        return true;
+    if (minimumSegmentDistanceFromPoint(pt) < CLOSEENOUGH) {
+	return true;
     }
     return false;
 }

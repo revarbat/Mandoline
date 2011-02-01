@@ -51,6 +51,34 @@ public:
         return !(*this == rhs);
     }
 
+    // Compound assignment operators
+    Path& operator+=(const Point &rhs);
+    Path& operator-=(const Point &rhs);
+    Path& operator*=(float rhs);
+    Path& operator*=(const Point &rhs);
+    Path& operator/=(float rhs);
+    Path& operator/=(const Point &rhs);
+
+    // Binary arithmetic operators
+    const Path operator+(const Point &rhs) const {
+	return Path(*this) += rhs;
+    }
+    const Path operator-(const Point &rhs) const {
+	return Path(*this) -= rhs;
+    }
+    const Path operator*(float rhs) const {
+	return Path(*this) *= rhs;
+    }
+    const Path operator*(const Point &rhs) const {
+	return Path(*this) *= rhs;
+    }
+    const Path operator/(float rhs) const {
+	return Path(*this) /= rhs;
+    }
+    const Path operator/(const Point &rhs) const {
+	return Path(*this) /= rhs;
+    }
+
     const Point startPoint() const {
         return segments.front().startPt;
     }
@@ -106,6 +134,7 @@ public:
 
     // Strips out segments that are shorter than the given length.
     void stripSegmentsShorterThan(float minlen);
+    void simplify(float minErr);
     void splitSegmentsAtIntersectionsWithPath(const Path &path);
     Paths &separateSelfIntersectingSubpaths(Paths &outPaths);
     void reorderByPoint(const Point &pt);

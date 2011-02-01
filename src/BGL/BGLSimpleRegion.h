@@ -29,6 +29,34 @@ public:
     SimpleRegion(const Path &x) : outerPath(x), subpaths(), zLevel(0.0f) {}
     SimpleRegion(const SimpleRegion &x) : outerPath(x.outerPath), subpaths(x.subpaths), zLevel(x.zLevel) {}
 
+    // Compound assignment operators
+    SimpleRegion& operator+=(const Point &rhs);
+    SimpleRegion& operator-=(const Point &rhs);
+    SimpleRegion& operator*=(float rhs);
+    SimpleRegion& operator*=(const Point &rhs);
+    SimpleRegion& operator/=(float rhs);
+    SimpleRegion& operator/=(const Point &rhs);
+
+    // Binary arithmetic operators
+    const SimpleRegion operator+(const Point &rhs) const {
+	return SimpleRegion(*this) += rhs;
+    }
+    const SimpleRegion operator-(const Point &rhs) const {
+	return SimpleRegion(*this) -= rhs;
+    }
+    const SimpleRegion operator*(float rhs) const {
+	return SimpleRegion(*this) *= rhs;
+    }
+    const SimpleRegion operator*(const Point &rhs) const {
+	return SimpleRegion(*this) *= rhs;
+    }
+    const SimpleRegion operator/(float rhs) const {
+	return SimpleRegion(*this) /= rhs;
+    }
+    const SimpleRegion operator/(const Point &rhs) const {
+	return SimpleRegion(*this) /= rhs;
+    }
+
     int32_t size();
     bool contains(const Point &pt) const;
 

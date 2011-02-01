@@ -18,6 +18,74 @@
 namespace BGL {
 
 
+// Compound assignment operators
+SimpleRegion& SimpleRegion::operator+=(const Point &rhs) {
+    Paths::iterator it;
+    for (it = subpaths.begin(); it != subpaths.end(); it++) {
+	*it += rhs;
+    }
+    outerPath += rhs;
+    return *this;
+}
+
+
+
+SimpleRegion& SimpleRegion::operator-=(const Point &rhs) {
+    Paths::iterator it;
+    for (it = subpaths.begin(); it != subpaths.end(); it++) {
+	*it -= rhs;
+    }
+    outerPath -= rhs;
+    return *this;
+}
+
+
+
+SimpleRegion& SimpleRegion::operator*=(float rhs) {
+    Paths::iterator it;
+    for (it = subpaths.begin(); it != subpaths.end(); it++) {
+	*it *= rhs;
+    }
+    outerPath *= rhs;
+    return *this;
+}
+
+
+
+SimpleRegion& SimpleRegion::operator*=(const Point &rhs) {
+    Paths::iterator it;
+    for (it = subpaths.begin(); it != subpaths.end(); it++) {
+	*it *= rhs;
+    }
+    outerPath *= rhs;
+    return *this;
+}
+
+
+
+SimpleRegion& SimpleRegion::operator/=(float rhs) {
+    Paths::iterator it;
+    for (it = subpaths.begin(); it != subpaths.end(); it++) {
+	*it /= rhs;
+    }
+    outerPath /= rhs;
+    return *this;
+}
+
+
+
+SimpleRegion& SimpleRegion::operator/=(const Point &rhs) {
+    Paths::iterator it;
+    for (it = subpaths.begin(); it != subpaths.end(); it++) {
+	*it /= rhs;
+    }
+    outerPath /= rhs;
+    return *this;
+}
+
+
+
+
 int32_t SimpleRegion::size()
 {
     return subpaths.size();

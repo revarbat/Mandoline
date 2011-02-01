@@ -17,7 +17,7 @@ ostream &svgHeader(ostream &os, float width, float height)
     os << " viewport=\"0 0 " << pwidth << " " << pheight << "\"";
     os << " stroke=\"black\"";
     os << ">" << endl;
-    os << "<g transform=\"scale(2.0)\" stroke-width=\"0.5pt\">" << endl;
+    os << "<g transform=\"scale(2.0)\" stroke-width=\"0.5pt\">";
 
     return os;
 } 
@@ -53,10 +53,6 @@ BGL::Point squigglePoints[] = {
 BGL::Point rectPoints[] = {
     BGL::Point( 5.0,  5.0),
     BGL::Point( 5.0, 25.0),
-    BGL::Point(20.0, 25.0),
-    BGL::Point(22.5, 30.0),
-    BGL::Point(25.0, 20.0),
-    BGL::Point(27.5, 25.0),
     BGL::Point(35.0, 25.0),
     BGL::Point(35.0,  5.0),
     BGL::Point( 5.0,  5.0)
@@ -70,83 +66,45 @@ int main(int argc, char**argv)
 
     fstream fout;
 
-    fout.open("output/test-001a-path-orig.svg", fstream::out | fstream::trunc);
+    fout.open("output/test-004a-path-orig.svg", fstream::out | fstream::trunc);
     if (fout.good()) {
 	svgHeader(fout, 100, 100);
-
-	fout << "<g stroke=\"#77f\" stroke-width=\"1\">" << endl;
-	squigglePath.svgPathWithOffset(fout, 10, 10);
-	fout << "</g>" << endl;
 
 	fout << "<g stroke=\"#0c0\">" << endl;
 	rectPath.svgPathWithOffset(fout, 10, 10);
 	fout << "</g>" << endl;
 
-	svgFooter(fout);
-	fout.sync();
-	fout.close();
-    }
-
-    fout.open("output/test-001b-path-union.svg", fstream::out | fstream::trunc);
-    if (fout.good()) {
-	svgHeader(fout, 100, 100);
-
-	BGL::Paths outPaths;
-	BGL::Paths::iterator pit;
-	BGL::Path::unionOf(squigglePath, rectPath, outPaths);
-	for (pit = outPaths.begin(); pit != outPaths.end(); pit++) {
-	    pit->svgPathWithOffset(fout, 10, 10);
-	}
+	fout << "<g stroke=\"#55f\">" << endl;
+	BGL::Path offPath(rectPath);
+	float dx = cos(M_PI/8.0f);
+	float dy = sin(M_PI/8.0f);
+	offPath += BGL::Point(dx, dy);
+	offPath.svgPathWithOffset(fout, 10, 10);
+	fout << "</g>" << endl;
 
 	svgFooter(fout);
 	fout.sync();
 	fout.close();
     }
 
-    fout.open("output/test-001c-path-diff.svg", fstream::out | fstream::trunc);
-    if (fout.good()) {
-	svgHeader(fout, 100, 100);
-
+    {
 	BGL::Paths outPaths;
-	BGL::Paths::iterator pit;
-	BGL::Path::differenceOf(squigglePath, rectPath, outPaths);
-	for (pit = outPaths.begin(); pit != outPaths.end(); pit++) {
-	    pit->svgPathWithOffset(fout, 10, 10);
-	}
-
-	svgFooter(fout);
-	fout.sync();
-	fout.close();
-    }
-
-    fout.open("output/test-001d-path-intsect.svg", fstream::out | fstream::trunc);
-    if (fout.good()) {
-	svgHeader(fout, 100, 100);
-
-	BGL::Paths outPaths;
-	BGL::Paths::iterator pit;
 	BGL::Path::intersectionOf(squigglePath, rectPath, outPaths);
-	for (pit = outPaths.begin(); pit != outPaths.end(); pit++) {
-	    pit->svgPathWithOffset(fout, 10, 10);
-	}
-
-	svgFooter(fout);
-	fout.sync();
-	fout.close();
     }
 
-    fout.open("output/test-001e-path-diff2.svg", fstream::out | fstream::trunc);
+    fout.open("output/test-004b-path-diff2.svg", fstream::out | fstream::trunc);
     if (fout.good()) {
 	svgHeader(fout, 100, 100);
 
 	BGL::Paths outPaths;
 	BGL::Paths::iterator pit;
+	BGL::Path origPath(rectPath);
 	BGL::Path offPath(rectPath);
 	float dx = cos(M_PI/8.0f);
 	float dy = sin(M_PI/8.0f);
 	offPath += BGL::Point(dx, dy);
 
-	BGL::Path::differenceOf(rectPath, offPath, outPaths);
+	BGL::Path::differenceOf(origPath, offPath, outPaths);
 	for (pit = outPaths.begin(); pit != outPaths.end(); pit++) {
 	    pit->svgPathWithOffset(fout, 10, 10);
 	}
@@ -158,5 +116,6 @@ int main(int argc, char**argv)
 
     return 0;
 }
+
 
 
