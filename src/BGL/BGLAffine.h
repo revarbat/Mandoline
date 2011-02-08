@@ -18,25 +18,25 @@ namespace BGL {
 
 class Affine {
 public:
-    float a, b, c, d, tx, ty;
+    double a, b, c, d, tx, ty;
 
     // Constructors
     Affine() : a(1.0), b(0.0), c(0.0), d(1.0), tx(0.0), ty(0.0)  {}
-    Affine(float A, float B, float C, float D, float TX, float TY) : a(A), b(B), c(C), d(D), tx(TX), ty(TY) {}
+    Affine(double A, double B, double C, double D, double TX, double TY) : a(A), b(B), c(C), d(D), tx(TX), ty(TY) {}
     Affine(const Affine& x) : a(x.a), b(x.b), c(x.c), d(x.d), tx(x.tx), ty(x.ty) {}
 
-    static Affine translationAffine(float dx, float dy);
-    static Affine scalingAffine(float sx, float sy);
-    static Affine rotationAffine(float radang);
+    static Affine translationAffine(double dx, double dy);
+    static Affine scalingAffine(double sx, double sy);
+    static Affine rotationAffine(double radang);
 
     Affine& transform(const Affine& aff);
-    Affine& translate(float dx, float dy);
-    Affine& scale(float sx, float sy);
-    Affine& scaleAroundPoint(float sx, float sy, float x, float y);
-    Affine& rotate(float radang);
-    Affine& rotateAroundPoint(float radang, float x, float y);
+    Affine& translate(double dx, double dy);
+    Affine& scale(double sx, double sy);
+    Affine& scaleAroundPoint(double sx, double sy, double x, double y);
+    Affine& rotate(double radang);
+    Affine& rotateAroundPoint(double radang, double x, double y);
 
-    void transformPoint(float& x, float &y) const;
+    void transformPoint(double& x, double &y) const;
 };
 
 

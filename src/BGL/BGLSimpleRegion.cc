@@ -41,7 +41,7 @@ SimpleRegion& SimpleRegion::operator-=(const Point &rhs) {
 
 
 
-SimpleRegion& SimpleRegion::operator*=(float rhs) {
+SimpleRegion& SimpleRegion::operator*=(double rhs) {
     Paths::iterator it;
     for (it = subpaths.begin(); it != subpaths.end(); it++) {
 	*it *= rhs;
@@ -63,7 +63,7 @@ SimpleRegion& SimpleRegion::operator*=(const Point &rhs) {
 
 
 
-SimpleRegion& SimpleRegion::operator/=(float rhs) {
+SimpleRegion& SimpleRegion::operator/=(double rhs) {
     Paths::iterator it;
     for (it = subpaths.begin(); it != subpaths.end(); it++) {
 	*it /= rhs;
@@ -164,7 +164,7 @@ bool SimpleRegion::intersects(const SimpleRegion &reg) const
 
 
 
-string SimpleRegion::svgPathWithOffset(float dx, float dy)
+string SimpleRegion::svgPathWithOffset(double dx, double dy)
 {
     string out;
     out.append(outerPath.svgPathWithOffset(dx, dy));
@@ -178,7 +178,7 @@ string SimpleRegion::svgPathWithOffset(float dx, float dy)
 
 
 
-ostream &SimpleRegion::svgPathDataWithOffset(ostream& os, float dx, float dy) const
+ostream &SimpleRegion::svgPathDataWithOffset(ostream& os, double dx, double dy) const
 {
     outerPath.svgPathDataWithOffset(os, dx, dy);
     Paths::const_iterator pit;
@@ -190,7 +190,7 @@ ostream &SimpleRegion::svgPathDataWithOffset(ostream& os, float dx, float dy) co
 }
 
 
-ostream &SimpleRegion::svgPathWithOffset(ostream& os, float dx, float dy) const
+ostream &SimpleRegion::svgPathWithOffset(ostream& os, double dx, double dy) const
 {
     os << "<path fill=\"none\" d=\"";
     svgPathDataWithOffset(os, dx, dy);
@@ -202,7 +202,7 @@ ostream &SimpleRegion::svgPathWithOffset(ostream& os, float dx, float dy) const
 
 
 
-void SimpleRegion::simplify(float minErr)
+void SimpleRegion::simplify(double minErr)
 {
     Paths::iterator it;
     for (it = subpaths.begin(); it != subpaths.end(); it++) {
@@ -318,6 +318,13 @@ SimpleRegions &SimpleRegion::differenceOf(SimpleRegion &r1, SimpleRegion &r2, Si
 	    Path::differenceOf(*it1, *it2, tempPaths);
 	}
 	newInnerPaths = tempPaths;
+    }
+    for (it2 = r1.subpaths.begin(); it2 != r1.subpaths.end(); it2++) {
+        Paths tempPaths;
+	for (it1 = outerPaths.begin(); it1 != outerPaths.end(); it1++) {
+	    Path::differenceOf(*it1, *it2, tempPaths);
+	}
+	outerPaths = tempPaths;
     }
 
     Paths innerPaths;
@@ -458,7 +465,7 @@ Paths &SimpleRegion::containedSubpathsOfPath(const Path &path, Paths &outPaths)
 
 
 
-Paths &SimpleRegion::infillPathsForRegionWithDensity(float density, float extrusionWidth, Paths &outPaths)
+Paths &SimpleRegion::infillPathsForRegionWithDensity(double density, double extrusionWidth, Paths &outPaths)
 {
     Bounds bounds = outerPath.bounds();
     if (bounds.minX == Bounds::NONE) {
@@ -472,24 +479,24 @@ Paths &SimpleRegion::infillPathsForRegionWithDensity(float density, float extrus
     // D = Wsqrt2/S
     // DS = Wsqrt2
     // S = Wsqrt2/D
-    float spacing = extrusionWidth*sqrtf(2.0f)/density;
+    double spacing = extrusionWidth*sqrt(2.0f)/density;
     if (density >= 0.99f) {
         spacing = extrusionWidth;
     }
-    float zag = spacing;
+    double zag = spacing;
     
     bool alternate = (((int)floor(bounds.minX/spacing-1)) & 0x1) == 0;
-    for (float fillx = floor(bounds.minX/spacing-1)*spacing; fillx < bounds.maxX+spacing; fillx += spacing) {
+    for (double fillx = floor(bounds.minX/spacing-1)*spacing; fillx < bounds.maxX+spacing; fillx += spacing) {
         alternate = !alternate;
 	Path path;
-        float zig = 0.0f;
+        double zig = 0.0f;
         if (density < 0.99f) {
             zig = 0.5f*zag;
             if (alternate) {
                 zig = -zig;
             }
         }
-        for (float filly = floor(0.5*bounds.minY/zag-1)*2.0f*zag; filly < bounds.maxY+zag; filly += zag) {
+        for (double filly = floor(0.5*bounds.minY/zag-1)*2.0f*zag; filly < bounds.maxY+zag; filly += zag) {
             path.segments.push_back(Line(Point(fillx+zig,filly),Point(fillx-zig,filly+zag)));
             zig = -zig;
         }

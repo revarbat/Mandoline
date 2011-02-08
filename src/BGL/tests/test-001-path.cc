@@ -74,11 +74,11 @@ int main(int argc, char**argv)
     if (fout.good()) {
 	svgHeader(fout, 100, 100);
 
-	fout << "<g stroke=\"#77f\" stroke-width=\"1\">" << endl;
+	fout << "<g stroke=\"#77f\" stroke-width=\"1.0\">" << endl;
 	squigglePath.svgPathWithOffset(fout, 10, 10);
 	fout << "</g>" << endl;
 
-	fout << "<g stroke=\"#0c0\">" << endl;
+	fout << "<g stroke=\"#0c0\" stroke-width=\"0.5\">" << endl;
 	rectPath.svgPathWithOffset(fout, 10, 10);
 	fout << "</g>" << endl;
 

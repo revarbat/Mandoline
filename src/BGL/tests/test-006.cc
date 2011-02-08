@@ -75,21 +75,79 @@ int main(int argc, char**argv)
     BGL::CompoundRegion compRegD(outPaths4);
 
     BGL::CompoundRegion outReg;
-    BGL::CompoundRegion::unionOf(compRegA, compRegB, outReg);
     BGL::CompoundRegion outReg2;
+    BGL::CompoundRegion outReg3;
+    BGL::CompoundRegion::unionOf(compRegA, compRegB, outReg);
     BGL::CompoundRegion::unionOf(outReg, compRegC, outReg2);
+    BGL::CompoundRegion::unionOf(outReg2, compRegD, outReg3);
 
     fstream fout;
 
-    fout.open("output/test-006a-path-orig.svg", fstream::out | fstream::trunc);
+    fout.open("output/test-006a-origAB.svg", fstream::out | fstream::trunc);
     if (fout.good()) {
 	svgHeader(fout, 100, 100);
 
-	fout << "<g stroke=\"#c00\" stroke-width=\"1.5\">" << endl;
-	outReg2.svgPathWithOffset(fout, 10, 10);
+	fout << "<g stroke=\"#c00\">" << endl;
+	compRegA.svgPathWithOffset(fout, 10, 10);
 	fout << "</g>" << endl;
 
 	fout << "<g stroke=\"#0c0\">" << endl;
+	compRegB.svgPathWithOffset(fout, 10, 10);
+	fout << "</g>" << endl;
+	
+	svgFooter(fout);
+	fout.sync();
+	fout.close();
+    }
+
+    fout.open("output/test-006b-unionAB.svg", fstream::out | fstream::trunc);
+    if (fout.good()) {
+	svgHeader(fout, 100, 100);
+
+	outReg.svgPathWithOffset(fout, 10, 10);
+	
+	svgFooter(fout);
+	fout.sync();
+	fout.close();
+    }
+
+    fout.open("output/test-006c-origABC.svg", fstream::out | fstream::trunc);
+    if (fout.good()) {
+	svgHeader(fout, 100, 100);
+
+	fout << "<g stroke=\"#c00\">" << endl;
+	outReg.svgPathWithOffset(fout, 10, 10);
+	fout << "</g>" << endl;
+
+	fout << "<g stroke=\"#00c\">" << endl;
+	compRegC.svgPathWithOffset(fout, 10, 10);
+	fout << "</g>" << endl;
+	
+	svgFooter(fout);
+	fout.sync();
+	fout.close();
+    }
+
+    fout.open("output/test-006d-unionABC.svg", fstream::out | fstream::trunc);
+    if (fout.good()) {
+	svgHeader(fout, 100, 100);
+
+	outReg2.svgPathWithOffset(fout, 10, 10);
+	
+	svgFooter(fout);
+	fout.sync();
+	fout.close();
+    }
+
+    fout.open("output/test-006e-origABCD.svg", fstream::out | fstream::trunc);
+    if (fout.good()) {
+	svgHeader(fout, 100, 100);
+
+	fout << "<g stroke=\"#c00\">" << endl;
+	outReg2.svgPathWithOffset(fout, 10, 10);
+	fout << "</g>" << endl;
+
+	fout << "<g stroke=\"#0cc\">" << endl;
 	compRegD.svgPathWithOffset(fout, 10, 10);
 	fout << "</g>" << endl;
 	
@@ -98,12 +156,10 @@ int main(int argc, char**argv)
 	fout.close();
     }
 
-    fout.open("output/test-006b-path-union.svg", fstream::out | fstream::trunc);
+    fout.open("output/test-006f-unionABCD.svg", fstream::out | fstream::trunc);
     if (fout.good()) {
 	svgHeader(fout, 100, 100);
 
-	BGL::CompoundRegion outReg3;
-	BGL::CompoundRegion::unionOf(outReg2, compRegD, outReg3);
 	outReg3.svgPathWithOffset(fout, 10, 10);
 
 	svgFooter(fout);

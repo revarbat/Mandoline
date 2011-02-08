@@ -248,12 +248,16 @@ int main(int argc, char**argv)
 	fout.close();
     }
 
-    fout.open("output/test-003e-compreg-insetA-by5.svg", fstream::out | fstream::trunc);
+    fout.open("output/test-003e-compreg-insetA-by05.svg", fstream::out | fstream::trunc);
     if (fout.good()) {
 	svgHeader(fout, 100, 100);
 
+	fout << "<g stroke=\"#77f\">" << endl;
+	compregA.svgPathWithOffset(fout, 10, 10);
+	fout << "</g>" << endl;
+
 	BGL::CompoundRegion outRegs;
-	compregA.insetRegion(5.0f, outRegs);
+	compregA.insetRegion(0.5f, outRegs);
 	outRegs.svgPathWithOffset(fout, 10, 10);
 
 	svgFooter(fout);
@@ -265,6 +269,10 @@ int main(int argc, char**argv)
     if (fout.good()) {
 	svgHeader(fout, 100, 100);
 
+	fout << "<g stroke=\"#77f\">" << endl;
+	compregA.svgPathWithOffset(fout, 10, 10);
+	fout << "</g>" << endl;
+
 	BGL::CompoundRegion outRegs;
 	compregA.insetRegion(1.0f, outRegs);
 	outRegs.svgPathWithOffset(fout, 10, 10);
@@ -274,12 +282,16 @@ int main(int argc, char**argv)
 	fout.close();
     }
 
-    fout.open("output/test-003g-compreg-insetB-by5.svg", fstream::out | fstream::trunc);
+    fout.open("output/test-003g-compreg-insetB-by05.svg", fstream::out | fstream::trunc);
     if (fout.good()) {
 	svgHeader(fout, 100, 100);
 
+	fout << "<g stroke=\"#77f\">" << endl;
+	compregB.svgPathWithOffset(fout, 10, 10);
+	fout << "</g>" << endl;
+
 	BGL::CompoundRegion outRegs;
-	compregB.insetRegion(5.0f, outRegs);
+	compregB.insetRegion(0.5f, outRegs);
 	outRegs.svgPathWithOffset(fout, 10, 10);
 
 	svgFooter(fout);
@@ -290,6 +302,10 @@ int main(int argc, char**argv)
     fout.open("output/test-003h-compreg-insetB-by1.svg", fstream::out | fstream::trunc);
     if (fout.good()) {
 	svgHeader(fout, 100, 100);
+
+	fout << "<g stroke=\"#77f\">" << endl;
+	compregB.svgPathWithOffset(fout, 10, 10);
+	fout << "</g>" << endl;
 
 	BGL::CompoundRegion outRegs;
 	compregB.insetRegion(1.0f, outRegs);

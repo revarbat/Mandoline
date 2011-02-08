@@ -38,7 +38,7 @@ CompoundRegion& CompoundRegion::operator-=(const Point &rhs) {
 
 
 
-CompoundRegion& CompoundRegion::operator*=(float rhs) {
+CompoundRegion& CompoundRegion::operator*=(double rhs) {
     SimpleRegions::iterator it;
     for (it = subregions.begin(); it != subregions.end(); it++) {
 	*it *= rhs;
@@ -58,7 +58,7 @@ CompoundRegion& CompoundRegion::operator*=(const Point &rhs) {
 
 
 
-CompoundRegion& CompoundRegion::operator/=(float rhs) {
+CompoundRegion& CompoundRegion::operator/=(double rhs) {
     SimpleRegions::iterator it;
     for (it = subregions.begin(); it != subregions.end(); it++) {
 	*it /= rhs;
@@ -100,7 +100,7 @@ bool CompoundRegion::contains(const Point &pt) const
 
 
 
-void CompoundRegion::simplify(float minErr)
+void CompoundRegion::simplify(double minErr)
 {
     SimpleRegions::iterator it;
     for (it = subregions.begin(); it != subregions.end(); it++) {
@@ -118,7 +118,7 @@ CompoundRegion &CompoundRegion::assembleCompoundRegionFrom(Paths &paths, Compoun
 
 
 
-string CompoundRegion::svgPathWithOffset(float dx, float dy)
+string CompoundRegion::svgPathWithOffset(double dx, double dy)
 {
     string out;
     SimpleRegions::iterator rit;
@@ -130,7 +130,7 @@ string CompoundRegion::svgPathWithOffset(float dx, float dy)
 
 
 
-ostream &CompoundRegion::svgPathDataWithOffset(ostream& os, float dx, float dy) const
+ostream &CompoundRegion::svgPathDataWithOffset(ostream& os, double dx, double dy) const
 {
     SimpleRegions::const_iterator rit;
     for (rit = subregions.begin(); rit != subregions.end(); rit++) {
@@ -141,7 +141,7 @@ ostream &CompoundRegion::svgPathDataWithOffset(ostream& os, float dx, float dy) 
 
 
 
-ostream &CompoundRegion::svgPathWithOffset(ostream& os, float dx, float dy) const
+ostream &CompoundRegion::svgPathWithOffset(ostream& os, double dx, double dy) const
 {
     os << "<path fill=\"none\" d=\"";
     svgPathDataWithOffset(os, dx, dy);
@@ -258,12 +258,12 @@ CompoundRegion &CompoundRegion::intersectionOf(CompoundRegion &r1, CompoundRegio
 
 
 
-ostream &ssvgHeader(ostream &os, float width, float height)
+ostream &ssvgHeader(ostream &os, double width, double height)
 {
     width *= 2;
     height *=2;
-    float pwidth  = width * 90.0f / 25.4f;
-    float pheight = height * 90.0f / 25.4f;
+    double pwidth  = width * 90.0f / 25.4f;
+    double pheight = height * 90.0f / 25.4f;
 
     os << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
     os << "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">\n";
@@ -292,15 +292,15 @@ ostream &ssvgFooter(ostream& os)
 
 
 
-CompoundRegion &CompoundRegion::insetRegion(float insetBy, CompoundRegion &outReg)
+CompoundRegion &CompoundRegion::insetRegion(double insetBy, CompoundRegion &outReg)
 {
     // This is a HACK.  But I got frustrated trying to handle proper insets.
     char buf[128];
     const int angles = 16;
     CompoundRegion circumReg;
-    for (float ang = 0.0f; ang < M_PI*2.0f; ang += M_PI*2.0f/angles) {
-        float dx = insetBy * cos(ang);
-        float dy = insetBy * sin(ang);
+    for (double ang = 0.0f; ang < M_PI*2.0f; ang += M_PI*2.0f/angles) {
+        double dx = insetBy * cos(ang);
+        double dy = insetBy * sin(ang);
 	CompoundRegion offReg(*this);
 	CompoundRegion tempReg(*this);
 	offReg += Point(dx,dy);
@@ -356,7 +356,7 @@ Paths &CompoundRegion::containedSubpathsOfPath(Path &path, Paths &outPaths)
 
 
 
-Paths &CompoundRegion::infillPathsForRegionWithDensity(float density, float extrusionWidth, Paths &outPaths)
+Paths &CompoundRegion::infillPathsForRegionWithDensity(double density, double extrusionWidth, Paths &outPaths)
 {
     SimpleRegions::iterator rit;
     for (rit = subregions.begin(); rit != subregions.end(); rit++) {

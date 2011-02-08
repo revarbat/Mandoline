@@ -21,12 +21,12 @@ bool Line::isLinearWith(const Point& pt) const
 
 bool Line::hasInBounds(const Point &pt) const
 {
-    float px = pt.x;
-    float py = pt.y;
-    float sx = startPt.x;
-    float sy = startPt.y;
-    float ex = endPt.x;
-    float ey = endPt.y;
+    double px = pt.x;
+    double py = pt.y;
+    double sx = startPt.x;
+    double sy = startPt.y;
+    double ex = endPt.x;
+    double ey = endPt.y;
     
     if (px > sx+EPSILON && px > ex+EPSILON) {
         return false;
@@ -57,13 +57,13 @@ bool Line::contains(const Point &pt) const
 
 Point Line::closestSegmentPointTo(const Point &pt) const
 {
-    float x1 = startPt.x;
-    float y1 = startPt.y;
-    float x2 = endPt.x;
-    float y2 = endPt.y;
-    float xd = x2 - x1;
-    float yd = y2 - y1;
-    float u;
+    double x1 = startPt.x;
+    double y1 = startPt.y;
+    double x2 = endPt.x;
+    double y2 = endPt.y;
+    double xd = x2 - x1;
+    double yd = y2 - y1;
+    double u;
 
     if (startPt == endPt) {
         return Point(startPt);
@@ -81,13 +81,13 @@ Point Line::closestSegmentPointTo(const Point &pt) const
 
 Point Line::closestExtendedLinePointTo(const Point &pt) const
 {
-    float x1 = startPt.x;
-    float y1 = startPt.y;
-    float x2 = endPt.x;
-    float y2 = endPt.y;
-    float xd = x2 - x1;
-    float yd = y2 - y1;
-    float u;
+    double x1 = startPt.x;
+    double y1 = startPt.y;
+    double x2 = endPt.x;
+    double y2 = endPt.y;
+    double xd = x2 - x1;
+    double yd = y2 - y1;
+    double u;
     
     if (startPt == endPt) {
         return Point(startPt);
@@ -98,7 +98,7 @@ Point Line::closestExtendedLinePointTo(const Point &pt) const
 
 
 
-float Line::minimumSegmentDistanceFromPoint(const Point &pt) const
+double Line::minimumSegmentDistanceFromPoint(const Point &pt) const
 {
     Point closePt = closestSegmentPointTo(pt);
     return pt.distanceFrom(closePt);
@@ -107,7 +107,7 @@ float Line::minimumSegmentDistanceFromPoint(const Point &pt) const
 
 
 
-float Line::minimumExtendedLineDistanceFromPoint(const Point &pt) const
+double Line::minimumExtendedLineDistanceFromPoint(const Point &pt) const
 {
     Point closePt = closestExtendedLinePointTo(pt);
     return pt.distanceFrom(closePt);
@@ -120,79 +120,124 @@ float Line::minimumExtendedLineDistanceFromPoint(const Point &pt) const
 // If they don't intersect, the Intersection will have a type of NONE.
 Intersection Line::intersectionWithSegment(const Line &ln) const
 {
-    float x1 = startPt.x;
-    float y1 = startPt.y;
-    float x2 = endPt.x;
-    float y2 = endPt.y;
-    float x3 = ln.startPt.x;
-    float y3 = ln.startPt.y;
-    float x4 = ln.endPt.x;
-    float y4 = ln.endPt.y;
+    double x1 = startPt.x;
+    double y1 = startPt.y;
+    double x2 = endPt.x;
+    double y2 = endPt.y;
+    double x3 = ln.startPt.x;
+    double y3 = ln.startPt.y;
+    double x4 = ln.endPt.x;
+    double y4 = ln.endPt.y;
 
-    float dx1 = x2 - x1;
-    float dy1 = y2 - y1;
+    double dx1 = x2 - x1;
+    double dy1 = y2 - y1;
     
-    float dx2 = x4 - x3;
-    float dy2 = y4 - y3;
+    double dx2 = x4 - x3;
+    double dy2 = y4 - y3;
     
-    float dx3 = x1 - x3;
-    float dy3 = y1 - y3;
+    double dx3 = x1 - x3;
+    double dy3 = y1 - y3;
     
-    float d  = dy2 * dx1 - dx2 * dy1;
-    float na = dx2 * dy3 - dy2 * dx3;
-    float nb = dx1 * dy3 - dy1 * dx3;
+    double d  = dy2 * dx1 - dx2 * dy1;
+    double na = dx2 * dy3 - dy2 * dx3;
+    double nb = dx1 * dy3 - dy1 * dx3;
     
+    cerr.precision(18);
+    cerr.setf(ios::fixed);
+
+    bool dodebug = false;
+    /*
+    if (startPt.distanceFrom(Point(20.500,27.188)) <= 0.001) {
+	if (ln.startPt.distanceFrom(Point(1.419,15.262)) <= 0.001) {
+	    dodebug = true;
+	}
+    }
+    */
+    if (dodebug) {
+	cerr << "testing isect of " << *this << " and " << ln << endl;
+	cerr << "d = " << d << " for " << *this << " and " << ln << endl;
+    }
     if (fabs(d) <= EPSILON) {
+	if (dodebug) {
+	    cerr << "PARALLEL" << endl;
+	}
 	if (startPt == endPt) {
             // Line is actually a zero length directionless line. (AKA a point.)
+	    if (dodebug) {
+		cerr << "    exit A" << endl;
+	    }
             return Intersection();
 	} else if (ln.startPt == ln.endPt) {
             // ln is actually a zero length directionless line. (AKA a point.)
+	    if (dodebug) {
+		cerr << "    exit B" << endl;
+	    }
             return Intersection();
 	} else if (
-	    minimumExtendedLineDistanceFromPoint(ln.startPt) < CLOSEENOUGH &&
-	    minimumExtendedLineDistanceFromPoint(ln.endPt) < CLOSEENOUGH
+	    minimumExtendedLineDistanceFromPoint(ln.startPt) < EPSILON &&
+	    minimumExtendedLineDistanceFromPoint(ln.endPt) < EPSILON
 	) {
             // Lines are coincident (or very close to).  Check for overlap.
-	    Point p0(startPt);
-	    Point p1(endPt);
-	    Point p2(ln.startPt);
-	    Point p3(ln.endPt);
-	    Point tmp;
-            if (startPt > endPt) {
-	        tmp = p0; p0 = p1; p1 = tmp;
-            }
-            if (ln.startPt > ln.endPt) {
-	        tmp = p2; p2 = p3; p3 = tmp;
-            }
-	    if (p0 > p2) {
-	        tmp = p0; p0 = p2; p2 = tmp;
-		tmp = p1; p1 = p3; p3 = tmp;
-            }
-            if (p1 == p2) {
-                return Intersection(p1,0);
-	    } else if (p1 > p2) {
-                return Intersection(p2,p1,0);
+	    Points isects;
+	    if (ln.contains(startPt)) {
+		isects.push_back(startPt);
+	    }
+	    if (ln.contains(endPt)) {
+		isects.push_back(endPt);
+	    }
+	    if (contains(ln.startPt)) {
+		if (!hasEndPoint(ln.startPt)) {
+		    isects.push_back(ln.startPt);
+		}
+	    }
+	    if (contains(ln.endPt)) {
+		if (!hasEndPoint(ln.endPt)) {
+		    isects.push_back(ln.endPt);
+		}
+	    }
+	    int icnt = isects.size();
+	    if (icnt == 0) {
+		if (dodebug) {
+		    cerr << "    exit C" << endl;
+		}
+		return Intersection();
+	    } else if (icnt == 1) {
+		if (dodebug) {
+		    cerr << "    exit D" << endl;
+		}
+                return Intersection(isects.front(),0);
+	    } else  {
+		if (dodebug) {
+		    cerr << "    exit E" << endl;
+		}
+                return Intersection(isects.front(),isects.back(),0);
             }
         }
+	if (dodebug) {
+	    cerr << "    exit F" << endl;
+	}
 	return Intersection();
     }
     
-    float ua = na / d;
-    float ub = nb / d;
+    double ua = na / d;
+    double ub = nb / d;
     
-    if (ua < 0.0 || ua > 1.0) {
+    double xi = x1 + ua * dx1;
+    double yi = y1 + ua * dy1;
+    
+    if (dodebug) {
+	cerr << "    ua=" << ua << ", ub=" << ub << endl;
+	cerr << "    isect at " << xi << ", " << yi << endl;
+    }
+    if (ua < -EPSILON || ua > 1.0+EPSILON) {
         // Intersection wouldn't be inside first segment
 	return Intersection();
     }
     
-    if (ub < 0.0 || ub > 1.0) {
+    if (ub < -EPSILON || ub > 1.0+EPSILON) {
         // Intersection wouldn't be inside second segment
 	return Intersection();
     }
-    
-    float xi = x1 + ua * dx1;
-    float yi = y1 + ua * dy1;
     
     return Intersection(Point(xi,yi),0);
 }
@@ -204,23 +249,23 @@ Intersection Line::intersectionWithSegment(const Line &ln) const
 // If they are coincident, the Intersection will have a type of COINCIDENT.
 Intersection Line::intersectionWithExtendedLine(const Line &ln) const
 {
-    float x1 = startPt.x;
-    float y1 = startPt.y;
-    float x2 = endPt.x;
-    float y2 = endPt.y;
+    double x1 = startPt.x;
+    double y1 = startPt.y;
+    double x2 = endPt.x;
+    double y2 = endPt.y;
     
-    float dx1 = x2 - x1;
-    float dy1 = y2 - y1;
+    double dx1 = x2 - x1;
+    double dy1 = y2 - y1;
     
-    float dx2 = ln.endPt.x - ln.startPt.x;
-    float dy2 = ln.endPt.y - ln.startPt.y;
+    double dx2 = ln.endPt.x - ln.startPt.x;
+    double dy2 = ln.endPt.y - ln.startPt.y;
     
-    float dx3 = x1 - ln.startPt.x;
-    float dy3 = y1 - ln.startPt.y;
+    double dx3 = x1 - ln.startPt.x;
+    double dy3 = y1 - ln.startPt.y;
     
-    float d  = dy2 * dx1 - dx2 * dy1;
-    float na = dx2 * dy3 - dy2 * dx3;
-    //float nb = dx1 * dy3 - dy1 * dx3;
+    double d  = dy2 * dx1 - dx2 * dy1;
+    double na = dx2 * dy3 - dy2 * dx3;
+    //double nb = dx1 * dy3 - dy1 * dx3;
     
     if (fabs(d) <= EPSILON) {
         if (
@@ -235,19 +280,19 @@ Intersection Line::intersectionWithExtendedLine(const Line &ln) const
 	}
     }
     
-    float ua = na / d;
-    //float ub = nb / d;
-    float xi = x1 + ua * dx1;
-    float yi = y1 + ua * dy1;
+    double ua = na / d;
+    //double ub = nb / d;
+    double xi = x1 + ua * dx1;
+    double yi = y1 + ua * dy1;
     return Intersection(Point(xi,yi),0);
 }
 
 
 
-Line& Line::leftOffset(float offsetby)
+Line& Line::leftOffset(double offsetby)
 {
-    float ang = angle();
-    float pang = ang + M_PI_2;  /* 90 degs ccw */
+    double ang = angle();
+    double pang = ang + M_PI_2;  /* 90 degs ccw */
     Point offPt;
     offPt.polarOffset(pang, offsetby);
     startPt += offPt;

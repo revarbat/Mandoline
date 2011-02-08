@@ -30,99 +30,99 @@ public:
     Point startPt;
     Point endPt;
     int16_t flags;
-    float temperature;
-    float extrusionWidth;
+    double temperature;
+    double extrusionWidth;
 
     // Constructors
     Line() :
         startPt(),
-	endPt(),
-	flags(0),
-	temperature(0),
-	extrusionWidth(0)
+        endPt(),
+        flags(0),
+        temperature(0),
+        extrusionWidth(0)
     {
     }
 
     Line(const Point& p1, const Point& p2) :
         startPt(p1),
-	endPt(p2),
-	flags(0),
-	temperature(0),
-	extrusionWidth(0)
+        endPt(p2),
+        flags(0),
+        temperature(0),
+        extrusionWidth(0)
     {
     }
 
     Line(const Line& ln) :
         startPt(ln.startPt),
         endPt(ln.endPt),
-	flags(ln.flags),
+        flags(ln.flags),
         temperature(ln.temperature),
-	extrusionWidth(ln.extrusionWidth)
+        extrusionWidth(ln.extrusionWidth)
     {
     }
 
     // Assignment operator
     Line& operator=(const Line &rhs) {
-	if (this != &rhs) {
-	    startPt = rhs.startPt;
-	    endPt = rhs.endPt;
-	    flags = rhs.flags;
-	    temperature = rhs.temperature;
-	    extrusionWidth = rhs.extrusionWidth;
-	}
-	return *this;
+        if (this != &rhs) {
+            startPt = rhs.startPt;
+            endPt = rhs.endPt;
+            flags = rhs.flags;
+            temperature = rhs.temperature;
+            extrusionWidth = rhs.extrusionWidth;
+        }
+        return *this;
     }
 
     // Compound assignment operators
     Line& operator+=(const Point &rhs) {
         this->startPt += rhs;
         this->endPt += rhs;
-	return *this;
+        return *this;
     }
     Line& operator-=(const Point &rhs) {
         this->startPt -= rhs;
         this->endPt -= rhs;
-	return *this;
+        return *this;
     }
-    Line& operator*=(float rhs) {
+    Line& operator*=(double rhs) {
         this->startPt *= rhs;
         this->endPt *= rhs;
-	return *this;
+        return *this;
     }
     Line& operator*=(const Point &rhs) {
         this->startPt *= rhs;
         this->endPt *= rhs;
-	return *this;
+        return *this;
     }
-    Line& operator/=(float rhs) {
+    Line& operator/=(double rhs) {
         this->startPt /= rhs;
         this->endPt /= rhs;
-	return *this;
+        return *this;
     }
     Line& operator/=(const Point &rhs) {
         this->startPt /= rhs;
         this->endPt /= rhs;
-	return *this;
+        return *this;
     }
 
     // Binary arithmetic operators
     const Line operator+(const Point &rhs) const {
-	return Line(*this) += rhs;
+        return Line(*this) += rhs;
     }
     const Line operator-(const Point &rhs) const {
-	return Line(*this) -= rhs;
+        return Line(*this) -= rhs;
     }
-    const Line operator*(float rhs) const {
-	return Line(*this) *= rhs;
+    const Line operator*(double rhs) const {
+        return Line(*this) *= rhs;
     }
     const Line operator*(const Point &rhs) const {
-	return Line(*this) *= rhs;
+        return Line(*this) *= rhs;
     }
-    const Line operator/(float rhs) const {
-	return Line(*this) /= rhs;
+    const Line operator/(double rhs) const {
+        return Line(*this) /= rhs;
     }
     const Line operator/(const Point &rhs) const {
-	return Line(*this) /= rhs;
+        return Line(*this) /= rhs;
     }
 
     // Comparison operators
@@ -139,62 +139,62 @@ public:
     }
 
     // Transformations
-    Line& scale(float scale) {
-	*this *= scale;
-	return *this;
+    Line& scale(double scale) {
+        *this *= scale;
+        return *this;
     }
     Line& scale(const Point& vect) {
-	*this *= vect;
-	return *this;
+        *this *= vect;
+        return *this;
     }
-    Line& scaleAroundPoint(const Point& center, float scale) {
-	*this -= center;
-	*this *= scale;
-	*this += center;
-	return *this;
+    Line& scaleAroundPoint(const Point& center, double scale) {
+        *this -= center;
+        *this *= scale;
+        *this += center;
+        return *this;
     }
     Line& scaleAroundPoint(const Point& center, const Point& vect) {
-	*this -= center;
-	*this *= vect;
-	*this += center;
-	return *this;
+        *this -= center;
+        *this *= vect;
+        *this += center;
+        return *this;
     }
 
     // Calculations
-    float length() const {
+    double length() const {
         return startPt.distanceFrom(endPt);
     }
-    float angle() const {
+    double angle() const {
         return startPt.angleToPoint(endPt);
     }
-    float angleDelta(const Line& ln) const {
-        float delta = ln.angle() - angle();
-	if (delta < -M_PI) {
-	    delta += M_PI * 2.0f;
-	} else if (delta > M_PI) {
-	    delta -= M_PI * 2.0f;
-	}
-	return delta;
+    double angleDelta(const Line& ln) const {
+        double delta = ln.angle() - angle();
+        if (delta < -M_PI) {
+            delta += M_PI * 2.0f;
+        } else if (delta > M_PI) {
+            delta -= M_PI * 2.0f;
+        }
+        return delta;
     }
 
     // Misc
     Line& reverse() {
         Point tmpPt = startPt;
-	startPt = endPt;
-	endPt = tmpPt;
-	return *this;
+        startPt = endPt;
+        endPt = tmpPt;
+        return *this;
     }
     bool isLinearWith(const Point& pt) const;
     bool hasInBounds(const Point &pt) const;
     bool contains(const Point &pt) const;
     Point closestSegmentPointTo(const Point &pt) const;
     Point closestExtendedLinePointTo(const Point &pt) const;
-    float minimumSegmentDistanceFromPoint(const Point &pt) const;
-    float minimumExtendedLineDistanceFromPoint(const Point &pt) const;
+    double minimumSegmentDistanceFromPoint(const Point &pt) const;
+    double minimumExtendedLineDistanceFromPoint(const Point &pt) const;
     Intersection intersectionWithSegment(const Line &ln) const;
     Intersection intersectionWithExtendedLine(const Line &ln) const;
 
-    Line& leftOffset(float offsetby);
+    Line& leftOffset(double offsetby);
 
     // Friend functions
     friend ostream& operator <<(ostream &os,const Line &pt);

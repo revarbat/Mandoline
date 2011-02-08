@@ -17,6 +17,7 @@ ostream &svgHeader(ostream &os, float width, float height)
     os << " viewport=\"0 0 " << pwidth << " " << pheight << "\"";
     os << " stroke=\"black\"";
     os << ">" << endl;
+    os << "<g transform=\"scale(2.0)\" stroke-width=\"0.5pt\">" << endl;
 
     return os;
 } 
@@ -25,6 +26,7 @@ ostream &svgHeader(ostream &os, float width, float height)
 
 ostream &svgFooter(ostream& os)
 {
+    os << "</g>" << endl;
     os << "</svg>" << endl;
     return os;
 }
@@ -146,11 +148,11 @@ int main(int argc, char**argv)
     if (fout.good()) {
 	svgHeader(fout, 100, 100);
 
-	fout << "<g stroke=\"#77f\" stroke-width=\"3\">" << endl;
+	fout << "<g stroke=\"#77f\" stroke-width=\"1.0\">" << endl;
 	regA.svgPathWithOffset(fout, 10, 10);
 	fout << "</g>" << endl;
 
-	fout << "<g stroke=\"#0c0\">" << endl;
+	fout << "<g stroke=\"#0c0\" stroke-width=\"0.5\">" << endl;
 	regB.svgPathWithOffset(fout, 10, 10);
 	fout << "</g>" << endl;
 

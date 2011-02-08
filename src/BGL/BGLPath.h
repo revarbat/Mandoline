@@ -38,11 +38,11 @@ public:
 
     // Assignment operator
     Path& operator=(const Path &rhs) {
-	if (this != &rhs) {
-	    flags = rhs.flags;
-	    segments = rhs.segments;
-	}
-	return *this;
+        if (this != &rhs) {
+            flags = rhs.flags;
+            segments = rhs.segments;
+        }
+        return *this;
     }
 
     // Comparison operators
@@ -54,29 +54,29 @@ public:
     // Compound assignment operators
     Path& operator+=(const Point &rhs);
     Path& operator-=(const Point &rhs);
-    Path& operator*=(float rhs);
+    Path& operator*=(double rhs);
     Path& operator*=(const Point &rhs);
-    Path& operator/=(float rhs);
+    Path& operator/=(double rhs);
     Path& operator/=(const Point &rhs);
 
     // Binary arithmetic operators
     const Path operator+(const Point &rhs) const {
-	return Path(*this) += rhs;
+        return Path(*this) += rhs;
     }
     const Path operator-(const Point &rhs) const {
-	return Path(*this) -= rhs;
+        return Path(*this) -= rhs;
     }
-    const Path operator*(float rhs) const {
-	return Path(*this) *= rhs;
+    const Path operator*(double rhs) const {
+        return Path(*this) *= rhs;
     }
     const Path operator*(const Point &rhs) const {
-	return Path(*this) *= rhs;
+        return Path(*this) *= rhs;
     }
-    const Path operator/(float rhs) const {
-	return Path(*this) /= rhs;
+    const Path operator/(double rhs) const {
+        return Path(*this) /= rhs;
     }
     const Path operator/(const Point &rhs) const {
-	return Path(*this) /= rhs;
+        return Path(*this) /= rhs;
     }
 
     const Point startPoint() const {
@@ -86,9 +86,9 @@ public:
         return segments.back().endPt;
     }
     bool isClosed() const {
-	if (size() == 0) {
-	    return false;
-	}
+        if (size() == 0) {
+            return false;
+        }
         return (startPoint() == endPoint());
     }
     int size() const {
@@ -97,9 +97,9 @@ public:
     bool hasEndPoint(const Point& pt) const {
         return (pt == startPoint() || pt == endPoint());
     }
-    float length() const;
-    float area() const;
-    float windingArea() const;
+    double length() const;
+    double area() const;
+    double windingArea() const;
     bool isClockwise() const;
     Bounds bounds() const;
 
@@ -108,19 +108,19 @@ public:
     bool attach(const Line& ln);
     bool attach(const Path& path);
 
-    string svgPathWithOffset(float dx, float dy) const;
-    ostream &svgPathDataWithOffset(ostream& os, float dx, float dy) const;
-    ostream &svgPathWithOffset(ostream& os, float dx, float dy) const;
+    string svgPathWithOffset(double dx, double dy) const;
+    ostream &svgPathDataWithOffset(ostream& os, double dx, double dy) const;
+    ostream &svgPathWithOffset(ostream& os, double dx, double dy) const;
 
     bool intersects(const Line &ln) const;
     bool intersects(const Path &path) const;
     Intersections &intersectionsWith(const Line &ln, Intersections &outISects) const;
 
-    bool hasEdgeWithPoint(const Point &pt) const;
+    bool hasEdgeWithPoint(const Point &pt, Lines::const_iterator &outSeg) const;
     bool contains(const Point &pt) const;
 
-    void setTemperature(float val);
-    void setWidth(float val);
+    void setTemperature(double val);
+    void setWidth(double val);
 
     Lines::const_iterator begin() const { return segments.begin(); }
     Lines::const_reverse_iterator rbegin() const { return segments.rbegin(); }
@@ -133,8 +133,8 @@ public:
     Lines::reverse_iterator rend() { return segments.rend(); }
 
     // Strips out segments that are shorter than the given length.
-    void stripSegmentsShorterThan(float minlen);
-    void simplify(float minErr);
+    void stripSegmentsShorterThan(double minlen);
+    void simplify(double minErr);
     void splitSegmentsAtIntersectionsWithPath(const Path &path);
     Paths &separateSelfIntersectingSubpaths(Paths &outPaths);
     void reorderByPoint(const Point &pt);
@@ -156,8 +156,8 @@ public:
     Lines &containedSegments(const Line &line, Lines &outSegs) const;
     Paths &containedSubpathsOfPath(Path &path, Paths outPaths) const;
 
-    Paths &leftOffset(float offsetby, Paths& outPaths);
-    Paths &inset(float offsetby, Paths& outPaths);
+    Paths &leftOffset(double offsetby, Paths& outPaths);
+    Paths &inset(double offsetby, Paths& outPaths);
 
     // Friend functions
     friend ostream& operator <<(ostream &os,const Path &pt);

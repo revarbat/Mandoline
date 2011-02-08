@@ -8,13 +8,13 @@ namespace BGL {
 
 class Bounds {
 public:
-    float minX, maxX, minY, maxY;
-    static const float NONE;
+    double minX, maxX, minY, maxY;
+    static const double NONE;
 
     Bounds() : minX(NONE), maxX(NONE), minY(NONE), maxY(NONE) {}
     Bounds(const Bounds &x)
         : minX(x.minX), maxX(x.maxX), minY(x.minY), maxY(x.maxY) {}
-    Bounds(float xmin, float ymin, float xmax, float ymax)
+    Bounds(double xmin, double ymin, double xmax, double ymax)
         : minX(xmin), maxX(xmax), minY(ymin), maxY(ymax) {}
 
     // Assignment operator

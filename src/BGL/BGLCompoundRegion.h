@@ -21,7 +21,7 @@ namespace BGL {
 class CompoundRegion {
 public:
     SimpleRegions subregions;
-    float zLevel;
+    double zLevel;
 
     CompoundRegion() : subregions(), zLevel(0.0f) {}
     CompoundRegion(const SimpleRegions &x) : subregions(x), zLevel(0.0f) {}
@@ -36,9 +36,9 @@ public:
     // Compound assignment operators
     CompoundRegion& operator+=(const Point &rhs);
     CompoundRegion& operator-=(const Point &rhs);
-    CompoundRegion& operator*=(float rhs);
+    CompoundRegion& operator*=(double rhs);
     CompoundRegion& operator*=(const Point &rhs);
-    CompoundRegion& operator/=(float rhs);
+    CompoundRegion& operator/=(double rhs);
     CompoundRegion& operator/=(const Point &rhs);
 
     // Binary arithmetic operators
@@ -48,13 +48,13 @@ public:
     const CompoundRegion operator-(const Point &rhs) const {
 	return CompoundRegion(*this) -= rhs;
     }
-    const CompoundRegion operator*(float rhs) const {
+    const CompoundRegion operator*(double rhs) const {
 	return CompoundRegion(*this) *= rhs;
     }
     const CompoundRegion operator*(const Point &rhs) const {
 	return CompoundRegion(*this) *= rhs;
     }
-    const CompoundRegion operator/(float rhs) const {
+    const CompoundRegion operator/(double rhs) const {
 	return CompoundRegion(*this) /= rhs;
     }
     const CompoundRegion operator/(const Point &rhs) const {
@@ -64,11 +64,11 @@ public:
     int32_t size() const;
     bool contains(const Point &pt) const;
 
-    string svgPathWithOffset(float dx, float dy);
-    ostream &svgPathDataWithOffset(ostream& os, float dx, float dy) const;
-    ostream &svgPathWithOffset(ostream& os, float dx, float dy) const;
+    string svgPathWithOffset(double dx, double dy);
+    ostream &svgPathDataWithOffset(ostream& os, double dx, double dy) const;
+    ostream &svgPathWithOffset(ostream& os, double dx, double dy) const;
 
-    void simplify(float minErr);
+    void simplify(double minErr);
 
     CompoundRegion &unionWith(SimpleRegion &reg);
     CompoundRegion &differenceWith(SimpleRegion &reg);
@@ -78,7 +78,7 @@ public:
     CompoundRegion &differenceWith(CompoundRegion &reg);
     CompoundRegion &intersectionWith(CompoundRegion &reg);
 
-    CompoundRegion &insetRegion(float insetBy, CompoundRegion &outReg);
+    CompoundRegion &insetRegion(double insetBy, CompoundRegion &outReg);
 
     static CompoundRegion &differenceOf  (CompoundRegion &r1, CompoundRegion &r2, CompoundRegion &outReg);
     static CompoundRegion &unionOf       (CompoundRegion &r1, CompoundRegion &r2, CompoundRegion &outReg);
@@ -89,7 +89,7 @@ public:
     Lines &containedSegmentsOfLine(Line &line, Lines &lnsref);
     Paths &containedSubpathsOfPath(Path &path, Paths &pathsref);
 
-    Paths &infillPathsForRegionWithDensity(float density, float extrusionWidth, Paths &outPaths);
+    Paths &infillPathsForRegionWithDensity(double density, double extrusionWidth, Paths &outPaths);
 
 };
 typedef list<CompoundRegion> CompoundRegions;

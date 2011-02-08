@@ -23,7 +23,7 @@ class SimpleRegion {
 public:
     Path outerPath;
     Paths subpaths;
-    float zLevel;
+    double zLevel;
 
     SimpleRegion() : outerPath(), subpaths(), zLevel(0.0f) {}
     SimpleRegion(const Path &x) : outerPath(x), subpaths(), zLevel(0.0f) {}
@@ -32,9 +32,9 @@ public:
     // Compound assignment operators
     SimpleRegion& operator+=(const Point &rhs);
     SimpleRegion& operator-=(const Point &rhs);
-    SimpleRegion& operator*=(float rhs);
+    SimpleRegion& operator*=(double rhs);
     SimpleRegion& operator*=(const Point &rhs);
-    SimpleRegion& operator/=(float rhs);
+    SimpleRegion& operator/=(double rhs);
     SimpleRegion& operator/=(const Point &rhs);
 
     // Binary arithmetic operators
@@ -44,13 +44,13 @@ public:
     const SimpleRegion operator-(const Point &rhs) const {
 	return SimpleRegion(*this) -= rhs;
     }
-    const SimpleRegion operator*(float rhs) const {
+    const SimpleRegion operator*(double rhs) const {
 	return SimpleRegion(*this) *= rhs;
     }
     const SimpleRegion operator*(const Point &rhs) const {
 	return SimpleRegion(*this) *= rhs;
     }
-    const SimpleRegion operator/(float rhs) const {
+    const SimpleRegion operator/(double rhs) const {
 	return SimpleRegion(*this) /= rhs;
     }
     const SimpleRegion operator/(const Point &rhs) const {
@@ -63,11 +63,11 @@ public:
     bool intersects(const Path& path) const;
     bool intersects(const SimpleRegion& path) const;
 
-    string svgPathWithOffset(float dx, float dy);
-    ostream &svgPathDataWithOffset(ostream& os, float dx, float dy) const;
-    ostream &svgPathWithOffset(ostream& os, float dx, float dy) const;
+    string svgPathWithOffset(double dx, double dy);
+    ostream &svgPathDataWithOffset(ostream& os, double dx, double dy) const;
+    ostream &svgPathWithOffset(ostream& os, double dx, double dy) const;
 
-    void simplify(float minErr);
+    void simplify(double minErr);
 
     static SimpleRegions &assembleSimpleRegionsFrom(Paths &paths, SimpleRegions &outRegs);
     static SimpleRegions &assembleSimpleRegionsFrom(const Paths &outerPaths, const Paths &innerPaths, SimpleRegions &outRegs);
@@ -79,8 +79,7 @@ public:
     Lines &containedSegmentsOfLine(Line &line, Lines &lnsref);
     Paths &containedSubpathsOfPath(const Path &path, Paths &pathsref);
 
-    Paths &infillPathsForRegionWithDensity(float density, float extrusionWidth, Paths &outPaths);
-
+    Paths &infillPathsForRegionWithDensity(double density, double extrusionWidth, Paths &outPaths);
 };
 
 

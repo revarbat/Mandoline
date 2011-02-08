@@ -2,7 +2,7 @@
 
 namespace BGL {
 
-const float Bounds::NONE = -9e9;
+const double Bounds::NONE = -9e9;
 
 void Bounds::expand(const Point& pt)
 {

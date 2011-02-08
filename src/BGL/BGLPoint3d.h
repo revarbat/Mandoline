@@ -21,11 +21,11 @@ namespace BGL {
 class Point3d {
 public:
     // Member variables
-    float x, y, z;
+    double x, y, z;
 
     // Constructors
     Point3d() : x(0.0), y(0.0), z(0.0) {}
-    Point3d(float nux, float nuy, float nuz) : x(nux), y(nuy), z(nuz) {}
+    Point3d(double nux, double nuy, double nuz) : x(nux), y(nuy), z(nuz) {}
     Point3d(const Point3d &pt) : x(pt.x), y(pt.y), z(pt.z) {}
 
     // Assignment operator
@@ -51,7 +51,7 @@ public:
         this->z -= rhs.z;
 	return *this;
     }
-    Point3d& operator*=(float rhs) {
+    Point3d& operator*=(double rhs) {
         this->x *= rhs;
         this->y *= rhs;
         this->z *= rhs;
@@ -63,7 +63,7 @@ public:
         this->z *= rhs.z;
 	return *this;
     }
-    Point3d& operator/=(float rhs) {
+    Point3d& operator/=(double rhs) {
         this->x /= rhs;
         this->y /= rhs;
         this->z /= rhs;
@@ -83,13 +83,13 @@ public:
     const Point3d operator-(const Point3d &rhs) const {
 	return Point3d(*this) -= rhs;
     }
-    const Point3d operator*(float rhs) const {
+    const Point3d operator*(double rhs) const {
 	return Point3d(*this) *= rhs;
     }
     const Point3d operator*(const Point3d &rhs) const {
 	return Point3d(*this) *= rhs;
     }
-    const Point3d operator/(float rhs) const {
+    const Point3d operator/(double rhs) const {
 	return Point3d(*this) /= rhs;
     }
     const Point3d operator/(const Point3d &rhs) const {
@@ -98,32 +98,32 @@ public:
 
     // Comparison operators
     bool operator==(const Point3d &rhs) const {
-        return (fabsf(this->x-rhs.x) + fabsf(this->y+rhs.y) + fabsf(this->z+rhs.z) < CLOSEENOUGH);
+        return (fabs(this->x-rhs.x) + fabs(this->y+rhs.y) + fabs(this->z+rhs.z) < CLOSEENOUGH);
     }
     bool operator!=(const Point3d &rhs) const {
         return !(*this == rhs);
     }
 
-    // Comparators for z height float.
-    bool operator== (float zcoord) const {
-        return (fabsf(z-zcoord) < CLOSEENOUGH);
+    // Comparators for z height double.
+    bool operator== (double zcoord) const {
+        return (fabs(z-zcoord) < CLOSEENOUGH);
     }
-    bool operator< (float zcoord) const {
+    bool operator< (double zcoord) const {
         return (z < zcoord);
     }
-    bool operator> (float zcoord) const {
+    bool operator> (double zcoord) const {
         return (z > zcoord);
     }
-    bool operator<= (float zcoord) const {
+    bool operator<= (double zcoord) const {
         return !(*this > zcoord);
     }
-    bool operator>= (float zcoord) const {
+    bool operator>= (double zcoord) const {
         return !(*this < zcoord);
     }
 
 
     // Transformations
-    Point3d& scale(float scale) {
+    Point3d& scale(double scale) {
 	*this *= scale;
 	return *this;
     }
@@ -131,7 +131,7 @@ public:
 	*this *= vect;
 	return *this;
     }
-    Point3d& scaleAroundPoint3d(const Point3d& center, float scale) {
+    Point3d& scaleAroundPoint3d(const Point3d& center, double scale) {
 	*this -= center;
 	*this *= scale;
 	*this += center;
@@ -145,11 +145,11 @@ public:
     }
 
     // Calculations
-    float distanceFrom(const Point3d& pt) const {
+    double distanceFrom(const Point3d& pt) const {
         Point3d vect(*this);
 	vect -= pt;
 	vect *= vect;
-	return sqrtf(vect.x+vect.y+vect.z);
+	return sqrt(vect.x+vect.y+vect.z);
     }
 
     // Friend functions

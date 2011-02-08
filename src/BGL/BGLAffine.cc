@@ -11,24 +11,24 @@
 
 namespace BGL {
 
-Affine Affine::translationAffine(float dx, float dy)
+Affine Affine::translationAffine(double dx, double dy)
 {
     return Affine(1.0, 0.0, 0.0, 1.0, dx, dy);
 }
 
 
 
-Affine Affine::scalingAffine(float sx, float sy)
+Affine Affine::scalingAffine(double sx, double sy)
 {
     return Affine(sx, 0.0, 0.0, sy, 0.0, 0.0);
 }
 
 
 
-Affine Affine::rotationAffine(float radang)
+Affine Affine::rotationAffine(double radang)
 {
-    float cosv = cosf(radang);
-    float sinv = sinf(radang);
+    double cosv = cos(radang);
+    double sinv = sin(radang);
     return Affine(cosv, -sinv, sinv, cosv, 0.0, 0.0);
 }
 
@@ -36,10 +36,10 @@ Affine Affine::rotationAffine(float radang)
 
 Affine& Affine::transform(const Affine& aff)
 {
-    float olda = a;
-    float oldb = b;
-    float oldc = c;
-    float oldd = d;
+    double olda = a;
+    double oldb = b;
+    double oldc = c;
+    double oldd = d;
     a  = aff.a  * olda  +  aff.b  * oldc;
     b  = aff.a  * oldb  +  aff.b  * oldd;
     c  = aff.c  * olda  +  aff.d  * oldc;
@@ -51,21 +51,21 @@ Affine& Affine::transform(const Affine& aff)
 
 
 
-Affine& Affine::translate(float dx, float dy)
+Affine& Affine::translate(double dx, double dy)
 {
     return transform(translationAffine(dx,dy));
 }
 
 
 
-Affine& Affine::scale(float sx, float sy)
+Affine& Affine::scale(double sx, double sy)
 {
     return transform(scalingAffine(sx,sy));
 }
 
 
 
-Affine& Affine::scaleAroundPoint(float sx, float sy, float x, float y)
+Affine& Affine::scaleAroundPoint(double sx, double sy, double x, double y)
 {
     translate(-x,-y);
     transform(scalingAffine(sx,sy));
@@ -75,14 +75,14 @@ Affine& Affine::scaleAroundPoint(float sx, float sy, float x, float y)
 
 
 
-Affine& Affine::rotate(float radang)
+Affine& Affine::rotate(double radang)
 {
     return transform(rotationAffine(radang));
 }
 
 
 
-Affine& Affine::rotateAroundPoint(float radang, float x, float y)
+Affine& Affine::rotateAroundPoint(double radang, double x, double y)
 {
     translate(-x,-y);
     transform(rotationAffine(radang));
@@ -92,10 +92,10 @@ Affine& Affine::rotateAroundPoint(float radang, float x, float y)
 
 
 
-void Affine::transformPoint(float& x, float &y) const
+void Affine::transformPoint(double& x, double &y) const
 {
-    float nx = a * x + b * y + tx;
-    float ny = c * x + d * y + ty;
+    double nx = a * x + b * y + tx;
+    double ny = c * x + d * y + ty;
     x = nx;
     y = ny;
 }

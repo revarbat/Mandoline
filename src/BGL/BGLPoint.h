@@ -25,11 +25,11 @@ namespace BGL {
 class Point {
 public:
     // Member variables
-    float x, y;
+    double x, y;
 
     // Constructors
     Point() : x(0.0), y(0.0) {}
-    Point(float nux, float nuy) : x(nux), y(nuy) {}
+    Point(double nux, double nuy) : x(nux), y(nuy) {}
     Point(const Point &pt) : x(pt.x), y(pt.y) {}
     Point(const Point3d &pt) : x(pt.x), y(pt.y) {}
 
@@ -53,7 +53,7 @@ public:
         this->y -= rhs.y;
 	return *this;
     }
-    Point& operator*=(float rhs) {
+    Point& operator*=(double rhs) {
         this->x *= rhs;
         this->y *= rhs;
 	return *this;
@@ -63,7 +63,7 @@ public:
         this->y *= rhs.y;
 	return *this;
     }
-    Point& operator/=(float rhs) {
+    Point& operator/=(double rhs) {
         this->x /= rhs;
         this->y /= rhs;
 	return *this;
@@ -81,13 +81,13 @@ public:
     const Point operator-(const Point &rhs) const {
 	return Point(*this) -= rhs;
     }
-    const Point operator*(float rhs) const {
+    const Point operator*(double rhs) const {
 	return Point(*this) *= rhs;
     }
     const Point operator*(const Point &rhs) const {
 	return Point(*this) *= rhs;
     }
-    const Point operator/(float rhs) const {
+    const Point operator/(double rhs) const {
 	return Point(*this) /= rhs;
     }
     const Point operator/(const Point &rhs) const {
@@ -96,7 +96,7 @@ public:
 
     // Comparison operators
     bool operator==(const Point &rhs) const {
-        return (fabsf(x-rhs.x) < CLOSEENOUGH &&  fabsf(y-rhs.y) < CLOSEENOUGH);
+        return (fabs(x-rhs.x) < CLOSEENOUGH &&  fabs(y-rhs.y) < CLOSEENOUGH);
     }
     bool operator>=(const Point &rhs) const {
 	if (x < rhs.x) {
@@ -127,7 +127,7 @@ public:
     }
 
     // Transformations
-    Point& scale(float scale) {
+    Point& scale(double scale) {
 	*this *= scale;
 	return *this;
     }
@@ -135,7 +135,7 @@ public:
 	*this *= vect;
 	return *this;
     }
-    Point& scaleAroundPoint(const Point& center, float scale) {
+    Point& scaleAroundPoint(const Point& center, double scale) {
 	*this -= center;
 	*this *= scale;
 	*this += center;
@@ -149,16 +149,16 @@ public:
     }
 
     // Calculations
-    float distanceFrom(const Point& pt) const {
+    double distanceFrom(const Point& pt) const {
         Point delta = *this - pt;
-	return hypotf(delta.y,delta.x);
+	return hypot(delta.y,delta.x);
     }
-    float angleToPoint(const Point& pt) const {
+    double angleToPoint(const Point& pt) const {
         Point delta = *this - pt;
-	return atan2f(delta.y,delta.x);
+	return atan2(delta.y,delta.x);
     }
 
-    Point &polarOffset(float ang, float rad) {
+    Point &polarOffset(double ang, double rad) {
         x += rad*cos(ang);
 	y += rad*sin(ang);
 	return *this;
