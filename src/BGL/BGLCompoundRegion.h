@@ -78,7 +78,7 @@ public:
     CompoundRegion &differenceWith(CompoundRegion &reg);
     CompoundRegion &intersectionWith(CompoundRegion &reg);
 
-    CompoundRegion &insetRegion(double insetBy, CompoundRegion &outReg);
+    CompoundRegion &inset(double insetBy, CompoundRegion &outReg);
 
     static CompoundRegion &differenceOf  (CompoundRegion &r1, CompoundRegion &r2, CompoundRegion &outReg);
     static CompoundRegion &unionOf       (CompoundRegion &r1, CompoundRegion &r2, CompoundRegion &outReg);

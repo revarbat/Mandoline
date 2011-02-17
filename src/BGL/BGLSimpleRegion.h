@@ -76,6 +76,8 @@ public:
     static SimpleRegions& differenceOf  (SimpleRegion &r1, SimpleRegion &r2, SimpleRegions &outReg);
     static SimpleRegions& intersectionOf(SimpleRegion &r1, SimpleRegion &r2, SimpleRegions &outReg);
 
+    SimpleRegions &inset(double offsetby, SimpleRegions& outRegs);
+
     Lines &containedSegmentsOfLine(Line &line, Lines &lnsref);
     Paths &containedSubpathsOfPath(const Path &path, Paths &pathsref);
 

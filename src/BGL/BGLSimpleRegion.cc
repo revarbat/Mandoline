@@ -405,6 +405,31 @@ SimpleRegions &SimpleRegion::intersectionOf(SimpleRegion &r1, SimpleRegion &r2, 
 
 
 
+SimpleRegions &SimpleRegion::inset(double offsetby, SimpleRegions& outRegs)
+{
+    Paths outerPaths;
+    outerPath.inset(offsetby, outerPaths);
+
+    Paths innerPaths;
+    Paths::iterator it1;
+    for (it1 = subpaths.begin(); it1 != subpaths.end(); it1++) {
+	it1->inset(-offsetby, innerPaths);
+    }
+
+    Paths::iterator it2;
+    for (it1 = innerPaths.begin(); it1 != innerPaths.end(); it1++) {
+        Paths tempPaths;
+	for (it2 = outerPaths.begin(); it2 != outerPaths.end(); it2++) {
+	    Path::differenceOf(*it2, *it1, tempPaths);
+	}
+	outerPaths = tempPaths;
+    }
+
+    assembleSimpleRegionsFrom(outerPaths, outRegs);
+    return outRegs;
+}
+
+
 
 Lines &SimpleRegion::containedSegmentsOfLine(Line &line, Lines &outSegs)
 {

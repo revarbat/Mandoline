@@ -1129,12 +1129,68 @@ Paths &Path::leftOffset(double offsetby, Paths& outPaths)
 
 
 
-Paths &Path::inset(double insetby, Paths& outPaths)
+Paths &Path::inset(double insetBy, Paths& outPaths)
 {
-    if (isClockwise()) {
-        insetby = -insetby;
+    if (!isClosed()) {
+        return outPaths;
     }
-    return leftOffset(insetby, outPaths);
+
+    // Translate inset into a left offset.
+    if (isClockwise()) {
+        insetBy = -insetBy;
+    }
+
+    Paths trimPaths;
+    Paths::iterator pit;
+    Lines::iterator lit = segments.begin();
+    Line prevLine;
+    bool isfirst = true;
+    for (lit = segments.begin(); lit != segments.end(); lit++) {
+	Line offsetLine;
+	if (!isfirst) {
+	    if (prevLine.angleDelta(*lit) < 0.0) {
+		// sharp outside angle.  Needs added segments.
+		offsetLine = prevLine;
+		offsetLine.leftOffset(insetBy);
+		offsetLine.reverse();
+
+		double sang = prevLine.angle() + M_PI_2;
+		double eang = lit->angle() + M_PI_2;
+		double step = (eang-sang) / (floor(fabs(eang-sang) / (M_PI_4/2))+1);
+		for (double ang = sang + step/2.0; ang >= eang+step; ang += step) {
+		    offsetLine.endPt = offsetLine.startPt;
+		    offsetLine.startPt = prevLine.endPt;
+		    offsetLine.startPt.polarOffset(ang, insetBy/cos(ang/2.0));
+
+		    trimPaths.push_back(Path());
+		    Path &trimPath2 = trimPaths.front();
+		    trimPath2.segments.push_back(Line(prevLine.endPt, offsetLine.startPt));
+		    trimPath2.segments.push_back(offsetLine);
+		    trimPath2.segments.push_back(Line(offsetLine.endPt, prevLine.endPt));
+		}
+	    }
+	}
+	isfirst = false;
+
+	offsetLine = *lit;
+	offsetLine.leftOffset(insetBy);
+	offsetLine.reverse();
+
+	trimPaths.push_back(Path());
+	Path &trimPath = trimPaths.front();
+	trimPath.segments.push_back(*lit);
+	trimPath.segments.push_back(Line(lit->endPt, offsetLine.startPt));
+	trimPath.segments.push_back(offsetLine);
+	trimPath.segments.push_back(Line(offsetLine.endPt, lit->startPt));
+
+	prevLine = *lit;
+    }
+
+    Paths pathsToTrim;
+    pathsToTrim.push_back(*this);
+    differenceOf(pathsToTrim, trimPaths, outPaths);
+    return outPaths;
+    //return leftOffset(insetBy, outPaths);
 }
 
 

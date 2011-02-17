@@ -174,8 +174,8 @@ Intersection Line::intersectionWithSegment(const Line &ln) const
 	    }
             return Intersection();
 	} else if (
-	    minimumExtendedLineDistanceFromPoint(ln.startPt) < EPSILON &&
-	    minimumExtendedLineDistanceFromPoint(ln.endPt) < EPSILON
+	    minimumExtendedLineDistanceFromPoint(ln.startPt) < CLOSEENOUGH &&
+	    minimumExtendedLineDistanceFromPoint(ln.endPt) < CLOSEENOUGH
 	) {
             // Lines are coincident (or very close to).  Check for overlap.
 	    Points isects;
@@ -239,6 +239,15 @@ Intersection Line::intersectionWithSegment(const Line &ln) const
 	return Intersection();
     }
     
+    if (ua < 0.0) {
+	return Intersection(Point(x1,y1),0);
+    } else if (ua > 1.0) {
+	return Intersection(Point(x2,y2),0);
+    } else if (ub < 0.0) {
+	return Intersection(Point(x3,y3),0);
+    } else if (ub > 1.0) {
+	return Intersection(Point(x4,y4),0);
+    }
     return Intersection(Point(xi,yi),0);
 }
 

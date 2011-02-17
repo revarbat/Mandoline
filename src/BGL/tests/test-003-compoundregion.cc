@@ -257,7 +257,7 @@ int main(int argc, char**argv)
 	fout << "</g>" << endl;
 
 	BGL::CompoundRegion outRegs;
-	compregA.insetRegion(0.5f, outRegs);
+	compregA.inset(0.5f, outRegs);
 	outRegs.svgPathWithOffset(fout, 10, 10);
 
 	svgFooter(fout);
@@ -274,7 +274,7 @@ int main(int argc, char**argv)
 	fout << "</g>" << endl;
 
 	BGL::CompoundRegion outRegs;
-	compregA.insetRegion(1.0f, outRegs);
+	compregA.inset(1.0f, outRegs);
 	outRegs.svgPathWithOffset(fout, 10, 10);
 
 	svgFooter(fout);
@@ -291,7 +291,7 @@ int main(int argc, char**argv)
 	fout << "</g>" << endl;
 
 	BGL::CompoundRegion outRegs;
-	compregB.insetRegion(0.5f, outRegs);
+	compregB.inset(0.5f, outRegs);
 	outRegs.svgPathWithOffset(fout, 10, 10);
 
 	svgFooter(fout);
@@ -308,7 +308,7 @@ int main(int argc, char**argv)
 	fout << "</g>" << endl;
 
 	BGL::CompoundRegion outRegs;
-	compregB.insetRegion(1.0f, outRegs);
+	compregB.inset(1.0f, outRegs);
 	outRegs.svgPathWithOffset(fout, 10, 10);
 
 	svgFooter(fout);

@@ -292,43 +292,14 @@ ostream &ssvgFooter(ostream& os)
 
 
 
-CompoundRegion &CompoundRegion::insetRegion(double insetBy, CompoundRegion &outReg)
+CompoundRegion &CompoundRegion::inset(double insetBy, CompoundRegion &outReg)
 {
-    // This is a HACK.  But I got frustrated trying to handle proper insets.
-    char buf[128];
-    const int angles = 16;
-    CompoundRegion circumReg;
-    for (double ang = 0.0f; ang < M_PI*2.0f; ang += M_PI*2.0f/angles) {
-        double dx = insetBy * cos(ang);
-        double dy = insetBy * sin(ang);
-	CompoundRegion offReg(*this);
-	CompoundRegion tempReg(*this);
-	offReg += Point(dx,dy);
-	tempReg.differenceWith(offReg);
-	circumReg.unionWith(tempReg);
-
-	fstream fout;
-	snprintf(buf, sizeof(buf), "output/temp-%.2f.svg", ang);
-	fout.open(buf, fstream::out | fstream::trunc);
-	if (fout.good()) {
-	    ssvgHeader(fout, 100, 100);
-	    tempReg.svgPathWithOffset(fout, 10, 10);
-	    ssvgFooter(fout);
-	    fout.sync();
-	    fout.close();
-	}
-	snprintf(buf, sizeof(buf), "output/circum-%.2f.svg", ang);
-	fout.open(buf, fstream::out | fstream::trunc);
-	if (fout.good()) {
-	    ssvgHeader(fout, 100, 100);
-	    circumReg.svgPathWithOffset(fout, 10, 10);
-	    ssvgFooter(fout);
-	    fout.sync();
-	    fout.close();
-	}
+    SimpleRegions::iterator it1;
+    for (it1 = subregions.begin(); it1 != subregions.end(); it1++) {
+	CompoundRegion insetReg;
+	it1->inset(insetBy, insetReg.subregions);
+	outReg.unionWith(insetReg);
     }
-    outReg = *this;
-    outReg.differenceWith(circumReg);
     return outReg;
 }
 
