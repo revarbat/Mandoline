@@ -39,6 +39,9 @@ public:
     Intersection(const Point& pt1, const Point& pt2, int32_t segnum) : type(SEGMENT), p1(pt1), p2(pt2), segment(segnum) {}
 
     Line line() const;
+
+    void quantize(float quanta);
+    void quantize();
 };
 
 typedef list<Intersection> Intersections;

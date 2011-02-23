@@ -1,36 +1,6 @@
 #include <fstream>
 #include "../BGL.h"
 
-ostream &svgHeader(ostream &os, float width, float height)
-{
-    float pwidth  = width * 90.0f / 25.4f;
-    float pheight = height * 90.0f / 25.4f;
-
-    os << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
-    os << "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">\n";
-    os << "<svg xmlns=\"http://www.w3.org/2000/svg\"";
-    os << " xml:space=\"preserve\"";
-    os << " style=\"shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd\"";
-    os << " xmlns:xlink=\"http://www.w3.org/1999/xlink\"";
-    os << " width=\"" << width << "mm\"";
-    os << " height=\"" << height << "mm\"";
-    os << " viewport=\"0 0 " << pwidth << " " << pheight << "\"";
-    os << " stroke=\"black\"";
-    os << ">" << endl;
-    os << "<g transform=\"scale(2.0)\" stroke-width=\"0.5pt\">" << endl;
-
-    return os;
-} 
-
-
-
-ostream &svgFooter(ostream& os)
-{
-    os << "</g>" << endl;
-    os << "</svg>" << endl;
-    return os;
-}
-
 
 
 // Spiral
@@ -542,15 +512,16 @@ BGL::Point spiralPoints[] = {
 int main(int argc, char**argv)
 {
     BGL::Path spiralPath(sizeof(spiralPoints)/sizeof(BGL::Point), spiralPoints);
-    spiralPath *= 10;
+    spiralPath *= 30;
     BGL::Path spiralOffsetPath(spiralPath);
-    spiralOffsetPath += BGL::Point(0.5,3.0);
+    spiralOffsetPath += BGL::Point(1.5,9.0);
 
     fstream fout;
+    BGL::SVG svg(150, 150);
 
     fout.open("output/test-007a-path-orig.svg", fstream::out | fstream::trunc);
     if (fout.good()) {
-	svgHeader(fout, 100, 100);
+	svg.header(fout);
 
 	fout << "<g stroke=\"#77f\" stroke-width=\"1.0\">" << endl;
 	spiralPath.svgPathWithOffset(fout, 10, 10);
@@ -560,14 +531,14 @@ int main(int argc, char**argv)
 	spiralOffsetPath.svgPathWithOffset(fout, 10, 10);
 	fout << "</g>" << endl;
 
-	svgFooter(fout);
+	svg.footer(fout);
 	fout.sync();
 	fout.close();
     }
 
     fout.open("output/test-007b-path-union.svg", fstream::out | fstream::trunc);
     if (fout.good()) {
-	svgHeader(fout, 100, 100);
+	svg.header(fout);
 
 	BGL::Paths outPaths;
 	BGL::Paths::iterator pit;
@@ -576,14 +547,14 @@ int main(int argc, char**argv)
 	    pit->svgPathWithOffset(fout, 10, 10);
 	}
 
-	svgFooter(fout);
+	svg.footer(fout);
 	fout.sync();
 	fout.close();
     }
 
     fout.open("output/test-007c-path-diff.svg", fstream::out | fstream::trunc);
     if (fout.good()) {
-	svgHeader(fout, 100, 100);
+	svg.header(fout);
 
 	BGL::Paths outPaths;
 	BGL::Paths::iterator pit;
@@ -592,14 +563,14 @@ int main(int argc, char**argv)
 	    pit->svgPathWithOffset(fout, 10, 10);
 	}
 
-	svgFooter(fout);
+	svg.footer(fout);
 	fout.sync();
 	fout.close();
     }
 
     fout.open("output/test-007d-path-intsect.svg", fstream::out | fstream::trunc);
     if (fout.good()) {
-	svgHeader(fout, 100, 100);
+	svg.header(fout);
 
 	BGL::Paths outPaths;
 	BGL::Paths::iterator pit;
@@ -608,7 +579,7 @@ int main(int argc, char**argv)
 	    pit->svgPathWithOffset(fout, 10, 10);
 	}
 
-	svgFooter(fout);
+	svg.footer(fout);
 	fout.sync();
 	fout.close();
     }

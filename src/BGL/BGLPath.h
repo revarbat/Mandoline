@@ -132,6 +132,9 @@ public:
     Lines::iterator end() { return segments.begin(); }
     Lines::reverse_iterator rend() { return segments.rend(); }
 
+    void quantize(float quanta);
+    void quantize();
+
     // Strips out segments that are shorter than the given length.
     void stripSegmentsShorterThan(double minlen);
     void simplify(double minErr);
@@ -144,11 +147,11 @@ public:
 
     static Paths &assemblePathsFromSegments(const Lines &segs, Paths &outPaths);
     static Paths &repairUnclosedPaths(const Paths &paths, Paths &outPaths);
-    static Paths &assembleTaggedPaths(Path &path1, uint32_t flags1, Path &path2, uint32_t flags2, Paths &outPaths);
+    static Paths &assembleTaggedPaths(const Path &inPath1, uint32_t flags1, const Path &inPath2, uint32_t flags2, Paths &outPaths);
 
-    static Paths &differenceOf  (Path &path1, Path &path2, Paths &outPaths);
-    static Paths &unionOf       (Path &path1, Path &path2, Paths &outPaths);
-    static Paths &intersectionOf(Path &path1, Path &path2, Paths &outPaths);
+    static Paths &differenceOf  (const Path &path1, const Path &path2, Paths &outPaths);
+    static Paths &unionOf       (const Path &path1, const Path &path2, Paths &outPaths);
+    static Paths &intersectionOf(const Path &path1, const Path &path2, Paths &outPaths);
 
     static Paths &unionOf       (Paths &paths, Paths &outPaths);
     static Paths &differenceOf  (Paths &paths1, Paths &paths2, Paths &outPaths);

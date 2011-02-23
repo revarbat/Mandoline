@@ -416,16 +416,13 @@ SimpleRegions &SimpleRegion::inset(double offsetby, SimpleRegions& outRegs)
 	it1->inset(-offsetby, innerPaths);
     }
 
-    Paths::iterator it2;
-    for (it1 = innerPaths.begin(); it1 != innerPaths.end(); it1++) {
-        Paths tempPaths;
-	for (it2 = outerPaths.begin(); it2 != outerPaths.end(); it2++) {
-	    Path::differenceOf(*it2, *it1, tempPaths);
-	}
-	outerPaths = tempPaths;
-    }
+    Paths innerPaths2;
+    Path::unionOf(innerPaths, innerPaths2);
 
-    assembleSimpleRegionsFrom(outerPaths, outRegs);
+    Paths newPaths;
+    Path::differenceOf(outerPaths, innerPaths2, newPaths);
+
+    assembleSimpleRegionsFrom(newPaths, outRegs);
     return outRegs;
 }
 

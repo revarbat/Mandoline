@@ -20,7 +20,7 @@ BINDIR = @prefix@/bin
 BINS = libBGL.a
 SRCS = BGLCommon.cc BGLIntersection.cc BGLAffine.cc BGLBounds.cc \
         BGLPoint.cc BGLLine.cc BGLPath.cc BGLSimpleRegion.cc BGLCompoundRegion.cc \
-	BGLPoint3d.cc BGLTriangle3d.cc BGLMesh3d.cc
+	BGLPoint3d.cc BGLTriangle3d.cc BGLMesh3d.cc BGLSVG.cc
 OBJS = $(patsubst %.cc,%.o,$(SRCS))
 
 all: libBGL.a

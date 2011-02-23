@@ -13,7 +13,7 @@ namespace BGL {
 
 
 float EPSILON = 1e-14;
-float CLOSEENOUGH = 1e-9;
+float CLOSEENOUGH = 1e-3;
 
 
 }

@@ -1,38 +1,6 @@
 #include <fstream>
 #include "../BGL.h"
 
-ostream &svgHeader(ostream &os, float width, float height)
-{
-    width *= 2;
-    height *=2;
-    float pwidth  = width * 90.0f / 25.4f;
-    float pheight = height * 90.0f / 25.4f;
-
-    os << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
-    os << "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">\n";
-    os << "<svg xmlns=\"http://www.w3.org/2000/svg\"";
-    os << " xml:space=\"preserve\"";
-    os << " style=\"shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd\"";
-    os << " xmlns:xlink=\"http://www.w3.org/1999/xlink\"";
-    os << " width=\"" << width << "mm\"";
-    os << " height=\"" << height << "mm\"";
-    os << " viewport=\"0 0 " << pwidth << " " << pheight << "\"";
-    os << " stroke=\"black\"";
-    os << ">" << endl;
-    os << "<g transform=\"scale(2.0)\">";
-
-    return os;
-} 
-
-
-
-ostream &svgFooter(ostream& os)
-{
-    os << "</g>" << endl;
-    os << "</svg>" << endl;
-    return os;
-}
-
 
 
 BGL::Point pointSetA11[] =
@@ -190,11 +158,15 @@ int main(int argc, char**argv)
     compregB.subregions.push_back(regB1);
     compregB.subregions.push_back(regB2);
 
+    compregA *= 3.0;
+    compregB *= 3.0;
+
     fstream fout;
+    BGL::SVG svg(250, 100);
 
     fout.open("output/test-003a-compreg-orig.svg", fstream::out | fstream::trunc);
     if (fout.good()) {
-	svgHeader(fout, 100, 100);
+	svg.header(fout);
 
 	fout << "<g stroke=\"#77f\">" << endl;
 	compregA.svgPathWithOffset(fout, 10, 10);
@@ -204,131 +176,131 @@ int main(int argc, char**argv)
 	compregB.svgPathWithOffset(fout, 10, 10);
 	fout << "</g>" << endl;
 
-	svgFooter(fout);
+	svg.footer(fout);
 	fout.sync();
 	fout.close();
     }
 
     fout.open("output/test-003b-compreg-union.svg", fstream::out | fstream::trunc);
     if (fout.good()) {
-	svgHeader(fout, 100, 100);
+	svg.header(fout);
 
 	BGL::CompoundRegion outRegs;
 	BGL::CompoundRegion::unionOf(compregA, compregB, outRegs);
 	outRegs.svgPathWithOffset(fout, 10, 10);
 
-	svgFooter(fout);
+	svg.footer(fout);
 	fout.sync();
 	fout.close();
     }
 
     fout.open("output/test-003c-compreg-diff.svg", fstream::out | fstream::trunc);
     if (fout.good()) {
-	svgHeader(fout, 100, 100);
+	svg.header(fout);
 
 	BGL::CompoundRegion outRegs;
 	BGL::CompoundRegion::differenceOf(compregA, compregB, outRegs);
 	outRegs.svgPathWithOffset(fout, 10, 10);
 
-	svgFooter(fout);
+	svg.footer(fout);
 	fout.sync();
 	fout.close();
     }
 
     fout.open("output/test-003d-compreg-intsect.svg", fstream::out | fstream::trunc);
     if (fout.good()) {
-	svgHeader(fout, 100, 100);
+	svg.header(fout);
 
 	BGL::CompoundRegion outRegs;
 	BGL::CompoundRegion::intersectionOf(compregA, compregB, outRegs);
 	outRegs.svgPathWithOffset(fout, 10, 10);
 
-	svgFooter(fout);
+	svg.footer(fout);
 	fout.sync();
 	fout.close();
     }
 
     fout.open("output/test-003e-compreg-insetA-by05.svg", fstream::out | fstream::trunc);
     if (fout.good()) {
-	svgHeader(fout, 100, 100);
+	svg.header(fout);
 
 	fout << "<g stroke=\"#77f\">" << endl;
 	compregA.svgPathWithOffset(fout, 10, 10);
 	fout << "</g>" << endl;
 
 	BGL::CompoundRegion outRegs;
-	compregA.inset(0.5f, outRegs);
+	compregA.inset(1.5f, outRegs);
 	outRegs.svgPathWithOffset(fout, 10, 10);
 
-	svgFooter(fout);
+	svg.footer(fout);
 	fout.sync();
 	fout.close();
     }
 
     fout.open("output/test-003f-compreg-insetA-by1.svg", fstream::out | fstream::trunc);
     if (fout.good()) {
-	svgHeader(fout, 100, 100);
+	svg.header(fout);
 
 	fout << "<g stroke=\"#77f\">" << endl;
 	compregA.svgPathWithOffset(fout, 10, 10);
 	fout << "</g>" << endl;
 
 	BGL::CompoundRegion outRegs;
-	compregA.inset(1.0f, outRegs);
+	compregA.inset(3.0f, outRegs);
 	outRegs.svgPathWithOffset(fout, 10, 10);
 
-	svgFooter(fout);
+	svg.footer(fout);
 	fout.sync();
 	fout.close();
     }
 
     fout.open("output/test-003g-compreg-insetB-by05.svg", fstream::out | fstream::trunc);
     if (fout.good()) {
-	svgHeader(fout, 100, 100);
+	svg.header(fout);
 
 	fout << "<g stroke=\"#77f\">" << endl;
 	compregB.svgPathWithOffset(fout, 10, 10);
 	fout << "</g>" << endl;
 
 	BGL::CompoundRegion outRegs;
-	compregB.inset(0.5f, outRegs);
+	compregB.inset(1.5f, outRegs);
 	outRegs.svgPathWithOffset(fout, 10, 10);
 
-	svgFooter(fout);
+	svg.footer(fout);
 	fout.sync();
 	fout.close();
     }
 
     fout.open("output/test-003h-compreg-insetB-by1.svg", fstream::out | fstream::trunc);
     if (fout.good()) {
-	svgHeader(fout, 100, 100);
+	svg.header(fout);
 
 	fout << "<g stroke=\"#77f\">" << endl;
 	compregB.svgPathWithOffset(fout, 10, 10);
 	fout << "</g>" << endl;
 
 	BGL::CompoundRegion outRegs;
-	compregB.inset(1.0f, outRegs);
+	compregB.inset(3.0f, outRegs);
 	outRegs.svgPathWithOffset(fout, 10, 10);
 
-	svgFooter(fout);
+	svg.footer(fout);
 	fout.sync();
 	fout.close();
     }
 
     fout.open("output/test-003i-compreg-diff.svg", fstream::out | fstream::trunc);
     if (fout.good()) {
-	svgHeader(fout, 100, 100);
+	svg.header(fout);
 
-	float dx = cos(M_PI/8.0f);
-	float dy = sin(M_PI/8.0f);
+	float dx = 3.0*cos(M_PI/8.0f);
+	float dy = 3.0*sin(M_PI/8.0f);
 	BGL::CompoundRegion outReg(compregB);
 	BGL::CompoundRegion offReg(compregB);
 	offReg += BGL::Point(dx,dy);
 	outReg.differenceWith(offReg);
 	outReg.svgPathWithOffset(fout, 10, 10);
 
-	svgFooter(fout);
+	svg.footer(fout);
 	fout.sync();
 	fout.close();
     }

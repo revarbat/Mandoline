@@ -17,4 +17,6 @@
 #include "BGLTriangle3d.h"
 #include "BGLMesh3d.h"
 
+#include "BGLSVG.h"
+
 #endif

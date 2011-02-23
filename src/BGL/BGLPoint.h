@@ -148,13 +148,22 @@ public:
 	return *this;
     }
 
+    void quantize(float quanta) {
+        x = floor(x/quanta) * quanta;
+        y = floor(y/quanta) * quanta;
+    }
+
+    void quantize() {
+        quantize(CLOSEENOUGH/2.0);
+    }
+
     // Calculations
     double distanceFrom(const Point& pt) const {
         Point delta = *this - pt;
 	return hypot(delta.y,delta.x);
     }
     double angleToPoint(const Point& pt) const {
-        Point delta = *this - pt;
+        Point delta = pt - *this;
 	return atan2(delta.y,delta.x);
     }
 

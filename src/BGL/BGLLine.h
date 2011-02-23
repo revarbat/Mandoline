@@ -160,6 +160,16 @@ public:
         return *this;
     }
 
+    void quantize(float quanta) {
+        startPt.quantize(quanta);
+        endPt.quantize(quanta);
+    }
+
+    void quantize() {
+        startPt.quantize();
+        endPt.quantize();
+    }
+
     // Calculations
     double length() const {
         return startPt.distanceFrom(endPt);

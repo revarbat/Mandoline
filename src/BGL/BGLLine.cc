@@ -120,6 +120,29 @@ double Line::minimumExtendedLineDistanceFromPoint(const Point &pt) const
 // If they don't intersect, the Intersection will have a type of NONE.
 Intersection Line::intersectionWithSegment(const Line &ln) const
 {
+    bool dodebug = false;
+    /*
+    if (startPt.distanceFrom(Point(20.500,27.188)) <= 0.001) {
+	if (ln.startPt.distanceFrom(Point(1.419,15.262)) <= 0.001) {
+	    dodebug = true;
+	}
+    }
+    */
+
+    if (startPt == endPt) {
+	// Line is actually a zero length directionless line. (AKA a point.)
+	if (dodebug) {
+	    cerr << "    exit A" << endl;
+	}
+	return Intersection();
+    } else if (ln.startPt == ln.endPt) {
+	// ln is actually a zero length directionless line. (AKA a point.)
+	if (dodebug) {
+	    cerr << "    exit B" << endl;
+	}
+	return Intersection();
+    }
+
     double x1 = startPt.x;
     double y1 = startPt.y;
     double x2 = endPt.x;
@@ -145,14 +168,6 @@ Intersection Line::intersectionWithSegment(const Line &ln) const
     cerr.precision(18);
     cerr.setf(ios::fixed);
 
-    bool dodebug = false;
-    /*
-    if (startPt.distanceFrom(Point(20.500,27.188)) <= 0.001) {
-	if (ln.startPt.distanceFrom(Point(1.419,15.262)) <= 0.001) {
-	    dodebug = true;
-	}
-    }
-    */
     if (dodebug) {
 	cerr << "testing isect of " << *this << " and " << ln << endl;
 	cerr << "d = " << d << " for " << *this << " and " << ln << endl;
@@ -161,19 +176,7 @@ Intersection Line::intersectionWithSegment(const Line &ln) const
 	if (dodebug) {
 	    cerr << "PARALLEL" << endl;
 	}
-	if (startPt == endPt) {
-            // Line is actually a zero length directionless line. (AKA a point.)
-	    if (dodebug) {
-		cerr << "    exit A" << endl;
-	    }
-            return Intersection();
-	} else if (ln.startPt == ln.endPt) {
-            // ln is actually a zero length directionless line. (AKA a point.)
-	    if (dodebug) {
-		cerr << "    exit B" << endl;
-	    }
-            return Intersection();
-	} else if (
+	if (
 	    minimumExtendedLineDistanceFromPoint(ln.startPt) < CLOSEENOUGH &&
 	    minimumExtendedLineDistanceFromPoint(ln.endPt) < CLOSEENOUGH
 	) {
