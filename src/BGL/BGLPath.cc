@@ -1277,6 +1277,12 @@ Paths &Path::inset(double insetBy, Paths& outPaths)
 		if (eang > M_PI) {
 		    eang -= 2.0 * M_PI;
 		}
+		if (eang - sang > M_PI) {
+		    eang -= 2.0 * M_PI;
+		}
+		if (eang - sang < -M_PI) {
+		    eang += 2.0 * M_PI;
+		}
 		double step = (eang-sang) / (floor(fabs(eang-sang) / (M_PI_4/2))+1);
 		for (double ang = sang + step/2.0; fabs(ang-step/2.0-(eang+step)) > fabs(step/2); ang += step) {
 		    offsetLine.endPt = offsetLine.startPt;
