@@ -29,7 +29,7 @@ public:
     // Member variables
     Point startPt;
     Point endPt;
-    int16_t flags;
+    int flags;
     double temperature;
     double extrusionWidth;
 

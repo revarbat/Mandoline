@@ -25,9 +25,15 @@ void InsetOp::main()
     if ( NULL == context ) return;
     if ( NULL == slice ) return;
 
-    // TODO: perform actual insets to generate perimeter shells and the infill mask
-    slice->infillMask = slice->perimeter;
-    slice->shells.push_back(slice->perimeter);
+    double extWidth = context->standardExtrusionWidth();
+    int shells = context->perimeterShells;
+
+    slice->perimeter.inset(shells*extWidth, slice->infillMask);
+    for (int i = 0; i < shells; i++) {
+        BGL::CompoundRegion compReg;
+	slice->perimeter.inset((i+0.5)*extWidth, compReg);
+	slice->shells.push_back(compReg);
+    }
     slice->state = INSET;
 
     if ( isCancelled ) return;

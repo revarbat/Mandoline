@@ -274,7 +274,7 @@ string Path::svgPathWithOffset(double dx, double dy) const
     }
     Line prev;
     Point start;
-    double mult = 90.0f / 25.4f;
+    double mult = 1.0;
     Lines::const_iterator itera = segments.begin();
     bool isfirst = true;
     for (; itera != segments.end(); itera++) {
@@ -313,7 +313,7 @@ ostream &Path::svgPathDataWithOffset(ostream& os, double dx, double dy) const
     }
     os.setf(ios::fixed);
     os.precision(3);
-    double mult = 90.0f / 25.4f;
+    double mult = 1.0;
     Line prev;
     Point start;
     Lines::const_iterator itera = segments.begin();
@@ -345,7 +345,7 @@ ostream &Path::svgPathDataWithOffset(ostream& os, double dx, double dy) const
 
 ostream &Path::svgPathWithOffset(ostream& os, double dx, double dy) const
 {
-    os << "<path fill=\"none\" d=\"";
+    os << "<path d=\"";
     svgPathDataWithOffset(os, dx, dy);
     os << "\" />" << endl;
     return os;
@@ -594,36 +594,92 @@ Paths &Path::repairUnclosedPaths(const Paths &paths, Paths &outPaths)
 
 
 
-void Path::splitSegmentsAtIntersectionsWithPath(const Path &path)
+void Path::alignTo(const Path &path)
 {
     Lines::iterator itera;
     for (itera = segments.begin(); itera != segments.end(); itera++) {
         Lines::const_iterator iterb;
         for (iterb = path.segments.begin(); iterb != path.segments.end(); iterb++) {
+	    if (itera->startPt == iterb->startPt) {
+	        itera->startPt = iterb->startPt; // If close, jigger it to make it exact.
+	    }
+	    if (itera->startPt == iterb->endPt) {
+	        itera->startPt = iterb->endPt; // If close, jigger it to make it exact.
+	    }
+	    if (itera->endPt == iterb->startPt) {
+	        itera->endPt = iterb->startPt; // If close, jigger it to make it exact.
+	    }
+	    if (itera->endPt == iterb->endPt) {
+	        itera->endPt = iterb->endPt; // If close, jigger it to make it exact.
+	    }
+	    if (iterb->contains(itera->startPt) && !iterb->hasEndPoint(itera->startPt)) {
+		itera->startPt = iterb->closestSegmentPointTo(itera->startPt);
+	    }
+	    if (iterb->contains(itera->endPt) && !iterb->hasEndPoint(itera->endPt)) {
+		itera->endPt = iterb->closestSegmentPointTo(itera->endPt);
+	    }
+	}
+    }
+}
+
+
+
+void Path::splitSegmentsAtIntersectionsWithPath(const Path &path)
+{
+    bool dodebug = false;
+
+    Lines::iterator itera;
+    for (itera = segments.begin(); itera != segments.end(); itera++) {
+	if (dodebug) {
+	    cerr << "Advance itera" << endl;
+	}
+        Lines::const_iterator iterb;
+        for (iterb = path.segments.begin(); iterb != path.segments.end(); iterb++) {
+	    if (dodebug) {
+		cerr << "  " << *itera << " vs " << *iterb << "!  FIGHT!" << endl;
+	    }
 	    Points isects;
 	    if (itera->startPt == iterb->startPt) {
 		// It's close, so make it exact.
 	        itera->startPt = iterb->startPt;
+		if (dodebug) {
+		    cerr << "    exactify itera start to iterb start" << endl;
+		}
 	    }
 	    if (itera->endPt == iterb->startPt) {
 		// It's close, so make it exact.
 	        itera->endPt = iterb->startPt;
+		if (dodebug) {
+		    cerr << "    exactify itera end to iterb start" << endl;
+		}
 	    }
 	    if (itera->startPt == iterb->endPt) {
 		// It's close, so make it exact.
 	        itera->startPt = iterb->endPt;
+		if (dodebug) {
+		    cerr << "    exactify itera start to iterb end" << endl;
+		}
 	    }
 	    if (itera->endPt == iterb->endPt) {
 		// It's close, so make it exact.
 	        itera->endPt = iterb->endPt;
+		if (dodebug) {
+		    cerr << "    exactify itera end to iterb end" << endl;
+		}
 	    }
 	    if (itera->minimumSegmentDistanceFromPoint(iterb->startPt) < CLOSEENOUGH) {
                 if (!itera->hasEndPoint(iterb->startPt)) {
 		    isects.push_back(iterb->startPt);
+		    if (dodebug) {
+			cerr << "    A split itera at " << iterb->startPt << endl;
+		    }
 		}
 	    } else if (itera->minimumSegmentDistanceFromPoint(iterb->endPt) < CLOSEENOUGH) {
                 if (!itera->hasEndPoint(iterb->endPt)) {
 		    isects.push_back(iterb->endPt);
+		    if (dodebug) {
+			cerr << "    B split itera at " << iterb->endPt << endl;
+		    }
 		}
 	    } else {
 		Intersection isect = itera->intersectionWithSegment(*iterb);
@@ -631,12 +687,21 @@ void Path::splitSegmentsAtIntersectionsWithPath(const Path &path)
 		    isect.quantize();
 		    if (!itera->hasEndPoint(isect.p1)) {
 			isects.push_back(isect.p1);
+			if (dodebug) {
+			    cerr << "    isect1 split itera at " << isect.p1 << endl;
+			}
 		    } else if (itera->startPt == isect.p1) {
 			// if we are really close to the isect point, fudge to exactly the isect point.
 			itera->startPt = isect.p1;
+			if (dodebug) {
+			    cerr << "    exactify itera start to isect1 " << isect.p1 << endl;
+			}
 		    } else if (itera->endPt == isect.p1) {
 			// if we are really close to the isect point, fudge to exactly the isect point.
 			itera->endPt = isect.p1;
+			if (dodebug) {
+			    cerr << "    exactify itera end to isect1 " << isect.p1 << endl;
+			}
 		    }
 		    if (isect.type == SEGMENT) {
 			if (!itera->hasEndPoint(isect.p2)) {
@@ -648,13 +713,22 @@ void Path::splitSegmentsAtIntersectionsWithPath(const Path &path)
 				} else {
 				    isects.push_back(isect.p2);
 				}
+				if (dodebug) {
+				    cerr << "    isect2 split itera at " << isect.p2 << endl;
+				}
 			    }
 			} else if (itera->startPt == isect.p2) {
 			    // if we are really close to the isect point, fudge to exactly the isect point.
 			    itera->startPt = isect.p2;
+			    if (dodebug) {
+				cerr << "    exactify itera start to isect2 " << isect.p2 << endl;
+			    }
 			} else if (itera->endPt == isect.p2) {
 			    // if we are really close to the isect point, fudge to exactly the isect point.
 			    itera->endPt = isect.p2;
+			    if (dodebug) {
+				cerr << "    exactify itera end to isect2 " << isect.p2 << endl;
+			    }
 			}
 		    }
 		}
@@ -664,11 +738,13 @@ void Path::splitSegmentsAtIntersectionsWithPath(const Path &path)
 		Point tempPt = itera->startPt;
 		itera->startPt = *iterc;
 		itera = segments.insert(itera, Line(tempPt, *iterc));
+		if (dodebug) {
+		    cerr << "    Actually split at " << *iterc << endl;
+		}
 	    }
         }
     }
     quantize();
-    //stripSegmentsShorterThan(CLOSEENOUGH);
 }
 
 
@@ -751,8 +827,12 @@ void Path::untag()
 void Path::tagSegmentsRelativeToClosedPath(const Path &path)
 {
     bool invert = (flags == INSIDE);
-    bool dodebug = false;
+    bool dodebug = true;
 
+    // Align paths more exactly to each other.
+    alignTo(path);
+
+    // Split segments where other path intersects with us.
     splitSegmentsAtIntersectionsWithPath(path);
 
     Point midpt;
@@ -834,9 +914,9 @@ void Path::tagSegmentsRelativeToClosedPath(const Path &path)
 
 
 
-Paths& Path::assembleTaggedPaths(const Path &inPath1, uint32_t flags1, const Path &inPath2, uint32_t flags2, Paths &outPaths)
+Paths& Path::assembleTaggedPaths(const Path &inPath1, int flags1, const Path &inPath2, int flags2, Paths &outPaths)
 {
-    bool dodebug = false;
+    bool dodebug = true;
 
     Path path1(inPath1);
     Path path2(inPath2);
@@ -868,7 +948,7 @@ Paths& Path::assembleTaggedPaths(const Path &inPath1, uint32_t flags1, const Pat
 	cerr << "-----------------" << endl;
     }
     
-    uint32_t remaining = path1.size() + path2.size();
+    int remaining = path1.size() + path2.size();
     
     // Mark all unwanted segments in path1 as used.
     Lines::iterator itera = path1.segments.begin();
@@ -893,7 +973,7 @@ Paths& Path::assembleTaggedPaths(const Path &inPath1, uint32_t flags1, const Pat
     Lines::iterator otherseg;
     currseg = path1.segments.begin();
     otherseg = path2.segments.begin();
-    int32_t pathLimit = 0;
+    int pathLimit = 0;
     Path* patha = &path1;
     Path* pathb = &path2;
 
@@ -934,7 +1014,7 @@ Paths& Path::assembleTaggedPaths(const Path &inPath1, uint32_t flags1, const Pat
             
             // Find a connected unused segment in the new path.
             // Stop looking if we completely circumnavigate the path.
-            int32_t limit = 0;
+            int limit = 0;
             for (limit = patha->size(); limit > 0; limit--) {
                 currseg++;
                 if (currseg == patha->segments.end()) {
@@ -1220,10 +1300,13 @@ Paths &Path::leftOffset(double offsetby, Paths& outPaths)
 
 
 
-// Currently implemented as brute force.
+// Currently implemented as brute force using boolean geometry.
 Paths &Path::inset(double insetBy, Paths& outPaths)
 {
     bool dodebug = false;
+    const double minimum_arc_segment_length = 1.0;
+    const double minimum_arc_angle = M_PI_4 / 8.0;
+    const double maximum_arc_angle = M_PI / 3.0;
 
     if (dodebug) {
 	cerr << "Inset by " << insetBy << endl;
@@ -1283,7 +1366,20 @@ Paths &Path::inset(double insetBy, Paths& outPaths)
 		if (eang - sang < -M_PI) {
 		    eang += 2.0 * M_PI;
 		}
-		double step = (eang-sang) / (floor(fabs(eang-sang) / (M_PI_4/2))+1);
+
+		// We don't want too many tiny arc steps.  Try to keep them about 1mm apart.
+		// y = r * sin(a)
+		// a = asin(y/r)
+		double minstepang = maximum_arc_angle;
+		if (fabs(insetBy) >= minimum_arc_segment_length) {
+		    minstepang = asin(minimum_arc_segment_length/fabs(insetBy));
+		    if (minstepang < minimum_arc_angle) {
+			minstepang = minimum_arc_angle; // Don't go overboard with facets.
+		    } else if (minstepang > maximum_arc_angle) {
+			minstepang = maximum_arc_angle;
+		    }
+		}
+		double step = (eang-sang) / (floor(fabs(eang-sang) / minstepang)+1);
 		for (double ang = sang + step/2.0; fabs(ang-step/2.0-(eang+step)) > fabs(step/2); ang += step) {
 		    offsetLine.endPt = offsetLine.startPt;
 		    offsetLine.startPt = lit->startPt;
@@ -1349,7 +1445,20 @@ Paths &Path::inset(double insetBy, Paths& outPaths)
 	    if (eang - sang < -M_PI) {
 		eang += 2.0 * M_PI;
 	    }
-	    double step = (eang-sang) / (floor(fabs(eang-sang) / (M_PI_4/2))+1);
+
+	    // We don't want too many tiny arc steps.  Try to keep them about 1mm apart.
+	    // y = r * sin(a)
+	    // a = asin(y/r)
+	    double minstepang = maximum_arc_angle;
+	    if (fabs(insetBy) >= minimum_arc_segment_length) {
+		minstepang = asin(minimum_arc_segment_length/fabs(insetBy));
+		if (minstepang < minimum_arc_angle) {
+		    minstepang = minimum_arc_angle; // Don't go overboard with facets.
+		} else if (minstepang > maximum_arc_angle) {
+		    minstepang = maximum_arc_angle;
+		}
+	    }
+	    double step = (eang-sang) / (floor(fabs(eang-sang) / minstepang)+1);
 	    if (dodebug) {
 	        cerr << "sang=" << sang << endl;
 	        cerr << "eang=" << eang << endl;

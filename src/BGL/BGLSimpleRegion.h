@@ -57,7 +57,7 @@ public:
 	return SimpleRegion(*this) /= rhs;
     }
 
-    int32_t size();
+    int size();
     bool contains(const Point &pt) const;
 
     bool intersects(const Path& path) const;

@@ -61,7 +61,7 @@ public:
 	return CompoundRegion(*this) /= rhs;
     }
 
-    int32_t size() const;
+    int size() const;
     bool contains(const Point &pt) const;
 
     string svgPathWithOffset(double dx, double dy);

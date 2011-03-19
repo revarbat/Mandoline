@@ -196,6 +196,8 @@ int main (int argc, char * const argv[])
         z = onlyAtZ;
         topZ = onlyAtZ + ctx.layerThickness / 2.0f;
     }
+
+    printf("Extrusion Width=%.4g\n", ctx.standardExtrusionWidth());
     
     // Set up Operations Queue and threadpool.
     OpQueue opQ;

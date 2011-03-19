@@ -1,10 +1,11 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_PREREQ(2.60)
 AC_INIT([Mandoline], 1.0, [revarbat@gmail.com])
-AC_CONFIG_SRCDIR([CarvedSlice.h])
-AC_CONFIG_HEADER([config.h])
+AC_PREREQ(2.60)
+AM_INIT_AUTOMAKE([1.10 no-define foreign])
+AC_CONFIG_HEADERS([config.h])
+# AC_CONFIG_SRCDIR([CarvedSlice.h])
 
 # Checks for programs.
 AC_PROG_CXX
@@ -15,6 +16,7 @@ AC_PROG_INSTALL
 
 # Checks for header files.
 AC_CHECK_HEADERS([sys/time.h])
+AC_CHECK_HEADERS([inttypes.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_HEADER_STDBOOL
@@ -39,5 +41,5 @@ AC_ARG_WITH([gprof],
 AC_CHECK_FUNCS([gettimeofday])
 
 AC_CONFIG_FILES([Makefile])
-AC_CONFIG_SUBDIRS([BGL])
+# AC_CONFIG_SUBDIRS([BGL])
 AC_OUTPUT

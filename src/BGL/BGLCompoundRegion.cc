@@ -80,7 +80,7 @@ CompoundRegion& CompoundRegion::operator/=(const Point &rhs) {
 
 
 
-int32_t CompoundRegion::size() const
+int CompoundRegion::size() const
 {
     return subregions.size();
 }
@@ -253,41 +253,6 @@ CompoundRegion &CompoundRegion::intersectionOf(CompoundRegion &r1, CompoundRegio
     outReg = r1;
     outReg.intersectionWith(r2);
     return outReg;
-}
-
-
-
-
-ostream &ssvgHeader(ostream &os, double width, double height)
-{
-    width *= 2;
-    height *=2;
-    double pwidth  = width * 90.0f / 25.4f;
-    double pheight = height * 90.0f / 25.4f;
-
-    os << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
-    os << "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">\n";
-    os << "<svg xmlns=\"http://www.w3.org/2000/svg\"";
-    os << " xml:space=\"preserve\"";
-    os << " style=\"shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd\"";
-    os << " xmlns:xlink=\"http://www.w3.org/1999/xlink\"";
-    os << " width=\"" << width << "mm\"";
-    os << " height=\"" << height << "mm\"";
-    os << " viewport=\"0 0 " << pwidth << " " << pheight << "\"";
-    os << " stroke=\"black\"";
-    os << ">" << endl;
-    os << "<g transform=\"scale(2.0)\">";
-
-    return os;
-} 
-
-
-
-ostream &ssvgFooter(ostream& os)
-{
-    os << "</g>" << endl;
-    os << "</svg>" << endl;
-    return os;
 }
 
 

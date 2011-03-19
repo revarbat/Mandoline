@@ -38,7 +38,7 @@ int main(int argc, char**argv)
     rectPath *= 3.0;
 
     fstream fout;
-    BGL::SVG svg(150, 150);
+    BGL::SVG svg(250, 250);
 
     fout.open("output/test-004a-path-orig.svg", fstream::out | fstream::trunc);
     if (fout.good()) {

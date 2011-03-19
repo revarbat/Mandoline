@@ -26,7 +26,7 @@ int main(int argc, char**argv)
 {
 
     BGL::Path path(sizeof(pointSet)/sizeof(BGL::Point), pointSet);
-    path *= 3;
+    path *= 3.0;
 
     fstream fout;
     BGL::SVG svg(250, 250);
@@ -39,7 +39,7 @@ int main(int argc, char**argv)
 	path.svgPathWithOffset(fout, 30, 30);
 	fout << "</g>" << endl;
 
-	for (float i = 1.0; i <= 50.0; i++) {
+	for (float i = 1.0; i <= 50.0; i += 1.0) {
 	    BGL::Paths outPaths;
 	    path.inset(i, outPaths);
 	    BGL::Paths::const_iterator it;
@@ -61,7 +61,7 @@ int main(int argc, char**argv)
 	path.svgPathWithOffset(fout, 30, 30);
 	fout << "</g>" << endl;
 
-	for (float i = -1.0; i >= -30.0; i--) {
+	for (float i = -1.0; i >= -30.0; i -= 1.0) {
 	    BGL::Paths outPaths;
 	    path.inset(i, outPaths);
 	    BGL::Paths::const_iterator it;

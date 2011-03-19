@@ -138,6 +138,7 @@ public:
     // Strips out segments that are shorter than the given length.
     void stripSegmentsShorterThan(double minlen);
     void simplify(double minErr);
+    void alignTo(const Path &path);
     void splitSegmentsAtIntersectionsWithPath(const Path &path);
     Paths &separateSelfIntersectingSubpaths(Paths &outPaths);
     void reorderByPoint(const Point &pt);
@@ -147,7 +148,7 @@ public:
 
     static Paths &assemblePathsFromSegments(const Lines &segs, Paths &outPaths);
     static Paths &repairUnclosedPaths(const Paths &paths, Paths &outPaths);
-    static Paths &assembleTaggedPaths(const Path &inPath1, uint32_t flags1, const Path &inPath2, uint32_t flags2, Paths &outPaths);
+    static Paths &assembleTaggedPaths(const Path &inPath1, int flags1, const Path &inPath2, int flags2, Paths &outPaths);
 
     static Paths &differenceOf  (const Path &path1, const Path &path2, Paths &outPaths);
     static Paths &unionOf       (const Path &path1, const Path &path2, Paths &outPaths);

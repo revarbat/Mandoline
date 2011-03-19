@@ -15,7 +15,7 @@ private:
 
     std::list<Operation*> running;
     std::list<Operation*> pending;
-    uint32_t max_threads;
+    int max_threads;
 
 public:
     OpQueue();

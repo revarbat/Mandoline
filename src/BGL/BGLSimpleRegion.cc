@@ -86,7 +86,7 @@ SimpleRegion& SimpleRegion::operator/=(const Point &rhs) {
 
 
 
-int32_t SimpleRegion::size()
+int SimpleRegion::size()
 {
     return subpaths.size();
 }
@@ -220,6 +220,8 @@ SimpleRegions &SimpleRegion::assembleSimpleRegionsFrom(Paths &paths, SimpleRegio
 
     for (it1 = paths.begin(); it1 != paths.end(); it1++) {
 	it1->flags = 0;
+	it1->quantize(CLOSEENOUGH/2.0);
+	it1->simplify(0.05);
     }
     int count1, count2;
     for (count1 = 0, it1 = paths.begin(); it1 != paths.end(); count1++, it1++) {

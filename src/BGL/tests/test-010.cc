@@ -22,7 +22,7 @@ int main(int argc, char**argv)
     path *= 3.0;
 
     fstream fout;
-    BGL::SVG svg(250, 100);
+    BGL::SVG svg(250, 250);
     BGL::Paths::iterator pit;
 
     fout.open("output/test-010a-outset.svg", fstream::out | fstream::trunc);

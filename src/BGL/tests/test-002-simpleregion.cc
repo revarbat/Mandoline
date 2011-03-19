@@ -116,67 +116,80 @@ int main(int argc, char**argv)
     regB *= 3.0;
 
     fstream fout;
-    BGL::SVG svg(150, 150);
+    BGL::SVG svg(250, 250);
 
-    fout.open("output/test-002a-simpreg-orig.svg", fstream::out | fstream::trunc);
+    fout.open("output/test-002a-simpreg-union.svg", fstream::out | fstream::trunc);
     if (fout.good()) {
 	svg.header(fout);
 
-	fout << "<g stroke=\"#77f\" stroke-width=\"1.0\">" << endl;
+	fout << "<g stroke=\"#77f\" fill=\"#ccf\">" << endl;
 	regA.svgPathWithOffset(fout, 10, 10);
 	fout << "</g>" << endl;
 
-	fout << "<g stroke=\"#0c0\" stroke-width=\"0.5\">" << endl;
+	fout << "<g stroke=\"#0c0\">" << endl;
 	regB.svgPathWithOffset(fout, 10, 10);
 	fout << "</g>" << endl;
 
-	svg.footer(fout);
-	fout.sync();
-	fout.close();
-    }
-
-    fout.open("output/test-002b-simpreg-union.svg", fstream::out | fstream::trunc);
-    if (fout.good()) {
-	svg.header(fout);
-
+	fout << "<g stroke-width=\"0.6\">" << endl;
 	BGL::SimpleRegions outRegs;
 	BGL::SimpleRegions::iterator rit;
 	BGL::SimpleRegion::unionOf(regA, regB, outRegs);
 	for (rit = outRegs.begin(); rit != outRegs.end(); rit++) {
 	    rit->svgPathWithOffset(fout, 10, 10);
 	}
+	fout << "</g>" << endl;
 
 	svg.footer(fout);
 	fout.sync();
 	fout.close();
     }
 
-    fout.open("output/test-002c-simpreg-diff.svg", fstream::out | fstream::trunc);
+    fout.open("output/test-002b-simpreg-diff.svg", fstream::out | fstream::trunc);
     if (fout.good()) {
 	svg.header(fout);
 
+	fout << "<g stroke=\"#77f\" fill=\"#ccf\">" << endl;
+	regA.svgPathWithOffset(fout, 10, 10);
+	fout << "</g>" << endl;
+
+	fout << "<g stroke=\"#0c0\">" << endl;
+	regB.svgPathWithOffset(fout, 10, 10);
+	fout << "</g>" << endl;
+
+	fout << "<g stroke-width=\"0.6\">" << endl;
 	BGL::SimpleRegions outRegs;
 	BGL::SimpleRegions::iterator rit;
 	BGL::SimpleRegion::differenceOf(regA, regB, outRegs);
 	for (rit = outRegs.begin(); rit != outRegs.end(); rit++) {
 	    rit->svgPathWithOffset(fout, 10, 10);
 	}
+	fout << "</g>" << endl;
 
 	svg.footer(fout);
 	fout.sync();
 	fout.close();
     }
 
-    fout.open("output/test-002d-simpreg-intsect.svg", fstream::out | fstream::trunc);
+    fout.open("output/test-002c-simpreg-intsect.svg", fstream::out | fstream::trunc);
     if (fout.good()) {
 	svg.header(fout);
 
+	fout << "<g stroke=\"#77f\" fill=\"#ccf\">" << endl;
+	regA.svgPathWithOffset(fout, 10, 10);
+	fout << "</g>" << endl;
+
+	fout << "<g stroke=\"#0c0\">" << endl;
+	regB.svgPathWithOffset(fout, 10, 10);
+	fout << "</g>" << endl;
+
+	fout << "<g stroke-width=\"0.6\">" << endl;
 	BGL::SimpleRegions outRegs;
 	BGL::SimpleRegions::iterator rit;
 	BGL::SimpleRegion::intersectionOf(regA, regB, outRegs);
 	for (rit = outRegs.begin(); rit != outRegs.end(); rit++) {
 	    rit->svgPathWithOffset(fout, 10, 10);
 	}
+	fout << "</g>" << endl;
 
 	svg.footer(fout);
 	fout.sync();

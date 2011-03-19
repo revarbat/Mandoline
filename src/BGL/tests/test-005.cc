@@ -22,6 +22,7 @@ int main(int argc, char**argv)
 {
     BGL::Path rectPath(sizeof(rectPoints)/sizeof(BGL::Point), rectPoints);
     rectPath *= 3.0;
+
     BGL::Path offPath1(rectPath);
     BGL::Path offPath2(rectPath);
 
@@ -42,7 +43,7 @@ int main(int argc, char**argv)
     compRegB.subregions.pop_front();
 
     fstream fout;
-    BGL::SVG svg(150, 150);
+    BGL::SVG svg(250, 250);
 
     fout.open("output/test-005a-path-orig.svg", fstream::out | fstream::trunc);
     if (fout.good()) {

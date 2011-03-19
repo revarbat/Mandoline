@@ -28,7 +28,7 @@ public:
     Mesh3d() : triangles(), minX(9e9), maxX(-9e9), minY(9e9), maxY(-9e9), minZ(9e9), maxZ(-9e9) {}
     Mesh3d(const Mesh3d& x) : triangles(x.triangles), minX(x.minX), maxX(x.maxX), minY(x.minY), maxY(x.maxY), minZ(x.minZ), maxZ(x.maxZ) {}
 
-    int32_t size();
+    int size();
     Point3d centerPoint() const;
     void recalculateBounds();
 
@@ -40,7 +40,7 @@ public:
     void rotateY(double rad);
     void rotateZ(double rad);
 
-    int32_t loadFromSTLFile(const char *fileName);
+    int loadFromSTLFile(const char *fileName);
     CompoundRegion& regionForSliceAtZ(double Z, CompoundRegion &outReg) const;
 };
 

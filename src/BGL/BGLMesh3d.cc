@@ -17,6 +17,7 @@ namespace BGL {
 
 
 #include <sys/param.h>
+#include <inttypes.h>
 
 #ifdef __BYTE_ORDER
 # if __BYTE_ORDER == __LITTLE_ENDIAN
@@ -32,7 +33,7 @@ namespace BGL {
 
 
 
-int32_t Mesh3d::size()
+int Mesh3d::size()
 {
     return triangles.size();
 }
@@ -197,13 +198,13 @@ static inline void convertFromLittleEndian16(uint8_t* bytes)
 #endif
 
 
-int32_t Mesh3d::loadFromSTLFile(const char *fileName)
+int Mesh3d::loadFromSTLFile(const char *fileName)
 {
     struct vertexes_t {
-        double nx, ny, nz;
-        double x1, y1, z1;
-        double x2, y2, z2;
-        double x3, y3, z3;
+        float nx, ny, nz;
+        float x1, y1, z1;
+        float x2, y2, z2;
+        float x3, y3, z3;
         uint16_t attrBytes;
     };
     union {
@@ -217,7 +218,7 @@ int32_t Mesh3d::loadFromSTLFile(const char *fileName)
         uint8_t bytes[4];
     } intdata;
 
-    uint32_t facecount = 0;
+    int facecount = 0;
     
     uint8_t buf[512];
     FILE *f = fopen(fileName, "rb");
@@ -275,11 +276,11 @@ int32_t Mesh3d::loadFromSTLFile(const char *fileName)
 	        break;
 	    }
 	    vertexes_t &v = tridata.vertexes;
-	    fscanf(f, "%*s %lf %lf %lf", &v.nx, &v.ny, &v.nz);
+	    fscanf(f, "%*s %f %f %f", &v.nx, &v.ny, &v.nz);
 	    fscanf(f, "%*s %*s");
-	    fscanf(f, "%*s %lf %lf %lf", &v.x1, &v.y1, &v.z1);
-	    fscanf(f, "%*s %lf %lf %lf", &v.x2, &v.y2, &v.z2);
-	    fscanf(f, "%*s %lf %lf %lf", &v.x3, &v.y3, &v.z3);
+	    fscanf(f, "%*s %f %f %f", &v.x1, &v.y1, &v.z1);
+	    fscanf(f, "%*s %f %f %f", &v.x2, &v.y2, &v.z2);
+	    fscanf(f, "%*s %f %f %f", &v.x3, &v.y3, &v.z3);
 	    fscanf(f, "%*s");
 	    fscanf(f, "%*s");
 

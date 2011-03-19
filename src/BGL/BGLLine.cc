@@ -213,6 +213,9 @@ Intersection Line::intersectionWithSegment(const Line &ln) const
 		if (dodebug) {
 		    cerr << "    exit E" << endl;
 		}
+		if (isects.front() == isects.back()) {
+		    return Intersection(isects.front(),0);
+		}
                 return Intersection(isects.front(),isects.back(),0);
             }
         }

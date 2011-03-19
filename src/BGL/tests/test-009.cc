@@ -118,7 +118,7 @@ int main(int argc, char**argv)
     regB *= 3.0;
 
     fstream fout;
-    BGL::SVG svg(250, 100);
+    BGL::SVG svg(250, 250);
     BGL::SimpleRegions::iterator sit;
 
     fout.open("output/test-009a-insetA-by05.svg", fstream::out | fstream::trunc);

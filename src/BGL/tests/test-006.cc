@@ -19,14 +19,15 @@ int main(int argc, char**argv)
 {
     BGL::Path origPath(sizeof(pointSet)/sizeof(BGL::Point), pointSet);
     origPath *= 3.0;
+
     BGL::Path offPath1(origPath);
     BGL::Path offPath2(origPath);
     BGL::Path offPath3(origPath);
     BGL::Path offPath4(origPath);
 
-    offPath1 += BGL::Point(3.0*cos(0.0f), 3.0*sin(0.0f));
-    offPath2 += BGL::Point(3.0*cos(M_PI/8.0f), 3.0*sin(M_PI/8.0f));
-    offPath3 += BGL::Point(3.0*cos(M_PI/4.0f), 3.0*sin(M_PI/4.0f));
+    offPath1 += BGL::Point(3.0*cos(0.0f),             3.0*sin(0.0f));
+    offPath2 += BGL::Point(3.0*cos(M_PI/8.0f),        3.0*sin(M_PI/8.0f));
+    offPath3 += BGL::Point(3.0*cos(M_PI/4.0f),        3.0*sin(M_PI/4.0f));
     offPath4 += BGL::Point(3.0*cos(M_PI/(8.0f/3.0f)), 3.0*sin(M_PI/(8.0f/3.0f)));
 
     BGL::Paths outPaths1;
@@ -53,7 +54,7 @@ int main(int argc, char**argv)
     BGL::CompoundRegion::unionOf(outReg2, compRegD, outReg3);
 
     fstream fout;
-    BGL::SVG svg(150, 150);
+    BGL::SVG svg(250, 250);
 
     fout.open("output/test-006a-origAB.svg", fstream::out | fstream::trunc);
     if (fout.good()) {
