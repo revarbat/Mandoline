@@ -40,6 +40,7 @@ AC_ARG_WITH([gprof],
 # Checks for library functions.
 AC_CHECK_FUNCS([gettimeofday])
 
+AC_CHECK_DECLS([optreset],,, [[#include <getopt.h>]])
 AC_CONFIG_FILES([Makefile])
 # AC_CONFIG_SUBDIRS([BGL])
 AC_OUTPUT

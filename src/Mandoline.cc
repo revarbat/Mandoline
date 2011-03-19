@@ -92,7 +92,12 @@ int main (int argc, char * const argv[])
     ctx.loadDefaultsFromFile(buf);
 
     // Process remainder of command-line arguments.
-    optreset = opterr = optind = 1;
+    opterr = optind = 1;
+
+#ifdef HAVE_DECL_OPTRESET
+    optreset = 1;
+#endif
+
     while ((ch = getopt_long(argc, argv, shortopts, longopts, NULL)) != -1) {
         switch (ch) {
         case 'c':
