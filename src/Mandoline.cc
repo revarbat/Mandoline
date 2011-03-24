@@ -94,7 +94,7 @@ int main (int argc, char * const argv[])
     // Process remainder of command-line arguments.
     opterr = optind = 1;
 
-#ifdef HAVE_DECL_OPTRESET
+#if HAVE_DECL_OPTRESET
     optreset = 1;
 #endif
 

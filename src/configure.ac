@@ -2,8 +2,8 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_INIT([Mandoline], 1.0, [revarbat@gmail.com])
-AC_PREREQ(2.60)
-AM_INIT_AUTOMAKE([1.10 no-define foreign])
+AC_PREREQ(2.59)
+AM_INIT_AUTOMAKE([1.9.6 no-define foreign])
 AC_CONFIG_HEADERS([config.h])
 # AC_CONFIG_SRCDIR([CarvedSlice.h])
 
@@ -41,6 +41,14 @@ AC_ARG_WITH([gprof],
 AC_CHECK_FUNCS([gettimeofday])
 
 AC_CHECK_DECLS([optreset],,, [[#include <getopt.h>]])
+
+# Checks for pthreads
+ACX_PTHREAD(,)
+LIBS="$PTHREAD_LIBS $LIBS"
+CFLAGS="$CFLAGS $PTHREAD_CFLAGS"
+CXXFLAGS="$CXXFLAGS $PTHREAD_CFLAGS"
+
 AC_CONFIG_FILES([Makefile])
 # AC_CONFIG_SUBDIRS([BGL])
 AC_OUTPUT
+
