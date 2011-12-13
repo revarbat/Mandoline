@@ -1,19 +1,19 @@
 //
-//  BGLCommon.m
+//  BGLCommon.cc
 //  Part of the Belfry Geometry Library
 //
 //  Created by GM on 10/13/10.
 //  Copyright 2010 Belfry Software. All rights reserved.
 //
 
-#include "BGLCommon.h"
+#include "BGLCommon.hh"
 
 
 namespace BGL {
 
 
-float EPSILON = 1e-14;
-float CLOSEENOUGH = 1e-3;
+double EPSILON = 1e-10;
+double CLOSEENOUGH = 1e-3;
 
 
 }

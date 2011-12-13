@@ -6,12 +6,12 @@
 //  Copyright 2010 Belfry Software. All rights reserved.
 //
 
-#include "BGLMesh3d.h"
-#include "BGLPoint3d.h"
-#include "BGLLine.h"
-#include "BGLPath.h"
-#include "BGLCompoundRegion.h"
-#include "BGLTriangle3d.h"
+#include "BGLMesh3d.hh"
+#include "BGLPoint3d.hh"
+#include "BGLLine.hh"
+#include "BGLPath.hh"
+#include "BGLCompoundRegion.hh"
+#include "BGLTriangle3d.hh"
 
 namespace BGL {
 

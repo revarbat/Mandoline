@@ -1,20 +1,224 @@
 //
-//  BGLLine.m
+//  BGLLine.cc
 //  Part of the Belfry Geometry Library
 //
 //  Created by GM on 10/13/10.
 //  Copyright 2010 Belfry Software. All rights reserved.
 //
 
-#include "BGLLine.h"
+#include "BGLLine.hh"
 
 using namespace std;
 
 namespace BGL {
 
+
+
+// Assignment operator
+Line& Line::operator=(const Line &rhs) {
+    if (this != &rhs) {
+	startPt = rhs.startPt;
+	endPt = rhs.endPt;
+	flags = rhs.flags;
+	temperature = rhs.temperature;
+	extrusionWidth = rhs.extrusionWidth;
+    }
+    return *this;
+}
+
+
+
+// Compound assignment operators
+Line& Line::operator+=(const Point &rhs) {
+    this->startPt += rhs;
+    this->endPt += rhs;
+    return *this;
+}
+
+
+
+Line& Line::operator-=(const Point &rhs) {
+    this->startPt -= rhs;
+    this->endPt -= rhs;
+    return *this;
+}
+
+
+
+Line& Line::operator*=(double rhs) {
+    this->startPt *= rhs;
+    this->endPt *= rhs;
+    return *this;
+}
+
+
+
+Line& Line::operator*=(const Point &rhs) {
+    this->startPt *= rhs;
+    this->endPt *= rhs;
+    return *this;
+}
+
+
+
+Line& Line::operator/=(double rhs) {
+    this->startPt /= rhs;
+    this->endPt /= rhs;
+    return *this;
+}
+
+
+
+Line& Line::operator/=(const Point &rhs) {
+    this->startPt /= rhs;
+    this->endPt /= rhs;
+    return *this;
+}
+
+
+
+// Binary arithmetic operators
+const Line Line::operator+(const Point &rhs) const {
+    return Line(*this) += rhs;
+}
+
+
+
+const Line Line::operator-(const Point &rhs) const {
+    return Line(*this) -= rhs;
+}
+
+
+
+const Line Line::operator*(double rhs) const {
+    return Line(*this) *= rhs;
+}
+
+
+
+const Line Line::operator*(const Point &rhs) const {
+    return Line(*this) *= rhs;
+}
+
+
+
+const Line Line::operator/(double rhs) const {
+    return Line(*this) /= rhs;
+}
+
+
+
+const Line Line::operator/(const Point &rhs) const {
+    return Line(*this) /= rhs;
+}
+
+
+
+// Comparison operators
+bool Line::operator==(const Line &rhs) const {
+    return ((startPt == rhs.startPt && endPt == rhs.endPt) ||
+	(startPt == rhs.endPt && endPt == rhs.startPt));
+}
+
+
+
+bool Line::operator!=(const Line &rhs) const {
+    return !(*this == rhs);
+}
+
+
+
+bool Line::hasEndPoint(const Point& pt) const {
+    return (pt == startPt || pt == endPt);
+}
+
+
+
+// Transformations
+Line& Line::scale(double scale) {
+    *this *= scale;
+    return *this;
+}
+
+
+
+Line& Line::scale(const Point& vect) {
+    *this *= vect;
+    return *this;
+}
+
+
+
+Line& Line::scaleAroundPoint(const Point& center, double scale) {
+    *this -= center;
+    *this *= scale;
+    *this += center;
+    return *this;
+}
+
+
+
+Line& Line::scaleAroundPoint(const Point& center, const Point& vect) {
+    *this -= center;
+    *this *= vect;
+    *this += center;
+    return *this;
+}
+
+
+
+void Line::quantize(double quanta) {
+    startPt.quantize(quanta);
+    endPt.quantize(quanta);
+}
+
+
+
+void Line::quantize() {
+    startPt.quantize();
+    endPt.quantize();
+}
+
+
+
+// Calculations
+double Line::length() const {
+    return startPt.distanceFrom(endPt);
+}
+
+
+
+double Line::angle() const {
+    return startPt.angleToPoint(endPt);
+}
+
+
+
+double Line::angleDelta(const Line& ln) const {
+    double delta = ln.angle() - angle();
+    if (delta < -M_PI) {
+	delta += M_PI * 2.0f;
+    } else if (delta > M_PI) {
+	delta -= M_PI * 2.0f;
+    }
+    return delta;
+}
+
+
+
+// Misc
+Line& Line::reverse() {
+    Point tmpPt = startPt;
+    startPt = endPt;
+    endPt = tmpPt;
+    return *this;
+}
+
+
+
 bool Line::isLinearWith(const Point& pt) const
 {
-    return (minimumExtendedLineDistanceFromPoint(pt) < CLOSEENOUGH);
+    return (minimumExtendedLineDistanceFromPoint(pt) < EPSILON);
 }
 
 
@@ -48,7 +252,7 @@ bool Line::hasInBounds(const Point &pt) const
 bool Line::contains(const Point &pt) const
 {
     if (hasInBounds(pt)) {
-	return (minimumSegmentDistanceFromPoint(pt) < CLOSEENOUGH);
+	return (minimumSegmentDistanceFromPoint(pt) < EPSILON);
     }
     return false;
 }
@@ -165,10 +369,10 @@ Intersection Line::intersectionWithSegment(const Line &ln) const
     double na = dx2 * dy3 - dy2 * dx3;
     double nb = dx1 * dy3 - dy1 * dx3;
     
-    cerr.precision(18);
-    cerr.setf(ios::fixed);
-
     if (dodebug) {
+	cerr.precision(18);
+	cerr.setf(ios::fixed);
+
 	cerr << "testing isect of " << *this << " and " << ln << endl;
 	cerr << "d = " << d << " for " << *this << " and " << ln << endl;
     }
@@ -177,8 +381,8 @@ Intersection Line::intersectionWithSegment(const Line &ln) const
 	    cerr << "PARALLEL" << endl;
 	}
 	if (
-	    minimumExtendedLineDistanceFromPoint(ln.startPt) < CLOSEENOUGH &&
-	    minimumExtendedLineDistanceFromPoint(ln.endPt) < CLOSEENOUGH
+	    minimumExtendedLineDistanceFromPoint(ln.startPt) < EPSILON &&
+	    minimumExtendedLineDistanceFromPoint(ln.endPt) < EPSILON
 	) {
             // Lines are coincident (or very close to).  Check for overlap.
 	    Points isects;
@@ -235,12 +439,12 @@ Intersection Line::intersectionWithSegment(const Line &ln) const
 	cerr << "    ua=" << ua << ", ub=" << ub << endl;
 	cerr << "    isect at " << xi << ", " << yi << endl;
     }
-    if (ua < -EPSILON || ua > 1.0+EPSILON) {
+    if (ua < 0.0 || ua > 1.0) {
         // Intersection wouldn't be inside first segment
 	return Intersection();
     }
     
-    if (ub < -EPSILON || ub > 1.0+EPSILON) {
+    if (ub < 0.0 || ub > 1.0) {
         // Intersection wouldn't be inside second segment
 	return Intersection();
     }
@@ -284,8 +488,8 @@ Intersection Line::intersectionWithExtendedLine(const Line &ln) const
     
     if (fabs(d) <= EPSILON) {
         if (
-	    minimumExtendedLineDistanceFromPoint(ln.startPt) < CLOSEENOUGH &&
-	    minimumExtendedLineDistanceFromPoint(ln.endPt) < CLOSEENOUGH
+	    minimumExtendedLineDistanceFromPoint(ln.startPt) < EPSILON &&
+	    minimumExtendedLineDistanceFromPoint(ln.endPt) < EPSILON
 	) {
 	    // Lines are coincident.
 	    return Intersection(0);

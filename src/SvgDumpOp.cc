@@ -1,5 +1,5 @@
 //
-//  SVGDumpOperation.m
+//  SVGDumpOperation.cc
 //  Mandoline
 //
 //  Created by GM on 11/24/10.
@@ -7,10 +7,10 @@
 //
 
 #include <fstream>
-#include "SvgDumpOp.h"
-#include "BGL/BGL.h"
-#include "SlicingContext.h"
-#include "CarvedSlice.h"
+#include "SvgDumpOp.hh"
+#include <BGL.hh>
+#include "SlicingContext.hh"
+#include "CarvedSlice.hh"
 
 using namespace BGL;
 
@@ -27,7 +27,7 @@ void SvgDumpOp::main()
     if ( NULL == context ) return;
     if ( NULL == slice ) return;
 
-    float extrusionWidth = context->standardExtrusionWidth();
+    double extrusionWidth = context->standardExtrusionWidth();
     char dumpFileName[512];
     snprintf(dumpFileName, sizeof(dumpFileName), "%.128s-%06.2f.svg", context->dumpPrefix.c_str(), zLayer);
 

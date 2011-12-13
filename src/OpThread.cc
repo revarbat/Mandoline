@@ -1,4 +1,4 @@
-#include "OpThread.h"
+#include "OpThread.hh"
 
 
 static void* start_thread(void *obj)

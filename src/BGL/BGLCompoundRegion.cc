@@ -1,5 +1,5 @@
 //
-//  BGLCompoundRegion.m
+//  BGLCompoundRegion.cc
 //  Part of the Belfry Geometry Library
 //
 //  Created by GM on 10/14/10.
@@ -8,9 +8,9 @@
 
 #include <sstream>
 #include <fstream>
-#include "BGLCommon.h"
-#include "BGLPoint.h"
-#include "BGLCompoundRegion.h"
+#include "BGLCommon.hh"
+#include "BGLPoint.hh"
+#include "BGLCompoundRegion.hh"
 
 
 
@@ -143,7 +143,7 @@ ostream &CompoundRegion::svgPathDataWithOffset(ostream& os, double dx, double dy
 
 ostream &CompoundRegion::svgPathWithOffset(ostream& os, double dx, double dy) const
 {
-    os << "<path fill=\"none\" d=\"";
+    os << "<path fill=\"inherit\" d=\"";
     svgPathDataWithOffset(os, dx, dy);
     os << "\" />" << endl;
     return os;

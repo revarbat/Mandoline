@@ -1,6 +1,6 @@
-#include "OpQueue.h"
-#include "OpThread.h"
-#include "Operation.h"
+#include "OpQueue.hh"
+#include "OpThread.hh"
+#include "Operation.hh"
 
 
 

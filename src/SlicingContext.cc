@@ -6,8 +6,8 @@
 //  Copyright 2010 Belfry DevWorks. All rights reserved.
 //
 
-#include "SlicingContext.h"
-#include "Defaults.h"
+#include "SlicingContext.hh"
+#include "Defaults.hh"
 
 
 // default constructor
@@ -45,37 +45,37 @@ void SlicingContext::loadDefaultsFromFile(const char *fileName)
 
 
 
-float SlicingContext::standardFeedRate()
+double SlicingContext::standardFeedRate()
 {
-    float filamentRadius = 0.5f * filamentDiameter;
+    double filamentRadius = 0.5f * filamentDiameter;
     return (4*filamentFeedRate*filamentRadius*filamentRadius) / (widthOverHeightRatio*layerThickness*layerThickness);
 }
 
 
 
-float SlicingContext::standardExtrusionWidth()
+double SlicingContext::standardExtrusionWidth()
 {
     return layerThickness * widthOverHeightRatio;
 }
 
 
 
-float SlicingContext::ratioForWidth(float extrusionWidth)
+double SlicingContext::ratioForWidth(double extrusionWidth)
 {
     return extrusionWidth / layerThickness;
 }
 
 
 
-float SlicingContext::feedRateForWidth(float extrusionWidth)
+double SlicingContext::feedRateForWidth(double extrusionWidth)
 {
-    float filamentRadius = 0.5f * filamentDiameter;
+    double filamentRadius = 0.5f * filamentDiameter;
     return (4*filamentFeedRate*filamentRadius*filamentRadius) / (extrusionWidth*layerThickness);
 }
 
 
 
-CarvedSlice* SlicingContext::allocSlice(float Z)
+CarvedSlice* SlicingContext::allocSlice(double Z)
 {
     CarvedSlice *slice = NULL;
     // TODO: pthread mutex lock
@@ -86,7 +86,7 @@ CarvedSlice* SlicingContext::allocSlice(float Z)
 }
 
 
-CarvedSlice* SlicingContext::getSliceAtZ(float Z)
+CarvedSlice* SlicingContext::getSliceAtZ(double Z)
 {
     CarvedSlice *slice = NULL;
     // TODO: pthread mutex lock

@@ -1,4 +1,4 @@
-#include "BGLPoint.h"
+#include "BGLPoint.hh"
 
 namespace BGL {
 

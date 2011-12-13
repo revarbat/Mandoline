@@ -1,26 +1,26 @@
 #include <unistd.h>
 #include <getopt.h>
-#include "Defaults.h"
-#include "Stopwatch.h"
-#include "SlicingContext.h"
-#include "Operation.h"
-#include "OpQueue.h"
-#include "CarveOp.h"
-#include "InfillOp.h"
-#include "InsetOp.h"
-#include "SvgDumpOp.h"
-#include "PathFinderOp.h"
-#include "GCodeExportOp.h"
-#include "BGL/BGL.h"
+#include <BGL.hh>
+#include "Defaults.hh"
+#include "Stopwatch.hh"
+#include "SlicingContext.hh"
+#include "Operation.hh"
+#include "OpQueue.hh"
+#include "CarveOp.hh"
+#include "InfillOp.hh"
+#include "InsetOp.hh"
+#include "SvgDumpOp.hh"
+#include "PathFinderOp.hh"
+#include "GCodeExportOp.hh"
 
 static string inFileName  = "";
 static string material    = "ABS";
-static float scaling      = 1.0f;
-static float rotation     = 0.0f;
-static bool  doCenter     = true;
-static float onlyAtZ      = -1.0;
-static bool  doDumpSVG    = false;
-static int   threadcount  = DEFAULT_WORKER_THREADS;
+static double scaling      = 1.0f;
+static double rotation     = 0.0f;
+static bool   doCenter     = true;
+static double onlyAtZ      = -1.0;
+static bool   doDumpSVG    = false;
+static int    threadcount  = DEFAULT_WORKER_THREADS;
 
 enum ExportTypes {
     NONE,
@@ -195,8 +195,8 @@ int main (int argc, char * const argv[])
     
     // Calculate first and last layer Zs
     printf("Layer Thickness=%.4g\n", ctx.layerThickness);
-    float z = ctx.layerThickness/2.0f;
-    float topZ = mesh.maxZ;
+    double z = ctx.layerThickness/2.0f;
+    double topZ = mesh.maxZ;
     if (onlyAtZ > 0.0f) {
         z = onlyAtZ;
         topZ = onlyAtZ + ctx.layerThickness / 2.0f;
@@ -217,7 +217,7 @@ int main (int argc, char * const argv[])
     opQ.waitUntilAllOperationsAreFinished();
     stopwatch.checkpoint("Carved");
     
-    map<float,CarvedSlice>::iterator it;
+    map<double,CarvedSlice>::iterator it;
 
     // Inset each level's carved region
     for (it = ctx.slices.begin(); it != ctx.slices.end(); it++) {

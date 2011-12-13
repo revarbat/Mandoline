@@ -1,4 +1,4 @@
-#include "BGLSVG.h"
+#include "BGLSVG.hh"
 
 namespace BGL {
 

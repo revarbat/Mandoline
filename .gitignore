@@ -1,0 +1,10 @@
+autom4te.cache
+Makefile
+*~
+config.status
+config.log
+*.o
+*.a
+*.swp
+*.DS_Store
+src/BGL/tests/point/output/RunResults.txt

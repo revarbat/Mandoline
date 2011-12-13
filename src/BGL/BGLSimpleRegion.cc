@@ -1,17 +1,17 @@
 //
-//  BGLRegion.m
+//  BGLRegion.cc
 //  Part of the Belfry Geometry Library
 //
 //  Created by GM on 10/14/10.
 //  Copyright 2010 Belfry Software. All rights reserved.
 //
 
-#include "BGLCommon.h"
-#include "BGLBounds.h"
-#include "BGLPoint.h"
-#include "BGLLine.h"
-#include "BGLPath.h"
-#include "BGLSimpleRegion.h"
+#include "BGLCommon.hh"
+#include "BGLBounds.hh"
+#include "BGLPoint.hh"
+#include "BGLLine.hh"
+#include "BGLPath.hh"
+#include "BGLSimpleRegion.hh"
 
 
 
@@ -192,7 +192,7 @@ ostream &SimpleRegion::svgPathDataWithOffset(ostream& os, double dx, double dy) 
 
 ostream &SimpleRegion::svgPathWithOffset(ostream& os, double dx, double dy) const
 {
-    os << "<path fill=\"none\" d=\"";
+    os << "<path fill=\"inherit\" d=\"";
     svgPathDataWithOffset(os, dx, dy);
     os << "\" />" << endl;
     return os;
@@ -220,7 +220,7 @@ SimpleRegions &SimpleRegion::assembleSimpleRegionsFrom(Paths &paths, SimpleRegio
 
     for (it1 = paths.begin(); it1 != paths.end(); it1++) {
 	it1->flags = 0;
-	it1->quantize(CLOSEENOUGH/2.0);
+	//it1->quantize(CLOSEENOUGH/2.0);
 	it1->simplify(0.05);
     }
     int count1, count2;
@@ -485,6 +485,103 @@ Paths &SimpleRegion::containedSubpathsOfPath(const Path &path, Paths &outPaths)
 	outPaths.push_back(tempPath);
     }
     return outPaths;
+}
+
+
+
+// If p1 and p2 are both inside this simpleregion, find the shortest route
+//   from p1 to p2 within this simpleregion.
+// If p1 and p2 are both outside this simpleregion, find the shortest route
+//   from p1 to p2 around the outside of this simpleregion.
+// If p1 is inside this simpleregion, and p2 is outside, find the shortest
+//   inside route from p1 to the closest perimeter point to p2, then go
+//   straight to p2.
+// If p1 is outside this simpleregion, and p2 is inside, go straight from p1
+//   to the closest perimeter point to p1, then find the shortest inside route
+//   from there to p2.
+Path &SimpleRegion::pathAround(Point p1, Point p2, Path &outPath) const
+{
+    bool inside1 = contains(p1);
+    bool inside2 = contains(p2);
+    bool doreverse = false;
+    bool doinverse = false;
+    if (inside1 && !inside2) {
+        doreverse = true;
+	Point tmp = p1;
+	p1 = p2;
+	p2 = tmp;
+    }
+    if (inside1 != inside2) {
+	Point perimPt = outerPath.closestPointTo(p1, NULL);
+	outPath.segments.push_back(Line(p1,perimPt));
+	p1 = perimPt;
+	inside1 = true;
+	inside2 = true;
+    }
+    if (!inside1) {
+        doinverse = true;
+    }
+
+    double lineAng = p1.angleToPoint(p2);
+    double minAng = 0.0;
+    double maxAng = 0.0;
+    Point minPt;
+    Point maxPt;
+
+    // TODO: FIX THIS for insideness
+    Paths::const_iterator itera;
+    Lines::const_iterator lit;
+    for (lit = outerPath.begin(); lit != outerPath.end(); lit++) {
+	double ptAng = lineAng - p1.angleToPoint(lit->endPt);
+	if (ptAng <= -M_PI) {
+	    ptAng += 2.0 * M_PI;
+	}
+	if (ptAng > M_PI) {
+	    ptAng -= 2.0 * M_PI;
+	}
+	if (ptAng < minAng) {
+	    minAng = ptAng;
+	    minPt = lit->endPt;
+	}
+	if (ptAng > maxAng) {
+	    maxAng = ptAng;
+	    maxPt = lit->endPt;
+	}
+    }
+    if (minAng != 0.0 && maxAng != 0.0) {
+        // TODO: umm, do something
+    }
+
+    bool isectFound = false;
+    for (itera = subpaths.begin(); itera != subpaths.end(); itera++) {
+
+	for (lit = itera->begin(); lit != itera->end(); lit++) {
+	    double ptAng = lineAng - p1.angleToPoint(lit->endPt);
+	    if (ptAng <= -M_PI) {
+		ptAng += 2.0 * M_PI;
+	    }
+	    if (ptAng > M_PI) {
+		ptAng -= 2.0 * M_PI;
+	    }
+	    if (ptAng < minAng) {
+		minAng = ptAng;
+		minPt = lit->endPt;
+	    }
+	    if (ptAng > maxAng) {
+		maxAng = ptAng;
+		maxPt = lit->endPt;
+	    }
+	}
+	if (minAng != 0.0 && maxAng != 0.0) {
+	    isectFound = true;
+	}
+    }
+    // TODO: make recursive.
+
+    if (doreverse) {
+        outPath.reverse();
+    }
+    return outPath;
 }
 
 

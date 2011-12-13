@@ -1,16 +1,20 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_INIT([Mandoline], 1.0, [revarbat@gmail.com])
-AC_PREREQ(2.59)
-AM_INIT_AUTOMAKE([1.9.6 no-define foreign])
+AC_INIT([Mandoline],[1.0],[revarbat@gmail.com])
+AC_PREREQ([2.68])
+AM_INIT_AUTOMAKE([1.11.1 no-define foreign])
 AC_CONFIG_HEADERS([config.h])
-# AC_CONFIG_SRCDIR([CarvedSlice.h])
+AC_CONFIG_SRCDIR([Mandoline.cc])
+AC_CONFIG_MACRO_DIR([m4])
 
 # Checks for programs.
 AC_PROG_CXX
 AC_PROG_CC
 AC_PROG_INSTALL
+
+# libtool
+LT_INIT
 
 # Checks for libraries.
 
@@ -49,6 +53,6 @@ CFLAGS="$CFLAGS $PTHREAD_CFLAGS"
 CXXFLAGS="$CXXFLAGS $PTHREAD_CFLAGS"
 
 AC_CONFIG_FILES([Makefile])
-# AC_CONFIG_SUBDIRS([BGL])
+AC_CONFIG_SUBDIRS([BGL])
 AC_OUTPUT
 

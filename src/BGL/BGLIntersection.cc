@@ -1,5 +1,5 @@
-#include "BGLIntersection.h"
-#include "BGLLine.h"
+#include "BGLIntersection.hh"
+#include "BGLLine.hh"
 
 namespace BGL {
 
@@ -10,7 +10,7 @@ Line Intersection::line() const
 
 
 
-void Intersection::quantize(float quanta) {
+void Intersection::quantize(double quanta) {
     if (type != NONE) {
 	p1.quantize(quanta);
 	if (type != POINT) {

@@ -1,8 +1,8 @@
 #include <ostream>
-#include "CarvedSlice.h"
+#include "CarvedSlice.hh"
 
 
-void CarvedSlice::svgPathWithSizeAndOffset(ostream &os, float width, float height, float dx, float dy, float strokeWidth)
+void CarvedSlice::svgPathWithSizeAndOffset(ostream &os, double width, double height, double dx, double dy, double strokeWidth)
 {
     BGL::SVG svg(width, height);
     svg.header(os);

@@ -6,9 +6,9 @@
 //  Copyright 2010 Belfry Software. All rights reserved.
 //
 
-#include "BGLTriangle3d.h"
-#include "BGLPoint3d.h"
-#include "BGLLine.h"
+#include "BGLTriangle3d.hh"
+#include "BGLPoint3d.hh"
+#include "BGLLine.hh"
 
 namespace BGL {
 

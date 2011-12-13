@@ -1,15 +1,15 @@
 //
-//  PathFinderOp.m
+//  PathFinderOp.cc
 //  Mandoline
 //
 //  Created by GM on 11/24/10.
 //  Copyright 2010 Belfry DevWorks. All rights reserved.
 //
 
-#include "PathFinderOp.h"
-#include "BGL/BGL.h"
-#include "SlicingContext.h"
-#include "CarvedSlice.h"
+#include <BGL.hh>
+#include "PathFinderOp.hh"
+#include "SlicingContext.hh"
+#include "CarvedSlice.hh"
 
 
 

@@ -1,4 +1,4 @@
-#include "BGLBounds.h"
+#include "BGLBounds.hh"
 
 namespace BGL {
 

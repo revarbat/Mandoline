@@ -6,10 +6,10 @@
 //  Copyright 2010 Belfry DevWorks. All rights reserved.
 //
 
-#include "CarveOp.h"
-#include "BGL/BGL.h"
-#include "SlicingContext.h"
-#include "CarvedSlice.h"
+#include <BGL.hh>
+#include "CarveOp.hh"
+#include "SlicingContext.hh"
+#include "CarvedSlice.hh"
 
 
 

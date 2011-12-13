@@ -9,7 +9,7 @@
 #include <iostream>
 #include <iomanip>
 
-#include "BGLPath.h"
+#include "BGLPath.hh"
 
 using namespace std;
 using namespace BGL;
@@ -110,7 +110,7 @@ Path& Path::operator/=(const Point &rhs) {
 
 
 
-void Path::quantize(float quanta) {
+void Path::quantize(double quanta) {
     Lines::iterator it;
     for (it = segments.begin(); it != segments.end(); it++) {
         it->quantize(quanta);
@@ -130,7 +130,7 @@ void Path::quantize() {
 
 double Path::length() const
 {
-    double totlen = 0.0f;
+    double totlen = 0.0;
     Lines::const_iterator itera = segments.begin();
     for(; itera != segments.end(); itera++) {
         totlen += itera->length();
@@ -142,13 +142,13 @@ double Path::length() const
 
 double Path::windingArea() const
 {
-    double totarea = 0.0f;
+    double totarea = 0.0;
     Lines::const_iterator itera = segments.begin();
     for(; itera != segments.end(); itera++) {
         totarea += itera->startPt.x * itera->endPt.y;
         totarea -= itera->endPt.x * itera->startPt.y;
     }
-    return (totarea/2.0f);
+    return (totarea/2.0);
 }
 
 
@@ -430,19 +430,15 @@ bool Path::contains(const Point &pt) const
         return false;
     }
     Line longLine(pt,Point(1.0e9,pt.y));
-    Line testLine;
-    Point& sp = testLine.startPt;
-    Point& ep = testLine.endPt;
     int icount = 0;
-    Lines::const_iterator itera = segments.begin();
-    for (; itera != segments.end(); itera++) {
-        sp = itera->startPt;
-        if (fabs(sp.y-pt.y) < CLOSEENOUGH) {
-            sp.y += 1.5 * CLOSEENOUGH;
+    Lines::const_iterator itera;
+    for (itera = segments.begin(); itera != segments.end(); itera++) {
+	Line testLine(itera->startPt, itera->endPt);
+        if (fabs(testLine.startPt.y-pt.y) <= EPSILON) {
+	    testLine.startPt.y += EPSILON;
         }
-        ep = itera->endPt;
-        if (fabs(ep.y-pt.y) < CLOSEENOUGH) {
-            ep.y += 1.5 * CLOSEENOUGH;
+        if (fabs(testLine.endPt.y-pt.y) <= EPSILON) {
+            testLine.endPt.y += EPSILON;
         }
         Intersection isect = testLine.intersectionWithSegment(longLine);
         if (isect.type != NONE) {
@@ -451,6 +447,42 @@ bool Path::contains(const Point &pt) const
     }
     return ((icount & 0x1) != 0);
 }
+
+
+
+Point Path::closestPointTo(const Point &pt, int *outSeg) const
+{
+    double minDist = 999e99;
+    Point minPt;
+    Lines::const_iterator seg;
+    int segNum = 0;
+    for (seg = segments.begin(); seg != segments.end(); seg++) {
+	Point testPt = seg->closestSegmentPointTo(pt);
+	double testDist = pt.distanceFrom(testPt);
+	if (testDist < minDist) {
+	    minDist = testDist;
+	    minPt = testPt;
+	    if (outSeg) {
+	        *outSeg = segNum;
+	    }
+	}
+	segNum++;
+    }
+    return minPt;
+}
+
+
+
+void Path::reverse()
+{
+    Lines tmpLines = segments;
+    segments.clear();
+    Lines::iterator itera;
+    for (itera = tmpLines.begin(); itera != tmpLines.end(); itera++) {
+        segments.push_front(*itera);
+    }
+}
+
 
 
 // Strips out segments that are shorter than the given length.
@@ -600,23 +632,53 @@ void Path::alignTo(const Path &path)
     for (itera = segments.begin(); itera != segments.end(); itera++) {
         Lines::const_iterator iterb;
         for (iterb = path.segments.begin(); iterb != path.segments.end(); iterb++) {
-	    if (itera->startPt == iterb->startPt) {
-	        itera->startPt = iterb->startPt; // If close, jigger it to make it exact.
-	    }
-	    if (itera->startPt == iterb->endPt) {
-	        itera->startPt = iterb->endPt; // If close, jigger it to make it exact.
-	    }
-	    if (itera->endPt == iterb->startPt) {
-	        itera->endPt = iterb->startPt; // If close, jigger it to make it exact.
-	    }
-	    if (itera->endPt == iterb->endPt) {
-	        itera->endPt = iterb->endPt; // If close, jigger it to make it exact.
-	    }
-	    if (iterb->contains(itera->startPt) && !iterb->hasEndPoint(itera->startPt)) {
+	    if (iterb->minimumSegmentDistanceFromPoint(itera->startPt) <= CLOSEENOUGH) {
+		// start point is close to the line, shift it onto the line.
 		itera->startPt = iterb->closestSegmentPointTo(itera->startPt);
 	    }
-	    if (iterb->contains(itera->endPt) && !iterb->hasEndPoint(itera->endPt)) {
+	    if (iterb->minimumSegmentDistanceFromPoint(itera->endPt) <= CLOSEENOUGH) {
+		// end point is close to the line, shift it onto the line.
 		itera->endPt = iterb->closestSegmentPointTo(itera->endPt);
+	    }
+	    if (itera->startPt.distanceFrom(iterb->startPt) <= CLOSEENOUGH) {
+		// endpoint is close, jigger it to make it exact.
+	        itera->startPt = iterb->startPt;
+	    }
+	    if (itera->startPt.distanceFrom(iterb->endPt) <= CLOSEENOUGH) {
+		// endpoint is close, jigger it to make it exact.
+	        itera->startPt = iterb->endPt;
+	    }
+	    if (itera->endPt.distanceFrom(iterb->startPt) <= CLOSEENOUGH) {
+		// endpoint is close, jigger it to make it exact.
+	        itera->endPt = iterb->startPt;
+	    }
+	    if (itera->endPt.distanceFrom(iterb->endPt) <= CLOSEENOUGH) {
+		// endpoint is close, jigger it to make it exact.
+	        itera->endPt = iterb->endPt;
+	    }
+	    if (itera->minimumSegmentDistanceFromPoint(iterb->startPt) <= CLOSEENOUGH) {
+		// other segment's start point is on the current segment
+		if (iterb->startPt.distanceFrom(itera->startPt) > CLOSEENOUGH &&
+		    iterb->startPt.distanceFrom(itera->endPt) > CLOSEENOUGH
+		) {
+		    // But is not at one end of the segment or the other. Split segment.
+		    Point midPt = itera->closestSegmentPointTo(iterb->startPt);
+		    Point firstPt = itera->startPt;
+		    itera->startPt = midPt;
+		    itera = segments.insert(itera, Line(firstPt, midPt));
+		}
+	    }
+	    if (itera->minimumSegmentDistanceFromPoint(iterb->endPt) <= CLOSEENOUGH) {
+		// other segment's end point is on the current segment
+		if (iterb->endPt.distanceFrom(itera->startPt) > CLOSEENOUGH &&
+		    iterb->endPt.distanceFrom(itera->endPt) > CLOSEENOUGH
+		) {
+		    // But is not at one end of the segment or the other. Split segment.
+		    Point midPt = itera->closestSegmentPointTo(iterb->endPt);
+		    Point firstPt = itera->startPt;
+		    itera->startPt = midPt;
+		    itera = segments.insert(itera, Line(firstPt, midPt));
+		}
 	    }
 	}
     }
@@ -640,41 +702,41 @@ void Path::splitSegmentsAtIntersectionsWithPath(const Path &path)
 	    }
 	    Points isects;
 	    if (itera->startPt == iterb->startPt) {
-		// It's close, so make it exact.
+		// It's really close, so make it exact.
 	        itera->startPt = iterb->startPt;
 		if (dodebug) {
 		    cerr << "    exactify itera start to iterb start" << endl;
 		}
 	    }
 	    if (itera->endPt == iterb->startPt) {
-		// It's close, so make it exact.
+		// It's really close, so make it exact.
 	        itera->endPt = iterb->startPt;
 		if (dodebug) {
 		    cerr << "    exactify itera end to iterb start" << endl;
 		}
 	    }
 	    if (itera->startPt == iterb->endPt) {
-		// It's close, so make it exact.
+		// It's really close, so make it exact.
 	        itera->startPt = iterb->endPt;
 		if (dodebug) {
 		    cerr << "    exactify itera start to iterb end" << endl;
 		}
 	    }
 	    if (itera->endPt == iterb->endPt) {
-		// It's close, so make it exact.
+		// It's really close, so make it exact.
 	        itera->endPt = iterb->endPt;
 		if (dodebug) {
 		    cerr << "    exactify itera end to iterb end" << endl;
 		}
 	    }
-	    if (itera->minimumSegmentDistanceFromPoint(iterb->startPt) < CLOSEENOUGH) {
+	    if (itera->minimumSegmentDistanceFromPoint(iterb->startPt) < EPSILON * 2.0) {
                 if (!itera->hasEndPoint(iterb->startPt)) {
 		    isects.push_back(iterb->startPt);
 		    if (dodebug) {
 			cerr << "    A split itera at " << iterb->startPt << endl;
 		    }
 		}
-	    } else if (itera->minimumSegmentDistanceFromPoint(iterb->endPt) < CLOSEENOUGH) {
+	    } else if (itera->minimumSegmentDistanceFromPoint(iterb->endPt) < EPSILON * 2.0) {
                 if (!itera->hasEndPoint(iterb->endPt)) {
 		    isects.push_back(iterb->endPt);
 		    if (dodebug) {
@@ -751,8 +813,8 @@ void Path::splitSegmentsAtIntersectionsWithPath(const Path &path)
 
 Paths &Path::separateSelfIntersectingSubpaths(Paths &outPaths)
 {
-    quantize(CLOSEENOUGH/2.0);
-    simplify(CLOSEENOUGH/2.0);
+    //quantize(CLOSEENOUGH/2.0);
+    //simplify(CLOSEENOUGH/2.0);
     splitSegmentsAtIntersectionsWithPath(*this);
 
     Path subpath1;
@@ -827,55 +889,72 @@ void Path::untag()
 void Path::tagSegmentsRelativeToClosedPath(const Path &path)
 {
     bool invert = (flags == INSIDE);
-    bool dodebug = true;
-
-    // Align paths more exactly to each other.
-    alignTo(path);
-
-    // Split segments where other path intersects with us.
-    splitSegmentsAtIntersectionsWithPath(path);
+    bool dodebug = false; // CURRDEBUG: set true
 
     Point midpt;
     Lines::iterator itera = segments.begin();
     for (; itera != segments.end(); itera++) {
         Line &seg = *itera;
-        midpt.x = (seg.startPt.x + seg.endPt.x) / 2.0f;
-        midpt.y = (seg.startPt.y + seg.endPt.y) / 2.0f;
+	midpt = (seg.startPt + seg.endPt) / 2.0;
+        //midpt.x = (seg.startPt.x + seg.endPt.x) / 2.0;
+        //midpt.y = (seg.startPt.y + seg.endPt.y) / 2.0;
         Lines::const_iterator foundSeg = path.segments.end();
+	bool isTagged = false;
         if (path.hasEdgeWithPoint(midpt, foundSeg)) {
             // Either shared or unshared segment.
+	    if (dodebug) {
+		cerr << "SorU? ";
+	    }
 
             // Check if the matching segments point the same way.
             double dang = seg.angleDelta(*foundSeg);
-            bool isShared = (fabs(dang) < M_PI_2);
+	    double dist1 = foundSeg->minimumExtendedLineDistanceFromPoint(seg.startPt);
+	    double dist2 = foundSeg->minimumExtendedLineDistanceFromPoint(seg.endPt);
+	    if ((fabs(dang) < EPSILON || fabs(fabs(dang)-M_PI) < EPSILON) && dist1 <= EPSILON && dist2 <= EPSILON) {
+		// Segments are parallel, or very close to being so.
 
-            // If the paths wind in opposite directions, invert shared test.
-            if (isClockwise() != path.isClockwise()) {
-                isShared = !isShared;
-            }
+		// Figure out if segments are shared or unshared edges.
+		bool isShared = (fabs(dang) < M_PI_2);
 
-            // tweak sharedness, for use in checking against multiple paths.
-            if (invert) {
-                isShared = !isShared;
-            }
-            switch (seg.flags) {
-                case USED:
-                case OUTSIDE:
-                case UNSHARED:
-                    seg.flags = isShared? SHARED : UNSHARED;
-                    break;
-                case SHARED:
-                    seg.flags = SHARED;
-                    break;
-                case INSIDE:
-                    seg.flags = isShared? UNSHARED : SHARED;
-                    break;
-            }
-        } else {
+		// If the paths wind in opposite directions, invert sharedness test.
+		if (isClockwise() != path.isClockwise()) {
+		    isShared = !isShared;
+		}
+
+		// tweak sharedness, for use in checking against multiple paths.
+		if (invert) {
+		    isShared = !isShared;
+		}
+		switch (seg.flags) {
+		    case USED:
+		    case OUTSIDE:
+		    case UNSHARED:
+			seg.flags = isShared? SHARED : UNSHARED;
+			break;
+		    case SHARED:
+			seg.flags = SHARED;
+			break;
+		    case INSIDE:
+			seg.flags = isShared? UNSHARED : SHARED;
+			break;
+		}
+		isTagged = true;
+	    }
+        }
+	if (!isTagged) {
+	    if (dodebug) {
+		cerr << "IorO? ";
+	    }
             bool isinside = path.contains(midpt);
             if (invert) {
                 isinside = !isinside;
+		if (dodebug) {
+		    cerr << "Invert ";
+		}
             }
+	    if (dodebug) {
+		cerr << (isinside? "I " : "O ");
+	    }
             if (isinside) {
                 // toggle insideness, for use in checking against multiple paths.
                 switch (seg.flags) {
@@ -916,28 +995,37 @@ void Path::tagSegmentsRelativeToClosedPath(const Path &path)
 
 Paths& Path::assembleTaggedPaths(const Path &inPath1, int flags1, const Path &inPath2, int flags2, Paths &outPaths)
 {
-    bool dodebug = true;
+    bool dodebug = false; // CURRDEBUG: set true
 
     Path path1(inPath1);
     Path path2(inPath2);
 
-    path1.quantize(CLOSEENOUGH/2.0);
-    path1.simplify(CLOSEENOUGH/2.0);
+    //path1.quantize(CLOSEENOUGH/2.0);
+    //path1.simplify(CLOSEENOUGH/2.0);
 
-    path2.quantize(CLOSEENOUGH/2.0);
-    path2.simplify(CLOSEENOUGH/2.0);
+    //path2.quantize(CLOSEENOUGH/2.0);
+    //path2.simplify(CLOSEENOUGH/2.0);
 
     if (dodebug) {
 	cerr << endl << endl;
-	cerr << "-----------------" << endl;
+	cerr << "-----------------Poly1---" << endl;
     }
+
+    // Align paths more exactly to each other.
+    path1.alignTo(path2);
+    path2.alignTo(path1);
+
+    // Split segments where other path intersects with us.
+    path1.splitSegmentsAtIntersectionsWithPath(path2);
+    path2.splitSegmentsAtIntersectionsWithPath(path1);
+
 
     // Tag segments for insideness, outsideness, or sharedness.
     path1.untag();
     path1.tagSegmentsRelativeToClosedPath(path2);
 
     if (dodebug) {
-	cerr << "-----------------" << endl;
+	cerr << "-----------------Poly2---" << endl;
     }
 
     // Tag segments for insideness, outsideness, or sharedness.
@@ -945,7 +1033,7 @@ Paths& Path::assembleTaggedPaths(const Path &inPath1, int flags1, const Path &in
     path2.tagSegmentsRelativeToClosedPath(path1);
 
     if (dodebug) {
-	cerr << "-----------------" << endl;
+	cerr << "-----------------End-----" << endl;
     }
     
     int remaining = path1.size() + path2.size();
@@ -1125,7 +1213,15 @@ Lines &Path::containedSegments(const Line &line, Lines &outSegs) const
     Path linePath;
     linePath.attach(line);
 
-    linePath.quantize(CLOSEENOUGH/2.0);
+    //linePath.quantize(CLOSEENOUGH/2.0);
+
+    // Align paths more exactly to each other.
+    linePath.alignTo(*this);
+
+    // Split segments where other path intersects with us.
+    linePath.splitSegmentsAtIntersectionsWithPath(*this);
+
+
     linePath.untag();
     linePath.tagSegmentsRelativeToClosedPath(*this);
     
@@ -1143,7 +1239,14 @@ Lines &Path::containedSegments(const Line &line, Lines &outSegs) const
 
 Paths &Path::containedSubpathsOfPath(Path &path, Paths outPaths) const
 {
-    path.quantize(CLOSEENOUGH/2.0);
+    //path.quantize(CLOSEENOUGH/2.0);
+
+    // Align paths more exactly to each other.
+    path.alignTo(*this);
+
+    // Split segments where other path intersects with us.
+    path.splitSegmentsAtIntersectionsWithPath(*this);
+
     path.untag();
     path.tagSegmentsRelativeToClosedPath(*this);
     
@@ -1197,7 +1300,7 @@ Paths &Path::leftOffset(double offsetby, Paths& outPaths)
         ) {
         double ang = itera->angle();
         double deltaAng = itera->angleDelta(*iterb);
-        double bisectAng = (M_PI-deltaAng)/2.0f + ang;
+        double bisectAng = (M_PI-deltaAng)/2.0 + ang;
 
         Point bisectPt(itera->endPt);
         bisectPt.polarOffset(bisectAng, offsetby);
@@ -1328,7 +1431,7 @@ Paths &Path::inset(double insetBy, Paths& outPaths)
         leftOffset = -leftOffset;
     }
 
-    simplify(CLOSEENOUGH/2.0);
+    //simplify(CLOSEENOUGH/2.0);
 
     Paths trimPaths;
     Paths::iterator pit;
