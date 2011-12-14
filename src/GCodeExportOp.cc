@@ -24,7 +24,7 @@ GCodeExportOp::~GCodeExportOp()
 }
 
 
-ostream &pathToGcode(Path& path, float zHeight, ostream& out) {
+ostream &pathToGcode(Path& path, double zHeight, ostream& out) {
     Lines::iterator line = path.segments.begin();
 
     out << "M103" << endl;
@@ -50,7 +50,7 @@ ostream &pathToGcode(Path& path, float zHeight, ostream& out) {
     return out;
 }
 
-ostream &pathsToGcode(Paths& paths, float zHeight, ostream& out) {
+ostream &pathsToGcode(Paths& paths, double zHeight, ostream& out) {
     // TODO: inner paths?
     Paths::iterator pit;
     for (pit = paths.begin();
@@ -63,7 +63,7 @@ ostream &pathsToGcode(Paths& paths, float zHeight, ostream& out) {
 }
 
 
-ostream &simpleRegionsToGcode(SimpleRegions& regions, float zHeight, ostream& out) {
+ostream &simpleRegionsToGcode(SimpleRegions& regions, double zHeight, ostream& out) {
     SimpleRegions::iterator perimeter;
     for (perimeter = regions.begin();
          perimeter != regions.end();
@@ -88,7 +88,7 @@ void GCodeExportOp::main()
     // For each slice, write out code.
     std::cout << "Layer count: " << context->slices.size() << std::endl;
 
-    map<float,CarvedSlice>::iterator it;
+    map<double,CarvedSlice>::iterator it;
 
     fstream fout;
     fout.open("out.gcode", fstream::out | fstream::trunc);
