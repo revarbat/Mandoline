@@ -121,6 +121,7 @@ int main(int argc, char**argv)
     fstream fout;
     BGL::SVG svg(250, 250);
 
+    cerr << endl << endl << "Union subtest --------------------------------------------------------" << endl;
     synthesize_testfile_name(fname, sizeof(fname), argv[0], "union", "svg");
     fout.open(fname, fstream::out | fstream::trunc);
     if (fout.good()) {
@@ -148,6 +149,7 @@ int main(int argc, char**argv)
 	fout.close();
     }
 
+    cerr << endl << endl << "Diff subtest --------------------------------------------------------" << endl;
     synthesize_testfile_name(fname, sizeof(fname), argv[0], "diff", "svg");
     fout.open(fname, fstream::out | fstream::trunc);
     if (fout.good()) {
@@ -175,6 +177,7 @@ int main(int argc, char**argv)
 	fout.close();
     }
 
+    cerr << endl << endl << "ISect subtest --------------------------------------------------------" << endl;
     synthesize_testfile_name(fname, sizeof(fname), argv[0], "intsect", "svg");
     fout.open(fname, fstream::out | fstream::trunc);
     if (fout.good()) {

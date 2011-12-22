@@ -28,21 +28,36 @@ export LOGFILE
 export PRODPID
 export MAINPID=$$
 
-exit_timeout() {
-    echo "Timed Out." >> ${LOGFILE}
-    ps -p ${PRODPID} | grep -v "PID TTY" >> /dev/null 2>&1
+killitnow() {
+    ps -p $2 | grep -v "PID TTY" >> /dev/null 2>&1
     if [ $? == 0 ] ; then
-	kill ${PRODPID}
-	wait ${PRODPID} 2>/dev/null
+	kill -$1 $2
+	wait $2 2>/dev/null
     fi
-    exit -1
 }
 
+
+exit_timeout() {
+    echo "Timed Out." >> ${LOGFILE}
+    killitnow SIGTERM ${PRODPID}
+    exit -1
+}
 trap exit_timeout SIGUSR1
 
 
-( trap 'exit 0' TERM ; sleep ${TIMEOUT} ; kill -SIGUSR1 ${MAINPID} ; wait ${MAINPID} 2>/dev/null) &
+die_die_die() {
+    echo "Killed by user." >> ${LOGFILE}
+    killitnow SIGTERM ${PRODPID}
+    exit -1
+}
+trap die_die_die SIGINT
+
+
+
+( trap 'exit 0' TERM ; sleep ${TIMEOUT} ; killitnow SIGUSR1 ${MAINPID} ) &
 TPID=$!
+export TPID
+
 
 wait ${PRODPID}
 resval=$?
@@ -56,7 +71,7 @@ fi
 SVGFILE=`ls -1 $SVGFILE`
 md5raw=`md5 $SVGFILE`
 md5val=`echo ${md5raw} | sed 's/^.* = //'`
-expected=`grep '^MD5 ('${SVGFILE} ExpectedResults.txt | sed 's/^.* = //'`
+expected=`grep '^MD5 ('${SVGFILE} ExpectedResults.txt | tail -1 | sed 's/^.* = //'`
 
 if [ "${md5val}x" != "${expected}x" ] ; then
     exit -1

@@ -527,20 +527,25 @@ int main(int argc, char**argv)
     if (fout.good()) {
 	svg.header(fout);
 
-	fout << "<g stroke=\"#77f\" fill=\"#ccf\">" << endl;
+	BGL::Paths outPaths;
+	BGL::Path::unionOf(spiralPath, spiralOffsetPath, outPaths);
+
+	fout << "<g stroke=\"#000\" fill=\"#7cc\">" << endl;
+	BGL::SimpleRegions::iterator rit;
+	BGL::SimpleRegions outRegs;
+	BGL::SimpleRegion::assembleSimpleRegionsFrom(outPaths, outRegs);
+	for (rit = outRegs.begin(); rit != outRegs.end(); rit++) {
+	    rit->svgPathWithOffset(fout, 10, 10);
+	}
+	fout << "</g>" << endl;
+
+	fout << "<g stroke=\"#77f\">" << endl;
 	spiralPath.svgPathWithOffset(fout, 10, 10);
 	fout << "</g>" << endl;
 
-	fout << "<g stroke=\"#0c0\" fill=\"#7f7\">" << endl;
+	fout << "<g stroke=\"#0c0\">" << endl;
 	spiralOffsetPath.svgPathWithOffset(fout, 10, 10);
 	fout << "</g>" << endl;
-
-	BGL::Paths outPaths;
-	BGL::Paths::iterator pit;
-	BGL::Path::unionOf(spiralPath, spiralOffsetPath, outPaths);
-	for (pit = outPaths.begin(); pit != outPaths.end(); pit++) {
-	    pit->svgPathWithOffset(fout, 10, 10);
-	}
 
 	svg.footer(fout);
 	fout.sync();
@@ -552,20 +557,25 @@ int main(int argc, char**argv)
     if (fout.good()) {
 	svg.header(fout);
 
-	fout << "<g stroke=\"#77f\" fill=\"#ccf\">" << endl;
+	BGL::Paths outPaths;
+	BGL::Path::differenceOf(spiralPath, spiralOffsetPath, outPaths);
+
+	fout << "<g stroke=\"#000\" fill=\"#7cc\">" << endl;
+	BGL::SimpleRegions::iterator rit;
+	BGL::SimpleRegions outRegs;
+	BGL::SimpleRegion::assembleSimpleRegionsFrom(outPaths, outRegs);
+	for (rit = outRegs.begin(); rit != outRegs.end(); rit++) {
+	    rit->svgPathWithOffset(fout, 10, 10);
+	}
+	fout << "</g>" << endl;
+
+	fout << "<g stroke=\"#77f\">" << endl;
 	spiralPath.svgPathWithOffset(fout, 10, 10);
 	fout << "</g>" << endl;
 
-	fout << "<g stroke=\"#0c0\" fill=\"#7f7\">" << endl;
+	fout << "<g stroke=\"#0c0\">" << endl;
 	spiralOffsetPath.svgPathWithOffset(fout, 10, 10);
 	fout << "</g>" << endl;
-
-	BGL::Paths outPaths;
-	BGL::Paths::iterator pit;
-	BGL::Path::differenceOf(spiralPath, spiralOffsetPath, outPaths);
-	for (pit = outPaths.begin(); pit != outPaths.end(); pit++) {
-	    pit->svgPathWithOffset(fout, 10, 10);
-	}
 
 	svg.footer(fout);
 	fout.sync();
@@ -585,12 +595,16 @@ int main(int argc, char**argv)
 	spiralOffsetPath.svgPathWithOffset(fout, 10, 10);
 	fout << "</g>" << endl;
 
+	fout << "<g stroke=\"#000\" fill=\"#7cc\">" << endl;
 	BGL::Paths outPaths;
-	BGL::Paths::iterator pit;
 	BGL::Path::intersectionOf(spiralPath, spiralOffsetPath, outPaths);
-	for (pit = outPaths.begin(); pit != outPaths.end(); pit++) {
-	    pit->svgPathWithOffset(fout, 10, 10);
+	BGL::SimpleRegions::iterator rit;
+	BGL::SimpleRegions outRegs;
+	BGL::SimpleRegion::assembleSimpleRegionsFrom(outPaths, outRegs);
+	for (rit = outRegs.begin(); rit != outRegs.end(); rit++) {
+	    rit->svgPathWithOffset(fout, 10, 10);
 	}
+	fout << "</g>" << endl;
 
 	svg.footer(fout);
 	fout.sync();

@@ -62,7 +62,7 @@ int main(int argc, char**argv)
     fstream fout;
     BGL::SVG svg(250, 250);
 
-    synthesize_testfile_name(fname, sizeof(fname), argv[0], "orig", "svg");
+    synthesize_testfile_name(fname, sizeof(fname), argv[0], "diff", "svg");
     fout.open(fname, fstream::out | fstream::trunc);
     if (fout.good()) {
 	svg.header(fout);

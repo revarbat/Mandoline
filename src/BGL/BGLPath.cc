@@ -435,10 +435,10 @@ bool Path::contains(const Point &pt) const
     for (itera = segments.begin(); itera != segments.end(); itera++) {
 	Line testLine(itera->startPt, itera->endPt);
         if (fabs(testLine.startPt.y-pt.y) <= EPSILON) {
-	    testLine.startPt.y += EPSILON;
+	    testLine.startPt.y += 2.0*EPSILON;
         }
         if (fabs(testLine.endPt.y-pt.y) <= EPSILON) {
-            testLine.endPt.y += EPSILON;
+            testLine.endPt.y += 2.0*EPSILON;
         }
         Intersection isect = testLine.intersectionWithSegment(longLine);
         if (isect.type != NONE) {
@@ -746,7 +746,7 @@ void Path::splitSegmentsAtIntersectionsWithPath(const Path &path)
 	    } else {
 		Intersection isect = itera->intersectionWithSegment(*iterb);
 		if (isect.type != NONE) {
-		    isect.quantize();
+		    //isect.quantize();
 		    if (!itera->hasEndPoint(isect.p1)) {
 			isects.push_back(isect.p1);
 			if (dodebug) {
@@ -806,7 +806,7 @@ void Path::splitSegmentsAtIntersectionsWithPath(const Path &path)
 	    }
         }
     }
-    quantize();
+    //quantize();
 }
 
 

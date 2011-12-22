@@ -72,9 +72,11 @@ public:
     static SimpleRegions &assembleSimpleRegionsFrom(Paths &paths, SimpleRegions &outRegs);
     static SimpleRegions &assembleSimpleRegionsFrom(const Paths &outerPaths, const Paths &innerPaths, SimpleRegions &outRegs);
 
-    static SimpleRegions& unionOf       (SimpleRegion &r1, SimpleRegion &r2, SimpleRegions &outReg);
-    static SimpleRegions& differenceOf  (SimpleRegion &r1, SimpleRegion &r2, SimpleRegions &outReg);
-    static SimpleRegions& intersectionOf(SimpleRegion &r1, SimpleRegion &r2, SimpleRegions &outReg);
+    static SimpleRegions &differenceOf  (SimpleRegion &reg, Path &path, SimpleRegions &outRegs);
+
+    static SimpleRegions& unionOf       (SimpleRegion &r1, SimpleRegion &r2, SimpleRegions &outRegs);
+    static SimpleRegions& differenceOf  (SimpleRegion &r1, SimpleRegion &r2, SimpleRegions &outRegs);
+    static SimpleRegions& intersectionOf(SimpleRegion &r1, SimpleRegion &r2, SimpleRegions &outRegs);
 
     SimpleRegions &inset(double offsetby, SimpleRegions& outRegs);
 

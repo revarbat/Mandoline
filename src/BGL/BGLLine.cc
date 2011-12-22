@@ -414,17 +414,20 @@ Intersection Line::intersectionWithSegment(const Line &ln) const
 		}
                 return Intersection(isects.front(),0);
 	    } else  {
-		if (dodebug) {
-		    cerr << "    exit E" << endl;
-		}
 		if (isects.front() == isects.back()) {
+		    if (dodebug) {
+			cerr << "    exit E" << endl;
+		    }
 		    return Intersection(isects.front(),0);
+		}
+		if (dodebug) {
+		    cerr << "    exit F" << endl;
 		}
                 return Intersection(isects.front(),isects.back(),0);
             }
         }
 	if (dodebug) {
-	    cerr << "    exit F" << endl;
+	    cerr << "    exit G" << endl;
 	}
 	return Intersection();
     }
