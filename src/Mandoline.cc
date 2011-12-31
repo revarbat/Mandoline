@@ -43,9 +43,8 @@ void usage(const char* arg0, SlicingContext& ctx)
     fprintf(stderr, "\t[-r INT]      Number of Raft layers. (default %d)\n", ctx.raftLayers);
     fprintf(stderr, "\t[-w FLOAT]    Extrusion width over thickness ratio. (default %.2f)\n", ctx.widthOverHeightRatio);
     fprintf(stderr, "\t[-c]          DON'T center model on platform before slicing.\n");
-    fprintf(stderr, "\t[-s FLOAT]    Scale model.  (default %.4gx)\n", scaling);
+    fprintf(stderr, "\t[-S FLOAT]    Scale model.  (default %.4gx)\n", scaling);
     fprintf(stderr, "\t[-R FLOAT]    Rotate model about Z.  (default %.4g deg)\n", rotation);
-    fprintf(stderr, "\t[-z FLOAT]    Slice model only at the given Z level.\n");
     fprintf(stderr, "\t[-d PREFIX]   Dump layers to SVG files with names like PREFIX-12.34.svg.\n");
     fprintf(stderr, "\t[-t INT]      Number of threads to slice with. (default %d)\n", threadcount);
     exit(-1);
@@ -72,7 +71,7 @@ int main (int argc, char * const argv[])
 	{"layer", required_argument, NULL, 'l'},
 	{"shells", required_argument, NULL, 'p'},
 	{"ratio", required_argument, NULL, 'w'},
-	{"raftlayers", required_argument, NULL, 'R'},
+	{"raftlayers", required_argument, NULL, 'r'},
 	{"nocenter", required_argument, NULL, 'c'},
 	{"scale", required_argument, NULL, 'S'},
 	{"rotatex", required_argument, NULL, 'R'},
