@@ -58,7 +58,7 @@ PROGRAMS = $(bin_PROGRAMS)
 am_mandoline_OBJECTS = Mandoline.$(OBJEXT) CarveOp.$(OBJEXT) \
 	CarvedSlice.$(OBJEXT) GCodeExportOp.$(OBJEXT) \
 	InfillOp.$(OBJEXT) InsetOp.$(OBJEXT) OpQueue.$(OBJEXT) \
-	OpThread.$(OBJEXT) PathFinderOp.$(OBJEXT) \
+	OpThread.$(OBJEXT) PathFinderOp.$(OBJEXT) RaftOp.$(OBJEXT) \
 	SlicingContext.$(OBJEXT) Stopwatch.$(OBJEXT) \
 	SvgDumpOp.$(OBJEXT)
 mandoline_OBJECTS = $(am_mandoline_OBJECTS)
@@ -277,6 +277,7 @@ mandoline_SOURCES = \
 	OpThread.cc OpThread.hh \
 	Operation.hh \
 	PathFinderOp.cc PathFinderOp.hh \
+	RaftOp.cc RaftOp.hh \
 	SlicingContext.cc SlicingContext.hh \
 	Stopwatch.cc Stopwatch.hh \
 	SvgDumpOp.cc SvgDumpOp.hh
@@ -400,6 +401,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/OpQueue.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/OpThread.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PathFinderOp.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RaftOp.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SlicingContext.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Stopwatch.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SvgDumpOp.Po@am__quote@

@@ -27,13 +27,17 @@ void InsetOp::main()
 
     double extWidth = context->standardExtrusionWidth();
     int shells = context->perimeterShells;
-
-    slice->perimeter.inset(shells*extWidth, slice->infillMask);
-    for (int i = 0; i < shells; i++) {
-        BGL::CompoundRegion compReg;
-	slice->perimeter.inset((i+0.5)*extWidth, compReg);
-	slice->shells.push_back(compReg);
+    if (shells < 1) {
+        shells = 1;
     }
+
+    int i;
+    for (i = 0; i < shells; i++) {
+        BGL::CompoundRegion compReg;
+        slice->perimeter.inset((i+0.5)*extWidth, compReg);
+        slice->shells.push_back(compReg);
+    }
+    slice->perimeter.inset((i+0.5)*extWidth, slice->infillMask);
     slice->state = INSET;
 
     if ( isCancelled ) return;

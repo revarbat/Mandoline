@@ -29,7 +29,7 @@ void SvgDumpOp::main()
 
     double extrusionWidth = context->standardExtrusionWidth();
     char dumpFileName[512];
-    snprintf(dumpFileName, sizeof(dumpFileName), "%.128s-%06.2f.svg", context->dumpPrefix.c_str(), zLayer);
+    snprintf(dumpFileName, sizeof(dumpFileName), "%.128s-%06.2f.svg", context->dumpPrefix.c_str(), slice->zLayer);
 
     fstream fout;
     fout.open(dumpFileName, fstream::out | fstream::trunc);

@@ -33,6 +33,7 @@ public:
     // Constructors
     Path() : flags(0), segments() {}
     Path(int cnt, const Point* pts);
+    Path(const Line& x) : flags(0), segments() {segments.push_back(x);}
     Path(const Lines& x) : flags(0), segments(x) {}
     Path(const Path& x) : flags(x.flags), segments(x.segments) {}
 

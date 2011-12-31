@@ -20,6 +20,8 @@ SlicingContext::SlicingContext()
     shrinkageRatio       = DEFAULT_SHRINKAGE_RATIO;
     infillDensity        = DEFAULT_INFILL_DENSITY;
     perimeterShells      = DEFAULT_PERIMETER_SHELLS;
+    raftLayers           = DEFAULT_RAFT_LAYERS;
+    raftOutset           = DEFAULT_RAFT_OUTSET;
     
     calculateSvgOffsets();
 }
@@ -79,18 +81,9 @@ CarvedSlice* SlicingContext::allocSlice(double Z)
 {
     CarvedSlice *slice = NULL;
     // TODO: pthread mutex lock
-    slices[Z] = CarvedSlice();
-    slice = &slices[Z];
-    // TODO: pthread mutex unlock
-    return slice;
-}
-
-
-CarvedSlice* SlicingContext::getSliceAtZ(double Z)
-{
-    CarvedSlice *slice = NULL;
-    // TODO: pthread mutex lock
-    slice = &slices[Z];
+    slices.push_back(CarvedSlice());
+    slice = &slices.back();
+    slice->zLayer = Z;
     // TODO: pthread mutex unlock
     return slice;
 }

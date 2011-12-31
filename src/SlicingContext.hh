@@ -28,6 +28,8 @@ public:
     double shrinkageRatio;
     double infillDensity;
     int    perimeterShells;
+    int    raftLayers;
+    double raftOutset;
 
     double svgWidth;
     double svgHeight;
@@ -36,7 +38,7 @@ public:
     string dumpPrefix;
     
     Mesh3d mesh;
-    map<double,CarvedSlice> slices;
+    list<CarvedSlice> slices;
     
     SlicingContext();
 
@@ -48,7 +50,6 @@ public:
     double feedRateForWidth(double extrusionWidth);
 
     CarvedSlice* allocSlice(double Z);
-    CarvedSlice* getSliceAtZ(double Z);
 };
 
 #endif

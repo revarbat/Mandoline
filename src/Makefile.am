@@ -17,6 +17,7 @@ mandoline_SOURCES = \
 	OpThread.cc OpThread.hh \
 	Operation.hh \
 	PathFinderOp.cc PathFinderOp.hh \
+	RaftOp.cc RaftOp.hh \
 	SlicingContext.cc SlicingContext.hh \
 	Stopwatch.cc Stopwatch.hh \
 	SvgDumpOp.cc SvgDumpOp.hh

@@ -15,12 +15,11 @@
 
 class SvgDumpOp : public Operation {
 public:
-    double zLayer;
     SlicingContext* context;
     CarvedSlice* slice;
 
-    SvgDumpOp(SlicingContext* ctx, CarvedSlice* slc, double Z)
-        : Operation(), zLayer(Z), context(ctx), slice(slc)
+    SvgDumpOp(SlicingContext* ctx, CarvedSlice* slc)
+        : Operation(), context(ctx), slice(slc)
     {
     }
     virtual ~SvgDumpOp();

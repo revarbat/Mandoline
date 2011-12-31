@@ -15,12 +15,11 @@
 
 class InsetOp : public Operation {
 public:
-    double zLayer;
     SlicingContext* context;
     CarvedSlice* slice;
 
-    InsetOp(SlicingContext* ctx, CarvedSlice* slc, double Z)
-        : Operation(), zLayer(Z), context(ctx), slice(slc)
+    InsetOp(SlicingContext* ctx, CarvedSlice* slc)
+        : Operation(), context(ctx), slice(slc)
     {
     }
     virtual ~InsetOp();

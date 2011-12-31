@@ -88,7 +88,7 @@ void GCodeExportOp::main()
     // For each slice, write out code.
     std::cout << "Layer count: " << context->slices.size() << std::endl;
 
-    map<double,CarvedSlice>::iterator it;
+    list<CarvedSlice>::iterator it;
 
     fstream fout;
     fout.open("out.gcode", fstream::out | fstream::trunc);
@@ -103,15 +103,15 @@ void GCodeExportOp::main()
     for (it = context->slices.begin(); it != context->slices.end(); it++) {
         fout << "(new layer)" << std::endl;
 
-        CarvedSlice* slice = &(*it).second;
+        CarvedSlice* slice = &(*it);
 
         fout << "(perimeter)" << std::endl;
 
-        simpleRegionsToGcode(slice->perimeter.subregions, (*it).first, fout);
+        simpleRegionsToGcode(slice->perimeter.subregions, slice->zLayer, fout);
 
         fout << "(infill)" << std::endl;
 
-        pathsToGcode(slice->infill, (*it).first, fout);
+        pathsToGcode(slice->infill, slice->zLayer, fout);
     }
 
     fout.close();
