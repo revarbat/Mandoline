@@ -265,6 +265,16 @@ bool Path::attach(const Path& path)
 
 
 
+Path& Path::rotate(double angle) {
+    Lines::iterator it;
+    for (it = segments.begin(); it != segments.end(); it++) {
+        it->rotate(angle);
+    }
+    return *this;
+}
+
+
+
 string Path::svgPathWithOffset(double dx, double dy) const
 {
     char buf[80];

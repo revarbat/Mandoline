@@ -199,6 +199,16 @@ Point& Point::scaleAroundPoint(const Point& center, const Point& vect) {
 
 
 
+Point& Point::rotate(double angle) {
+    double x2 = x * cos(angle) - y * sin(angle);
+    double y2 = x * sin(angle) + y * cos(angle);
+    x = x2;
+    y = y2;
+    return *this;
+}
+
+
+
 void Point::quantize(double quanta) {
     x = floor(x/quanta) * quanta;
     y = floor(y/quanta) * quanta;

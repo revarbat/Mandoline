@@ -66,6 +66,8 @@ public:
     Point& scaleAroundPoint(const Point& center, double scale);
     Point& scaleAroundPoint(const Point& center, const Point& vect);
 
+    Point& rotate(double angle);
+
     void quantize(double quanta);
     void quantize();
 

@@ -92,6 +92,8 @@ public:
     Line& scaleAroundPoint(const Point& center, double scale);
     Line& scaleAroundPoint(const Point& center, const Point& vect);
 
+    Line& rotate(double angle);
+
     void quantize(double quanta);
     void quantize();
 

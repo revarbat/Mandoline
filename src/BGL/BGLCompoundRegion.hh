@@ -64,6 +64,11 @@ public:
     int size() const;
     bool contains(const Point &pt) const;
 
+    bool intersects(const Line& ln) const;
+    bool intersects(const Path& path) const;
+    bool intersects(const SimpleRegion& reg) const;
+    bool intersects(const CompoundRegion& reg) const;
+
     string svgPathWithOffset(double dx, double dy);
     ostream &svgPathDataWithOffset(ostream& os, double dx, double dy) const;
     ostream &svgPathWithOffset(ostream& os, double dx, double dy) const;
@@ -89,7 +94,7 @@ public:
     Lines &containedSegmentsOfLine(Line &line, Lines &lnsref);
     Paths &containedSubpathsOfPath(Path &path, Paths &pathsref);
 
-    Paths &infillPathsForRegionWithDensity(double density, double extrusionWidth, Paths &outPaths);
+    Paths &infillPathsForRegionWithDensity(double angle, double density, double extrusionWidth, CompoundRegion &solidMask, Paths &outPaths);
 
 };
 typedef list<CompoundRegion> CompoundRegions;

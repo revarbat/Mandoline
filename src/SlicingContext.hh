@@ -28,6 +28,7 @@ public:
     double shrinkageRatio;
     double infillDensity;
     int    perimeterShells;
+    int    flatShells;
     int    raftLayers;
     double raftOutset;
 

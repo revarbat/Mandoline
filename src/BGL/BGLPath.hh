@@ -109,6 +109,8 @@ public:
     bool attach(const Line& ln);
     bool attach(const Path& path);
 
+    Path& rotate(double scale);
+
     string svgPathWithOffset(double dx, double dy) const;
     ostream &svgPathDataWithOffset(ostream& os, double dx, double dy) const;
     ostream &svgPathWithOffset(ostream& os, double dx, double dy) const;

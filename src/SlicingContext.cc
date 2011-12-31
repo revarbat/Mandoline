@@ -20,6 +20,7 @@ SlicingContext::SlicingContext()
     shrinkageRatio       = DEFAULT_SHRINKAGE_RATIO;
     infillDensity        = DEFAULT_INFILL_DENSITY;
     perimeterShells      = DEFAULT_PERIMETER_SHELLS;
+    flatShells           = DEFAULT_FLAT_SHELLS;
     raftLayers           = DEFAULT_RAFT_LAYERS;
     raftOutset           = DEFAULT_RAFT_OUTSET;
     

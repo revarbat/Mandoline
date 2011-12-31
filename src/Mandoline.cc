@@ -197,7 +197,8 @@ int main (int argc, char * const argv[])
     
     // Calculate first and last layer Zs
     printf("Layer Thickness=%.4g\n", ctx.layerThickness);
-    double z = ctx.layerThickness/2.0;
+    double halfLayer = ctx.layerThickness/2.0;
+    double z = halfLayer;
     double topZ = mesh.maxZ;
 
     printf("Extrusion Width=%.4g\n", ctx.standardExtrusionWidth());
@@ -208,7 +209,7 @@ int main (int argc, char * const argv[])
 
     // Carve model to find layer outlines
     while (z < topZ) {
-        CarveOp* op = new CarveOp(&ctx, ctx.allocSlice(z), z);
+        CarveOp* op = new CarveOp(&ctx, ctx.allocSlice(z+halfLayer), z);
 	opQ.addOperation(op);
         z += ctx.layerThickness;
     }

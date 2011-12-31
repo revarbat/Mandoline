@@ -12,6 +12,7 @@
 #include "BGLLine.hh"
 #include "BGLPath.hh"
 #include "BGLSimpleRegion.hh"
+#include "BGLCompoundRegion.hh"
 
 
 
@@ -106,6 +107,28 @@ bool SimpleRegion::contains(const Point &pt) const
 	}
     }
     return ((count & 0x1) == 0x1);
+}
+
+
+
+bool SimpleRegion::intersects(const Line &ln) const
+{
+    if (outerPath.intersects(ln)) {
+	return true;
+    }
+    Paths::const_iterator it1;
+    for (it1 = subpaths.begin(); it1 != subpaths.end(); it1++) {
+	if (it1->intersects(ln)) {
+	    return true;
+	}
+	if (it1->contains(ln.startPt) && it1->contains(ln.endPt)) {
+	    return false;
+	}
+    }
+    if (outerPath.contains(ln.startPt)) {
+	return true;
+    }
+    return false;
 }
 
 
@@ -599,42 +622,57 @@ Path &SimpleRegion::pathAround(Point p1, Point p2, Path &outPath) const
 
 
 
-Paths &SimpleRegion::infillPathsForRegionWithDensity(double density, double extrusionWidth, Paths &outPaths)
+Paths &SimpleRegion::infillPathsForRegionWithDensity(double angle, double density, double extrusionWidth, CompoundRegion &solidMask, Paths &outPaths)
 {
     Bounds bounds = outerPath.bounds();
     if (bounds.minX == Bounds::NONE) {
         return outPaths;
     }
-    if (density <= 0.001f) {
+    if (density <= 0.001) {
         return outPaths;
     }
     
-    // D = WSsqrt2/SS
-    // D = Wsqrt2/S
-    // DS = Wsqrt2
-    // S = Wsqrt2/D
-    double spacing = extrusionWidth*sqrt(2.0f)/density;
-    if (density >= 0.99f) {
+    double spacing = extrusionWidth*sqrt(2.0)/density;
+    if (density >= 0.99) {
         spacing = extrusionWidth;
     }
-    double zag = spacing;
-    
-    bool alternate = (((int)floor(bounds.minX/spacing-1)) & 0x1) == 0;
-    for (double fillx = floor(bounds.minX/spacing-1)*spacing; fillx < bounds.maxX+spacing; fillx += spacing) {
-        alternate = !alternate;
-	Path path;
-        double zig = 0.0f;
-        if (density < 0.99f) {
-            zig = 0.5f*zag;
-            if (alternate) {
-                zig = -zig;
-            }
+
+    // This next line limits our density options, but it ensures
+    // that solid infill won't bunch up on spacing boundries.
+    spacing = ceil(spacing/extrusionWidth)*extrusionWidth;
+
+    double maxd = max(max(fabs(bounds.minX),fabs(bounds.maxX)),
+                      max(fabs(bounds.minY),fabs(bounds.maxY)));
+    maxd *= 2.0;
+
+    int cells = floor(maxd/spacing+1);
+    for (int xcell = -cells; xcell <= cells; xcell++) {
+        Path path;
+	double fillx = (xcell+0.5) * spacing;
+	bool hasSolid = false;
+	for (double subx = fillx - spacing * 0.5; subx < fillx + spacing * 0.5; subx += extrusionWidth) {
+	    Line tempLn(Point(subx,-maxd),Point(subx,maxd));
+	    tempLn.rotate(angle);
+	    if (solidMask.intersects(tempLn)) {
+		path.segments.push_back(tempLn);
+	        hasSolid = true;
+	    }
+	}
+	if (!hasSolid) {
+	    for (int ycell = -cells; ycell < cells; ycell++) {
+		double filly = ycell * spacing;
+		double filly2 = (ycell+1) * spacing;
+		bool alternate = (((xcell+ycell) & 0x1) == 0);
+		double zig = 0.0;
+		if (density < 0.99) {
+		    zig = 0.5*spacing;
+		    if (alternate) {
+			zig = -zig;
+		    }
+		}
+		path.segments.push_back(Line(Point(fillx+zig,filly),Point(fillx-zig,filly2)).rotate(angle));
+	    }
         }
-        for (double filly = floor(0.5*bounds.minY/zag-1)*2.0f*zag; filly < bounds.maxY+zag; filly += zag) {
-            path.segments.push_back(Line(Point(fillx+zig,filly),Point(fillx-zig,filly+zag)));
-            zig = -zig;
-        }
-        Paths infillPaths;
 	containedSubpathsOfPath(path, outPaths);
     }
     return outPaths;

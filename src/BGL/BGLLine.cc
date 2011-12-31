@@ -167,6 +167,14 @@ Line& Line::scaleAroundPoint(const Point& center, const Point& vect) {
 
 
 
+Line& Line::rotate(double angle) {
+    startPt.rotate(angle);
+    endPt.rotate(angle);
+    return *this;
+}
+
+
+
 void Line::quantize(double quanta) {
     startPt.quantize(quanta);
     endPt.quantize(quanta);
