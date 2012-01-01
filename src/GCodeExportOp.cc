@@ -12,6 +12,8 @@
 #include <iostream>
 #include <fstream>
 
+
+
 GCodeExportOp::GCodeExportOp(SlicingContext* ctx)
     : Operation(), context(ctx)
 {
@@ -24,59 +26,78 @@ GCodeExportOp::~GCodeExportOp()
 }
 
 
-ostream &pathToGcode(Path& path, double zHeight, ostream& out) {
-    Lines::iterator line = path.segments.begin();
 
-    out << "M103" << endl;
+static double prevFilamentRate = -1;
+
+ostream &pathToGcode(Path& path, double zHeight, SlicingContext &ctx, ostream& out)
+{
+    Lines::iterator line = path.segments.begin();
+    double feed = ctx.feedRateForWidth(line->extrusionWidth);
 
     // Move to the starting position...
     out << "G1 X" << line->startPt.x
         << " Y" << line->startPt.y
         << " Z" << zHeight
-        << std::endl;
+	<< " F" << feed
+        << endl;
+
+    if (ctx.filamentFeedRate != prevFilamentRate) {
+	// set extrusion speed
+	out << "M108 R" << ctx.filamentFeedRate << endl;
+	prevFilamentRate = ctx.filamentFeedRate;
+    }
+
+    // start extruding
     out << "M101" << endl;
 
-    for (;
-         line != path.segments.end();
-         line++) {
+    for ( ; line != path.segments.end(); line++) {
+	feed = ctx.feedRateForWidth(line->extrusionWidth);
 
-
+	// Move to next point in polyline
         out << "G1 X" << line->endPt.x
             << " Y" << line->endPt.y
             << " Z" << zHeight
-            << std::endl;
+            << " F" << feed
+            << endl;
     }
+
+    // stop extruding
+    out << "M103" << endl;
 
     return out;
 }
 
-ostream &pathsToGcode(Paths& paths, double zHeight, ostream& out) {
+
+
+ostream &pathsToGcode(Paths& paths, double zHeight, SlicingContext &ctx, ostream& out) {
     // TODO: inner paths?
     Paths::iterator pit;
-    for (pit = paths.begin();
-         pit != paths.end();
-         pit++) {
-        pathToGcode((*pit), zHeight, out);
+    for ( pit = paths.begin(); pit != paths.end(); pit++) {
+        pathToGcode((*pit), zHeight, ctx, out);
     }
 
     return out;
 }
 
 
-ostream &simpleRegionsToGcode(SimpleRegions& regions, double zHeight, ostream& out) {
-    SimpleRegions::iterator perimeter;
-    for (perimeter = regions.begin();
-         perimeter != regions.end();
-         perimeter++) {
 
-        pathToGcode(perimeter->outerPath, zHeight, out);
+ostream &simpleRegionsToGcode(SimpleRegions& regions, double zHeight, SlicingContext ctx, ostream& out) {
+    SimpleRegions::iterator perimeter;
+    for (
+        perimeter = regions.begin();
+        perimeter != regions.end();
+        perimeter++
+    ) {
+        pathToGcode(perimeter->outerPath, zHeight, ctx, out);
 
         // TODO: inner paths?
-        pathsToGcode(perimeter->subpaths, zHeight, out);
+        pathsToGcode(perimeter->subpaths, zHeight, ctx, out);
     }
 
     return out;
 }
+
+
 
 void GCodeExportOp::main()
 {
@@ -84,9 +105,9 @@ void GCodeExportOp::main()
     if ( NULL == context ) return;
 
     // TODO: join paths and optimize them
-    std::cout << "Gcode pather starting" << std::endl;
+    cout << "Gcode pather starting" << endl;
     // For each slice, write out code.
-    std::cout << "Layer count: " << context->slices.size() << std::endl;
+    cout << "Layer count: " << context->slices.size() << endl;
 
     list<CarvedSlice>::iterator it;
 
@@ -96,22 +117,26 @@ void GCodeExportOp::main()
         return;
     }
 
-    fout << "M108 R35" << std::endl;
-    fout << "M108 R2" << std::endl;
-
     // For each layer....
     for (it = context->slices.begin(); it != context->slices.end(); it++) {
-        fout << "(new layer)" << std::endl;
+        fout << "(new layer)" << endl;
 
         CarvedSlice* slice = &(*it);
 
-        fout << "(perimeter)" << std::endl;
+        fout << "(perimeter)" << endl;
 
-        simpleRegionsToGcode(slice->perimeter.subregions, slice->zLayer, fout);
+        //simpleRegionsToGcode(slice->perimeter.subregions, slice->zLayer, *context, fout);
+	for (
+	    CompoundRegions::reverse_iterator cit = slice->shells.rbegin();
+	    cit != slice->shells.rend();
+	    cit--
+	) {
+	    simpleRegionsToGcode(cit->subregions, slice->zLayer, *context, fout);
+	}
 
-        fout << "(infill)" << std::endl;
+        fout << "(infill)" << endl;
 
-        pathsToGcode(slice->infill, slice->zLayer, fout);
+        pathsToGcode(slice->infill, slice->zLayer, *context, fout);
     }
 
     fout.close();

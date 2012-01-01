@@ -35,6 +35,7 @@ void InsetOp::main()
     for (i = 0; i < shells; i++) {
         BGL::CompoundRegion compReg;
         slice->perimeter.inset((i+0.5)*extWidth, compReg);
+	compReg.setWidth(context->standardExtrusionWidth());
         slice->shells.push_back(compReg);
     }
     slice->perimeter.inset((i+0.5)*extWidth, slice->infillMask);

@@ -225,6 +225,17 @@ ostream &SimpleRegion::svgPathWithOffset(ostream& os, double dx, double dy) cons
 
 
 
+void SimpleRegion::setWidth(double extWidth)
+{
+    Paths::iterator it;
+    for (it = subpaths.begin(); it != subpaths.end(); it++) {
+	it->setWidth(extWidth);
+    }
+    outerPath.setWidth(extWidth);
+}
+
+
+
 void SimpleRegion::simplify(double minErr)
 {
     Paths::iterator it;
@@ -674,6 +685,11 @@ Paths &SimpleRegion::infillPathsForRegionWithDensity(double angle, double densit
 	    }
         }
 	containedSubpathsOfPath(path, outPaths);
+
+	Paths::iterator pit;
+	for (pit = outPaths.begin(); pit != outPaths.end(); pit++) {
+	    pit->setWidth(extrusionWidth);
+	}
     }
     return outPaths;
 }

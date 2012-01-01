@@ -72,6 +72,7 @@ public:
     ostream &svgPathWithOffset(ostream& os, double dx, double dy) const;
 
     void simplify(double minErr);
+    void setWidth(double extWidth);
 
     static SimpleRegions &assembleSimpleRegionsFrom(Paths &paths, SimpleRegions &outRegs);
     static SimpleRegions &assembleSimpleRegionsFrom(const Paths &outerPaths, const Paths &innerPaths, SimpleRegions &outRegs);

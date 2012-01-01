@@ -56,6 +56,7 @@ void RaftOp::main()
     // Convert lines to simple paths for later path optimization.
     BGL::Lines::iterator it;
     for (it = raftLines.begin(); it != raftLines.end(); it++) {
+	it->extrusionWidth = context->standardExtrusionWidth();
         baseSlice->infill.push_back(BGL::Path(*it));
     }
     baseSlice->state = RAFTED;
@@ -75,6 +76,7 @@ void RaftOp::main()
 
     // Convert lines to simple paths for later path optimization.
     for (it = ifaceLines.begin(); it != ifaceLines.end(); it++) {
+	it->extrusionWidth = context->standardExtrusionWidth();
         ifaceSlice->infill.push_back(BGL::Path(*it));
     }
     ifaceSlice->state = RAFTED;

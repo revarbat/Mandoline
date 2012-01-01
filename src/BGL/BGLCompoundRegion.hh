@@ -74,6 +74,7 @@ public:
     ostream &svgPathWithOffset(ostream& os, double dx, double dy) const;
 
     void simplify(double minErr);
+    void setWidth(double extWidth);
 
     CompoundRegion &unionWith(SimpleRegion &reg);
     CompoundRegion &differenceWith(SimpleRegion &reg);

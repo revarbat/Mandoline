@@ -162,6 +162,16 @@ void CompoundRegion::simplify(double minErr)
 
 
 
+void CompoundRegion::setWidth(double extWidth)
+{
+    SimpleRegions::iterator it;
+    for (it = subregions.begin(); it != subregions.end(); it++) {
+	it->setWidth(extWidth);
+    }
+}
+
+
+
 CompoundRegion &CompoundRegion::assembleCompoundRegionFrom(Paths &paths, CompoundRegion &outReg)
 {
     SimpleRegion::assembleSimpleRegionsFrom(paths, outReg.subregions);
