@@ -111,6 +111,22 @@ bool SimpleRegion::contains(const Point &pt) const
 
 
 
+bool SimpleRegion::intersectsPerimeter(const Line &ln) const
+{
+    if (outerPath.intersects(ln)) {
+	return true;
+    }
+    Paths::const_iterator it1;
+    for (it1 = subpaths.begin(); it1 != subpaths.end(); it1++) {
+	if (it1->intersects(ln)) {
+	    return true;
+	}
+    }
+    return false;
+}
+
+
+
 bool SimpleRegion::intersects(const Line &ln) const
 {
     if (outerPath.intersects(ln)) {
@@ -269,7 +285,7 @@ SimpleRegions &SimpleRegion::assembleSimpleRegionsFrom(Paths &paths, SimpleRegio
     }
     for (it1 = paths.begin(); it1 != paths.end(); it1++) {
         if ((it1->flags & 0x1) == 0) {
-	    // Even contained count means outerpath.
+	    // An even contained count means outerpath.
 	    outRegs.push_back(SimpleRegion(*it1));
 	}
     }
@@ -420,7 +436,6 @@ SimpleRegions &SimpleRegion::differenceOf(SimpleRegion &r1, SimpleRegion &r2, Si
  */
 SimpleRegions &SimpleRegion::intersectionOf(SimpleRegion &r1, SimpleRegion &r2, SimpleRegions &outRegs)
 {
-    cerr << "isectof(R,R)" << endl;
     Paths outerPaths;
     Paths::iterator pit;
     Path::intersectionOf(r1.outerPath, r2.outerPath, outerPaths);
@@ -454,6 +469,7 @@ SimpleRegions &SimpleRegion::intersectionOf(SimpleRegion &r1, SimpleRegion &r2, 
 
 
 
+// Inset this region by the given offset. You can outset with a negative offset.
 SimpleRegions &SimpleRegion::inset(double offsetby, SimpleRegions& outRegs)
 {
     Paths outerPaths;
@@ -477,6 +493,7 @@ SimpleRegions &SimpleRegion::inset(double offsetby, SimpleRegions& outRegs)
 
 
 
+// Clip the given line to just the segments that are inside the region.
 Lines &SimpleRegion::containedSegmentsOfLine(Line &line, Lines &outSegs)
 {
     Path newpath;
@@ -500,6 +517,7 @@ Lines &SimpleRegion::containedSegmentsOfLine(Line &line, Lines &outSegs)
 
 
 
+// Clip the given path to just the subpaths that are inside the region.
 Paths &SimpleRegion::containedSubpathsOfPath(const Path &path, Paths &outPaths)
 {
     Path newpath(path);
@@ -546,6 +564,8 @@ Paths &SimpleRegion::containedSubpathsOfPath(const Path &path, Paths &outPaths)
 // If p1 is outside this simpleregion, and p2 is inside, go straight from p1
 //   to the closest perimeter point to p1, then find the shortest inside route
 //   from there to p2.
+
+// BUG: Sadly, this implementation is incomplete.
 Path &SimpleRegion::pathAround(Point p1, Point p2, Path &outPath) const
 {
     bool inside1 = contains(p1);
@@ -633,8 +653,118 @@ Path &SimpleRegion::pathAround(Point p1, Point p2, Path &outPath) const
 
 
 
-Paths &SimpleRegion::infillPathsForRegionWithDensity(double angle, double density, double extrusionWidth, CompoundRegion &solidMask, Paths &outPaths)
+Paths &SimpleRegion::joinSubPathsInside(double maxDist, const Paths &inPaths, Paths &outPaths)
 {
+    double minDistFound;
+    bool reversed1;
+    bool reversed2;
+    Path tempPath;
+    Paths tempPaths;
+    Paths::iterator pit, foundIter;
+    Paths::const_iterator cpit;
+
+    // Calculate a masking region just barely larger than the containing region.
+    SimpleRegions maskRegs;
+    inset(-0.25, maskRegs); // TODO: 0.25mm.  Replace this constant with a fraction of the extrusion width.
+    CompoundRegion maskReg(maskRegs);
+
+    // Copy paths so we can mutate the list.
+    for (cpit = inPaths.begin(); cpit != inPaths.end(); cpit++) {
+        tempPaths.push_back(*cpit);
+    }
+
+    while (tempPaths.size() > 0) {
+	// Grab the first path arbitrarily. This is our current path.
+        tempPath = tempPaths.front();
+        tempPaths.pop_front();
+
+	bool foundOne;
+	do {
+
+	    // Find closest path to the current one.
+	    foundOne = false;
+	    minDistFound = 99e99;
+	    foundIter = tempPaths.end();
+	    for (pit = tempPaths.begin(); pit != tempPaths.end(); pit++) {
+		double dist1, dist2, dist;
+
+		// Check distance from endpoint of current path to each other path.
+		dist1 = tempPath.endPoint().distanceFrom(pit->startPoint());
+		dist2 = tempPath.endPoint().distanceFrom(pit->endPoint());
+		dist = min(dist1,dist2);
+		if (dist <= maxDist && dist < minDistFound) {
+		    minDistFound = dist;
+		    reversed1 = false;
+		    reversed2 = (dist2 < dist1);
+		    foundIter = pit;
+		}
+
+		// Check distance from startpoint of current path to each other path.
+		dist1 = tempPath.startPoint().distanceFrom(pit->startPoint());
+		dist2 = tempPath.startPoint().distanceFrom(pit->endPoint());
+		dist = min(dist1,dist2);
+		if (dist <= maxDist && dist < minDistFound) {
+		    minDistFound = dist;
+		    reversed1 = true;
+		    reversed2 = (dist2 < dist1);
+		    foundIter = pit;
+		}
+	    }
+	    
+	    if (foundIter != tempPaths.end()) {
+		// We found a target path that is close enough
+		// to the current path.
+
+		// Figure out the start point of the joining line
+		// between the two paths.
+		double extWidth;
+		Point tempPt1;
+		if (reversed1) {
+		    tempPt1 = tempPath.startPoint();
+		    extWidth = tempPath.segments.front().extrusionWidth;
+		} else {
+		    tempPt1 = tempPath.endPoint();
+		    extWidth = tempPath.segments.back().extrusionWidth;
+		}
+
+		// Figure out the end point of the joining line
+		// between the two paths.
+		Point tempPt2;
+		if (reversed2) {
+		    tempPt2 = foundIter->endPoint();
+		} else {
+		    tempPt2 = foundIter->startPoint();
+		}
+
+		// Construct the joining line.
+		Line tempLn(tempPt1, tempPt2);
+		tempLn.extrusionWidth = extWidth;
+
+		// If the joining line doesn't cross the perimeter of the
+		// masking region, we join the paths with the line.
+		if (!maskReg.intersectsPerimeter(tempLn)) {
+		    foundOne = true;
+		    tempPath.attach(tempLn);
+		    tempPath.attach(*foundIter);
+
+		    // Remove target path from list.
+		    foundIter = tempPaths.erase(foundIter);
+		}
+	    }
+
+	} while (foundOne);  // Keep joining until we can't find a close path.
+	outPaths.push_back(tempPath);
+    }
+    return outPaths;
+}
+
+
+
+Paths &SimpleRegion::infillPathsForRegionWithDensity(double angle, InfillStyle style, double density, double extrusionWidth, CompoundRegion &solidMask, Paths &outPaths)
+{
+    Paths::iterator pit;
+    Paths tempPaths;
+
     Bounds bounds = outerPath.bounds();
     if (bounds.minX == Bounds::NONE) {
         return outPaths;
@@ -643,6 +773,7 @@ Paths &SimpleRegion::infillPathsForRegionWithDensity(double angle, double densit
         return outPaths;
     }
     
+    // Figure out the zig-zag cell spacing for the given infill density.
     double spacing = extrusionWidth*sqrt(2.0)/density;
     if (density >= 0.99) {
         spacing = extrusionWidth;
@@ -660,8 +791,12 @@ Paths &SimpleRegion::infillPathsForRegionWithDensity(double angle, double densit
     for (int xcell = -cells; xcell <= cells; xcell++) {
         Path path;
 	double fillx = (xcell+0.5) * spacing;
+	
+	// Check if we need solid infill lines.
+	// If any lines in the width of the cell cross the solid infill mask,
+	// then they are included in the infill instead of the zia-zag fill.
 	bool hasSolid = false;
-	for (double subx = fillx - spacing * 0.5; subx < fillx + spacing * 0.5; subx += extrusionWidth) {
+	for (double subx = fillx - spacing * 0.5; subx < fillx + spacing * 0.499; subx += extrusionWidth) {
 	    Line tempLn(Point(subx,-maxd),Point(subx,maxd));
 	    tempLn.rotate(angle);
 	    if (solidMask.intersects(tempLn)) {
@@ -669,31 +804,82 @@ Paths &SimpleRegion::infillPathsForRegionWithDensity(double angle, double densit
 	        hasSolid = true;
 	    }
 	}
+
+	// If no solid infill was done in this cell width,
+	// then we fill with sparse zig-zag infill instead.
 	if (!hasSolid) {
-	    for (int ycell = -cells; ycell < cells; ycell++) {
-		double filly = ycell * spacing;
-		double filly2 = (ycell+1) * spacing;
-		bool alternate = (((xcell+ycell) & 0x1) == 0);
-		double zig = 0.0;
-		if (density < 0.99) {
-		    zig = 0.5*spacing;
-		    if (alternate) {
-			zig = -zig;
+	    if (style == INFILL_RECTANGULAR) {
+		for (int ycell = -cells; ycell < cells; ycell++) {
+		    double filly1 = ycell * spacing;
+		    double filly2 = (ycell+1) * spacing;
+		    bool alternate = (((xcell+ycell) & 0x1) == 0);
+		    double zig = 0.0;
+		    if (density < 0.99) {
+			zig = 0.5*spacing;
+			if (alternate) {
+			    zig = -zig;
+			}
 		    }
+		    path.segments.push_back(Line(Point(fillx+zig,filly1),Point(fillx-zig,filly2)).rotate(angle));
 		}
-		path.segments.push_back(Line(Point(fillx+zig,filly),Point(fillx-zig,filly2)).rotate(angle));
+	    }
+	    if (style == INFILL_HEXAGONAL) {
+		for (int ycell = -cells; ycell < cells; ycell++) {
+		    double yscale = 1.0/cos(30.0 * M_PI / 180.0);
+		    double filly1 = yscale * ycell * spacing;
+		    double filly2 = yscale * (ycell+0.5) * spacing;
+		    double filly3 = yscale * (ycell+1.0) * spacing;
+		    bool alternate = ((xcell & 0x1) == 0);
+		    double zig1 = 0.0;
+		    double zig2 = 0.0;
+		    double zig3 = 0.0;
+		    if (density < 0.99) {
+			switch ((ycell+1000000) % 3) {
+			  case 0:
+			    zig1 =  0.5 * (spacing-extrusionWidth);
+			    zig2 = -zig1;
+			    zig3 =  zig2;
+			    break;
+			  case 1:
+			    zig1 = -0.5 * (spacing-extrusionWidth);
+			    zig2 =  zig1;
+			    zig3 = -zig2;
+			    break;
+			  case 2:
+			  default:
+			    zig1 =  0.5 * (spacing-extrusionWidth);
+			    zig2 = zig1;
+			    zig3 = zig2;
+			    break;
+			}
+			if (alternate) {
+			    zig1 = -zig1;
+			    zig2 = -zig2;
+			    zig3 = -zig3;
+			}
+		    }
+		    path.segments.push_back(Line(Point(fillx+zig1,filly1),Point(fillx+zig2,filly2)).rotate(angle));
+		    path.segments.push_back(Line(Point(fillx+zig2,filly2),Point(fillx+zig3,filly3)).rotate(angle));
+		}
 	    }
         }
-	containedSubpathsOfPath(path, outPaths);
 
-	Paths::iterator pit;
-	for (pit = outPaths.begin(); pit != outPaths.end(); pit++) {
-	    pit->setWidth(extrusionWidth);
-	}
+	// Clip all the paths to the infill mask.
+	containedSubpathsOfPath(path, tempPaths);
     }
+
+    // Set the extrusionWidth of all the subpaths.
+    for (pit = tempPaths.begin(); pit != tempPaths.end(); pit++) {
+	pit->setWidth(extrusionWidth);
+	//outPaths.push_back(*pit);
+    }
+
+    // Join together nearby subpaths with short lines.
+    joinSubPathsInside(spacing*2.1, tempPaths, outPaths);
+
     return outPaths;
 }
 
 
-}
+} // namespace BGL
 

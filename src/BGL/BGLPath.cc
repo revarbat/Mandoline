@@ -253,9 +253,16 @@ bool Path::attach(const Line& ln)
 
 bool Path::attach(const Path& path)
 {
-    if (couldAttach(path)) {
+    if (hasEndPoint(path.startPoint())) {
         Lines::const_iterator itera = path.segments.begin();
         for(; itera != path.segments.end(); itera++) {
+            attach(*itera);
+        }
+        return true;
+    }
+    if (hasEndPoint(path.endPoint())) {
+        Lines::const_reverse_iterator itera = path.segments.rbegin();
+        for(; itera != path.segments.rend(); itera++) {
             attach(*itera);
         }
         return true;

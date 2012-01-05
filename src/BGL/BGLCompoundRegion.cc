@@ -100,6 +100,19 @@ bool CompoundRegion::contains(const Point &pt) const
 
 
 
+bool CompoundRegion::intersectsPerimeter(const Line &ln) const
+{
+    SimpleRegions::const_iterator it;
+    for (it = subregions.begin(); it != subregions.end(); it++) {
+	if (it->intersectsPerimeter(ln)) {
+	    return true;
+	}
+    }
+    return false;
+}
+
+
+
 bool CompoundRegion::intersects(const Line &ln) const
 {
     SimpleRegions::const_iterator it;
@@ -354,11 +367,23 @@ Paths &CompoundRegion::containedSubpathsOfPath(Path &path, Paths &outPaths)
 
 
 
-Paths &CompoundRegion::infillPathsForRegionWithDensity(double angle, double density, double extrusionWidth, CompoundRegion &solidMask, Paths &outPaths)
+Paths &CompoundRegion::joinSubPathsInside(double maxDist, const Paths &inPaths, Paths &outPaths)
+{
+    // BUG: Could possibly join paths from separate SimpleRegions.
+    SimpleRegions::iterator rit;
+    for (rit = subregions.begin(); rit != subregions.end(); rit++) {
+        rit->joinSubPathsInside(maxDist, inPaths, outPaths);
+    }
+    return outPaths;
+}
+
+
+
+Paths &CompoundRegion::infillPathsForRegionWithDensity(double angle, InfillStyle style, double density, double extrusionWidth, CompoundRegion &solidMask, Paths &outPaths)
 {
     SimpleRegions::iterator rit;
     for (rit = subregions.begin(); rit != subregions.end(); rit++) {
-        rit->infillPathsForRegionWithDensity(angle, density, extrusionWidth, solidMask, outPaths);
+        rit->infillPathsForRegionWithDensity(angle, style, density, extrusionWidth, solidMask, outPaths);
     }
     return outPaths;
 }

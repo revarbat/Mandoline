@@ -1,5 +1,5 @@
 //
-//  BGLRegion.hh
+//  BGLSimpleRegion.hh
 //  Part of the Belfry Geometry Library
 //
 //  Created by GM on 10/14/10.
@@ -7,14 +7,21 @@
 //
 
 
-#ifndef BGL_CONTIGUOUSREGION_H
-#define BGL_CONTIGUOUSREGION_H
+#ifndef BGL_SIMPLEREGION_H
+#define BGL_SIMPLEREGION_H
 
 #include "config.h"
 #include "BGLPath.hh"
 #include "BGLLine.hh"
 
 namespace BGL {
+
+typedef enum {
+    INFILL_NONE,
+    INFILL_RECTANGULAR,
+    INFILL_HEXAGONAL
+} InfillStyle;
+
 
 class SimpleRegion;
 typedef list<SimpleRegion> SimpleRegions;
@@ -62,6 +69,8 @@ public:
     int size();
     bool contains(const Point &pt) const;
 
+    bool intersectsPerimeter(const Line& ln) const;
+
     bool intersects(const Line& ln) const;
     bool intersects(const Path& path) const;
     bool intersects(const SimpleRegion& reg) const;
@@ -89,7 +98,8 @@ public:
     Lines &containedSegmentsOfLine(Line &line, Lines &lnsref);
     Paths &containedSubpathsOfPath(const Path &path, Paths &pathsref);
 
-    Paths &infillPathsForRegionWithDensity(double angle, double density, double extrusionWidth, CompoundRegion &solidMask, Paths &outPaths);
+    Paths &joinSubPathsInside(double maxDist, const Paths &inPaths, Paths &outPaths);
+    Paths &infillPathsForRegionWithDensity(double angle, InfillStyle style, double density, double extrusionWidth, CompoundRegion &solidMask, Paths &outPaths);
 };
 
 

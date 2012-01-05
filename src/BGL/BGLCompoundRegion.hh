@@ -64,6 +64,8 @@ public:
     int size() const;
     bool contains(const Point &pt) const;
 
+    bool intersectsPerimeter(const Line& ln) const;
+
     bool intersects(const Line& ln) const;
     bool intersects(const Path& path) const;
     bool intersects(const SimpleRegion& reg) const;
@@ -95,7 +97,8 @@ public:
     Lines &containedSegmentsOfLine(Line &line, Lines &lnsref);
     Paths &containedSubpathsOfPath(Path &path, Paths &pathsref);
 
-    Paths &infillPathsForRegionWithDensity(double angle, double density, double extrusionWidth, CompoundRegion &solidMask, Paths &outPaths);
+    Paths &joinSubPathsInside(double maxDist, const Paths &inPaths, Paths &outPaths);
+    Paths &infillPathsForRegionWithDensity(double angle, InfillStyle style, double density, double extrusionWidth, CompoundRegion &solidMask, Paths &outPaths);
 
 };
 typedef list<CompoundRegion> CompoundRegions;

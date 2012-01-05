@@ -55,10 +55,12 @@ void RaftOp::main()
 
     // Convert lines to simple paths for later path optimization.
     BGL::Lines::iterator it;
+    BGL::Paths tempPaths;
     for (it = raftLines.begin(); it != raftLines.end(); it++) {
 	it->extrusionWidth = context->standardExtrusionWidth();
-        baseSlice->infill.push_back(BGL::Path(*it));
+        tempPaths.push_back(BGL::Path(*it));
     }
+    baseSlice->perimeter.joinSubPathsInside(offset*3.0, tempPaths, baseSlice->infill);
     baseSlice->state = RAFTED;
 
     if ( isCancelled ) return;
@@ -75,10 +77,12 @@ void RaftOp::main()
     }
 
     // Convert lines to simple paths for later path optimization.
+    BGL::Paths tempPaths2;
     for (it = ifaceLines.begin(); it != ifaceLines.end(); it++) {
 	it->extrusionWidth = context->standardExtrusionWidth();
-        ifaceSlice->infill.push_back(BGL::Path(*it));
+        tempPaths2.push_back(BGL::Path(*it));
     }
+    ifaceSlice->perimeter.joinSubPathsInside(offset*3.0, tempPaths2, ifaceSlice->infill);
     ifaceSlice->state = RAFTED;
 
     // Add a copy of the interface layer for each raft layer above the base.
