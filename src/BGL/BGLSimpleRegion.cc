@@ -94,6 +94,18 @@ int SimpleRegion::size()
 
 
 
+double SimpleRegion::perimeterLength() const
+{
+    double length = outerPath.length();
+    Paths::const_iterator it;
+    for (it = subpaths.begin(); it != subpaths.end(); it++) {
+        length += it->length();
+    }
+    return length;
+}
+
+
+
 bool SimpleRegion::contains(const Point &pt) const
 {
     int count = 0;

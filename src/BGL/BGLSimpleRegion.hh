@@ -67,6 +67,9 @@ public:
     }
 
     int size();
+
+    double perimeterLength() const;
+
     bool contains(const Point &pt) const;
 
     bool intersectsPerimeter(const Line& ln) const;

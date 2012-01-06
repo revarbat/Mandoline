@@ -23,6 +23,7 @@ SlicingContext::SlicingContext()
     flatShells           = DEFAULT_FLAT_SHELLS;
     raftLayers           = DEFAULT_RAFT_LAYERS;
     raftOutset           = DEFAULT_RAFT_OUTSET;
+    minLayerTime         = DEFAULT_MIN_LAYER_TIME;
     
     calculateSvgOffsets();
 }

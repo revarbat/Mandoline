@@ -29,10 +29,10 @@ GCodeExportOp::~GCodeExportOp()
 
 static double prevFilamentRate = -1;
 
-ostream &pathToGcode(Path& path, double zHeight, SlicingContext &ctx, ostream& out)
+ostream &pathToGcode(Path& path, double zHeight, double speedMult, SlicingContext &ctx, ostream& out)
 {
     Lines::iterator line = path.segments.begin();
-    double feed = ctx.feedRateForWidth(line->extrusionWidth);
+    double feed = ctx.feedRateForWidth(line->extrusionWidth) * speedMult;
 
     // Move to the starting position...
     out << "G1 X" << line->startPt.x
@@ -41,17 +41,18 @@ ostream &pathToGcode(Path& path, double zHeight, SlicingContext &ctx, ostream& o
 	<< " F" << feed
         << endl;
 
-    if (ctx.filamentFeedRate != prevFilamentRate) {
+    double filamentFeed = ctx.filamentFeedRate * speedMult;
+    if (fabs(filamentFeed - prevFilamentRate) > 1e-3) {
 	// set extrusion speed
-	out << "M108 R" << ctx.filamentFeedRate << endl;
-	prevFilamentRate = ctx.filamentFeedRate;
+	out << "M108 R" << filamentFeed << endl;
+	prevFilamentRate = filamentFeed;
     }
 
     // start extruding
     out << "M101" << endl;
 
     for ( ; line != path.segments.end(); line++) {
-	feed = ctx.feedRateForWidth(line->extrusionWidth);
+	feed = ctx.feedRateForWidth(line->extrusionWidth) * speedMult;
 
 	// Move to next point in polyline
         out << "G1 X" << line->endPt.x
@@ -69,11 +70,11 @@ ostream &pathToGcode(Path& path, double zHeight, SlicingContext &ctx, ostream& o
 
 
 
-ostream &pathsToGcode(Paths& paths, double zHeight, SlicingContext &ctx, ostream& out) {
+ostream &pathsToGcode(Paths& paths, double zHeight, double speedMult, SlicingContext &ctx, ostream& out) {
     // TODO: inner paths?
     Paths::iterator pit;
     for ( pit = paths.begin(); pit != paths.end(); pit++) {
-        pathToGcode((*pit), zHeight, ctx, out);
+        pathToGcode((*pit), zHeight, speedMult, ctx, out);
     }
 
     return out;
@@ -81,17 +82,17 @@ ostream &pathsToGcode(Paths& paths, double zHeight, SlicingContext &ctx, ostream
 
 
 
-ostream &simpleRegionsToGcode(SimpleRegions& regions, double zHeight, SlicingContext ctx, ostream& out) {
+ostream &simpleRegionsToGcode(SimpleRegions& regions, double zHeight, double speedMult, SlicingContext ctx, ostream& out) {
     SimpleRegions::iterator perimeter;
     for (
         perimeter = regions.begin();
         perimeter != regions.end();
         perimeter++
     ) {
-        pathToGcode(perimeter->outerPath, zHeight, ctx, out);
+        pathToGcode(perimeter->outerPath, zHeight, speedMult, ctx, out);
 
         // TODO: inner paths?
-        pathsToGcode(perimeter->subpaths, zHeight, ctx, out);
+        pathsToGcode(perimeter->subpaths, zHeight, speedMult, ctx, out);
     }
 
     return out;
@@ -104,8 +105,6 @@ void GCodeExportOp::main()
     if ( isCancelled ) return;
     if ( NULL == context ) return;
 
-    // TODO: join paths and optimize them
-    cout << "Gcode pather starting" << endl;
     // For each slice, write out code.
     cout << "Layer count: " << context->slices.size() << endl;
 
@@ -125,18 +124,15 @@ void GCodeExportOp::main()
 
         fout << "(perimeter)" << endl;
 
-        //simpleRegionsToGcode(slice->perimeter.subregions, slice->zLayer, *context, fout);
-	for (
-	    CompoundRegions::reverse_iterator cit = slice->shells.rbegin();
-	    cit != slice->shells.rend();
-	    cit--
-	) {
-	    simpleRegionsToGcode(cit->subregions, slice->zLayer, *context, fout);
+        //simpleRegionsToGcode(slice->perimeter.subregions, slice->zLayer, slice->speedMult, *context, fout);
+	CompoundRegions::reverse_iterator cit;
+	for (cit = slice->shells.rbegin(); cit != slice->shells.rend(); cit++) {
+	    simpleRegionsToGcode(cit->subregions, slice->zLayer, slice->speedMult, *context, fout);
 	}
 
         fout << "(infill)" << endl;
 
-        pathsToGcode(slice->infill, slice->zLayer, *context, fout);
+        pathsToGcode(slice->infill, slice->zLayer, slice->speedMult, *context, fout);
     }
 
     fout.close();

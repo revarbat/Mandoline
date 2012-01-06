@@ -9,6 +9,7 @@ mandoline_SOURCES = \
 	Mandoline.cc \
 	CarveOp.cc CarveOp.hh \
 	CarvedSlice.cc CarvedSlice.hh \
+	CoolOp.cc CoolOp.hh \
 	Defaults.hh \
 	GCodeExportOp.cc GCodeExportOp.hh \
 	InfillOp.cc InfillOp.hh \

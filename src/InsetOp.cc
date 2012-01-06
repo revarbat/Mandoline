@@ -38,7 +38,7 @@ void InsetOp::main()
 	compReg.setWidth(context->standardExtrusionWidth());
         slice->shells.push_back(compReg);
     }
-    slice->perimeter.inset((i+0.5)*extWidth, slice->infillMask);
+    slice->perimeter.inset((i+0.4)*extWidth, slice->infillMask);
     slice->state = INSET;
 
     if ( isCancelled ) return;

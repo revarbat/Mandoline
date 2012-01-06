@@ -87,6 +87,18 @@ int CompoundRegion::size() const
 
 
 
+double CompoundRegion::perimeterLength() const
+{
+    double length = 0.0;
+    SimpleRegions::const_iterator it;
+    for (it = subregions.begin(); it != subregions.end(); it++) {
+        length += it->perimeterLength();
+    }
+    return length;
+}
+
+
+
 bool CompoundRegion::contains(const Point &pt) const
 {
     SimpleRegions::const_iterator it;

@@ -10,8 +10,9 @@
 #include "InfillOp.hh"
 #include "InsetOp.hh"
 #include "RaftOp.hh"
-#include "SvgDumpOp.hh"
 #include "PathFinderOp.hh"
+#include "CoolOp.hh"
+#include "SvgDumpOp.hh"
 #include "GCodeExportOp.hh"
 
 static string inFileName  = "";
@@ -248,6 +249,14 @@ int main (int argc, char * const argv[])
     opQ.waitUntilAllOperationsAreFinished();
     delete pathOp;
     stopwatch.checkpoint("Path Optimized");
+    
+    // Figure out the speed to let each layer cool down.
+    for (it = ctx.slices.begin(); it != ctx.slices.end(); it++) {
+        CoolOp* op = new CoolOp(&ctx, &(*it));
+	opQ.addOperation(op);
+    }
+    opQ.waitUntilAllOperationsAreFinished();
+    stopwatch.checkpoint("Cooled");
     
     // Optionally dump to SVG
     if (doDumpSVG) {

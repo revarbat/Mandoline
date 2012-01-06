@@ -13,6 +13,7 @@ typedef enum {
     INFILLED,
     RAFTED,
     PATHED,
+    COOLED,
     OUTPUT
 } CarveSliceStatus;
 
@@ -26,6 +27,7 @@ public:
     CompoundRegion solidFillMask;
     CompoundRegions shells;
     Paths infill;
+    double speedMult;
 
     CarvedSlice() :
     	zLayer(0.0),
@@ -34,7 +36,8 @@ public:
 	infillMask(),
 	solidFillMask(),
 	shells(),
-	infill()
+	infill(),
+	speedMult(1.0)
     {
     }
 

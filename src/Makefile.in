@@ -56,7 +56,7 @@ CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
 am_mandoline_OBJECTS = Mandoline.$(OBJEXT) CarveOp.$(OBJEXT) \
-	CarvedSlice.$(OBJEXT) GCodeExportOp.$(OBJEXT) \
+	CarvedSlice.$(OBJEXT) CoolOp.$(OBJEXT) GCodeExportOp.$(OBJEXT) \
 	InfillOp.$(OBJEXT) InsetOp.$(OBJEXT) OpQueue.$(OBJEXT) \
 	OpThread.$(OBJEXT) PathFinderOp.$(OBJEXT) RaftOp.$(OBJEXT) \
 	SlicingContext.$(OBJEXT) Stopwatch.$(OBJEXT) \
@@ -269,6 +269,7 @@ mandoline_SOURCES = \
 	Mandoline.cc \
 	CarveOp.cc CarveOp.hh \
 	CarvedSlice.cc CarvedSlice.hh \
+	CoolOp.cc CoolOp.hh \
 	Defaults.hh \
 	GCodeExportOp.cc GCodeExportOp.hh \
 	InfillOp.cc InfillOp.hh \
@@ -394,6 +395,7 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CarveOp.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CarvedSlice.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CoolOp.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/GCodeExportOp.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/InfillOp.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/InsetOp.Po@am__quote@

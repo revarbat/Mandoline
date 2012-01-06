@@ -20,4 +20,5 @@
 
 #define DEFAULT_RAFT_LAYERS           3       /* Number of layers in raft under model. */
 #define DEFAULT_RAFT_OUTSET           5.0     /* mm to outset the raft. */
+#define DEFAULT_MIN_LAYER_TIME       20.0     /* Minimum seconds per layer. */
 

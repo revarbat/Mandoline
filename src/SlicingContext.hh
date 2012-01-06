@@ -31,6 +31,7 @@ public:
     int    flatShells;
     int    raftLayers;
     double raftOutset;
+    double minLayerTime;
 
     double svgWidth;
     double svgHeight;
