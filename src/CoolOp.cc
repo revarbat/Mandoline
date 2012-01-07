@@ -23,6 +23,9 @@ void CoolOp::main()
     if ( NULL == context ) return;
     if ( NULL == slice ) return;
 
+    int mainTool = 0;
+    int supportTool = context->supportTool;
+
     double pathLen = 0.0;
     BGL::CompoundRegions::iterator cit;
     BGL::Paths::iterator pit;
@@ -34,7 +37,7 @@ void CoolOp::main()
     }
 
     // pathTime is in seconds.
-    double pathTime = pathLen / (context->standardFeedRate() / 60.0);
+    double pathTime = pathLen / (context->standardFeedRate(mainTool) / 60.0);
     if (pathTime > 0 && pathTime < context->minLayerTime) {
         slice->speedMult = pathTime / context->minLayerTime;
     }

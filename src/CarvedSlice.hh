@@ -27,6 +27,7 @@ public:
     CompoundRegion solidFillMask;
     CompoundRegions shells;
     Paths infill;
+    Paths supportPaths;
     double speedMult;
 
     CarvedSlice() :
@@ -37,6 +38,7 @@ public:
 	solidFillMask(),
 	shells(),
 	infill(),
+	supportPaths(),
 	speedMult(1.0)
     {
     }

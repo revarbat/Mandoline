@@ -39,14 +39,20 @@ void usage(const char* arg0, SlicingContext& ctx)
     fprintf(stderr, "\t--material STRING\n");
     fprintf(stderr, "\t            Loads settings for given material. (default ABS)\n");
     fprintf(stderr, "\t-f FLOAT\n");
-    fprintf(stderr, "\t--filament-diam FLOAT\n");
-    fprintf(stderr, "\t            Filament diameter. (default %.1f mm)\n", ctx.filamentDiameter);
+    fprintf(stderr, "\t--tool0-filament-diam FLOAT\n");
+    fprintf(stderr, "\t            Tool0 filament diameter. (default %.2f mm)\n", ctx.filamentDiameter[0]);
     fprintf(stderr, "\t-F FLOAT\n");
-    fprintf(stderr, "\t--filament-feed-rate FLOAT\n");
-    fprintf(stderr, "\t            Filament feedrate. (default %.3f RPM)\n", ctx.filamentFeedRate);
+    fprintf(stderr, "\t--tool0-feed-rate FLOAT\n");
+    fprintf(stderr, "\t            Tool0 filament feedrate. (default %.3f RPM)\n", ctx.filamentFeedRate[0]);
     fprintf(stderr, "\t-d FLOAT\n");
-    fprintf(stderr, "\t--drive-gear-diam FLOAT\n");
-    fprintf(stderr, "\t            Drive gear diameter. (default %.1f mm)\n", ctx.driveGearDiameter);
+    fprintf(stderr, "\t--tool0-gear-diam FLOAT\n");
+    fprintf(stderr, "\t            Tool0 drive gear diameter. (default %.2f mm)\n", ctx.driveGearDiameter[0]);
+    fprintf(stderr, "\t-n FLOAT\n");
+    fprintf(stderr, "\t--tool0-nozzle-diam FLOAT\n");
+    fprintf(stderr, "\t            Tool0 extruder nozzle hole diameter. (default %.2f mm)\n", ctx.nozzleDiameter[0]);
+    fprintf(stderr, "\t-t FLOAT\n");
+    fprintf(stderr, "\t--tool0-temp FLOAT\n");
+    fprintf(stderr, "\t            Tool0 extruder temperature. (default %.1f mm)\n", ctx.extruderTemp[0]);
     fprintf(stderr, "\t-i FLOAT\n");
     fprintf(stderr, "\t--infill FLOAT\n");
     fprintf(stderr, "\t            Infill density. (default %.2f)\n", ctx.infillDensity);
@@ -60,16 +66,46 @@ void usage(const char* arg0, SlicingContext& ctx)
     fprintf(stderr, "\t--raft-layers INT\n");
     fprintf(stderr, "\t            Number of Raft layers. (default %d)\n", ctx.raftLayers);
     fprintf(stderr, "\t-w FLOAT\n");
-    fprintf(stderr, "\t--width-over-thickness FLOAT\n");
-    fprintf(stderr, "\t            Extrusion width over thickness ratio. (default %.2f)\n", ctx.widthOverHeightRatio);
+    fprintf(stderr, "\t--width-over-height FLOAT\n");
+    fprintf(stderr, "\t            Extrusion width over height ratio. (default %.2f)\n", ctx.widthOverHeightRatio);
+    fprintf(stderr, "\t--support-tool INT\n");
+    fprintf(stderr, "\t            Tool to use when printing rafts and supports. (default %d)\n", ctx.supportTool);
+    fprintf(stderr, "\t--tool0-x-offset FLOAT\n");
+    fprintf(stderr, "\t            Tool0 nozzle X-axis offset. (default %.3f mm)\n", ctx.xAxisOffset[0]);
+    fprintf(stderr, "\t--tool0-y-offset FLOAT\n");
+    fprintf(stderr, "\t            Tool0 nozzle Y-axis offset. (default %.3f mm)\n", ctx.yAxisOffset[0]);
+    fprintf(stderr, "\t--tool0-retract-rate FLOAT\n");
+    fprintf(stderr, "\t            Tool0 retraction rate. (default %.3f RPM)\n", ctx.retractionRate[0]);
+    fprintf(stderr, "\t--tool0-retract-time FLOAT\n");
+    fprintf(stderr, "\t            Tool0 retraction time. (default %.0f ms)\n", ctx.retractionTime[0]);
+    fprintf(stderr, "\t--tool0-pushback-time FLOAT\n");
+    fprintf(stderr, "\t            Tool0 pushback time. (default %.0f ms)\n", ctx.pushBackTime[0]);
+    fprintf(stderr, "\t--tool1-filament-diam FLOAT\n");
+    fprintf(stderr, "\t            Tool1 filament diameter. (default %.2f mm)\n", ctx.filamentDiameter[1]);
+    fprintf(stderr, "\t--tool1-feed-rate FLOAT\n");
+    fprintf(stderr, "\t            Tool1 filament feedrate. (default %.3f RPM)\n", ctx.filamentFeedRate[1]);
+    fprintf(stderr, "\t--tool1-gear-diam FLOAT\n");
+    fprintf(stderr, "\t            Tool1 drive gear diameter. (default %.2f mm)\n", ctx.driveGearDiameter[1]);
+    fprintf(stderr, "\t--tool1-nozzle-diam FLOAT\n");
+    fprintf(stderr, "\t            Tool1 extruder nozzle hole diameter. (default %.2f mm)\n", ctx.nozzleDiameter[1]);
+    fprintf(stderr, "\t--tool1-temp FLOAT\n");
+    fprintf(stderr, "\t            Tool1 extruder temperature. (default %.1f mm)\n", ctx.extruderTemp[1]);
+    fprintf(stderr, "\t--tool1-x-offset FLOAT\n");
+    fprintf(stderr, "\t            Tool1 nozzle X-axis offset. (default %.3f mm)\n", ctx.xAxisOffset[1]);
+    fprintf(stderr, "\t--tool1-y-offset FLOAT\n");
+    fprintf(stderr, "\t            Tool1 nozzle Y-axis offset. (default %.3f mm)\n", ctx.yAxisOffset[1]);
+    fprintf(stderr, "\t--tool1-retract-rate FLOAT\n");
+    fprintf(stderr, "\t            Tool1 retraction rate. (default %.3f RPM)\n", ctx.retractionRate[1]);
+    fprintf(stderr, "\t--tool1-retract-time FLOAT\n");
+    fprintf(stderr, "\t            Tool1 retraction time. (default %.0f ms)\n", ctx.retractionTime[1]);
+    fprintf(stderr, "\t--tool1-pushback-time FLOAT\n");
+    fprintf(stderr, "\t            Tool1 pushback time. (default %.0f ms)\n", ctx.pushBackTime[1]);
     fprintf(stderr, "\t--flat-shells INT\n");
     fprintf(stderr, "\t            Number of layers to infill solidly on top and bottom. (default %d)\n", ctx.flatShells);
     fprintf(stderr, "\t--raft-outset FLOAT\n");
     fprintf(stderr, "\t            Millimeters to outset raft around model. (default %.1f).\n", ctx.raftOutset);
     fprintf(stderr, "\t--min-layer-time FLOAT\n");
     fprintf(stderr, "\t            Minimum seconds per layer. (default %.1f).\n", ctx.minLayerTime);
-    fprintf(stderr, "\t--shrinkage-ratio FLOAT\n");
-    fprintf(stderr, "\t            Ratio of how much the part will shrink when cooled. (default %.3f).\n", ctx.shrinkageRatio);
     fprintf(stderr, "\t--no-center\n");
     fprintf(stderr, "\t            DON'T center model on platform before slicing.\n");
     fprintf(stderr, "\t--scale FLOAT\n");
@@ -88,17 +124,32 @@ void usage(const char* arg0, SlicingContext& ctx)
 }
 
 
-#define OPT_RAFT_OUTSET       1001
-#define OPT_MIN_LAYER_TIME    1002
-#define OPT_FLAT_SHELLS       1003
-#define OPT_SHRINKAGE_RATIO   1004
-#define OPT_WRITE_DEFAULTS    1005
-#define OPT_WRITE_MATERIAL    1006
-#define OPT_NO_CENTER         1007
-#define OPT_THREADS           1008
-#define OPT_DUMP_PREFIX       1009
-#define OPT_SCALE             1010
-#define OPT_ROTATE            1011
+#define OPT_RAFT_OUTSET         1001
+#define OPT_MIN_LAYER_TIME      1002
+#define OPT_FLAT_SHELLS         1003
+#define OPT_WRITE_DEFAULTS      1005
+#define OPT_WRITE_MATERIAL      1006
+#define OPT_NO_CENTER           1007
+#define OPT_THREADS             1008
+#define OPT_DUMP_PREFIX         1009
+#define OPT_SCALE               1010
+#define OPT_ROTATE              1011
+#define OPT_TOOL1_FEED_RATE     1012
+#define OPT_TOOL1_FILAMENT_DIAM 1013
+#define OPT_TOOL1_GEAR_DIAM     1014
+#define OPT_TOOL1_NOZZLE_DIAM   1015
+#define OPT_TOOL1_TEMP          1016
+#define OPT_SUPPORT_TOOL        1017
+#define OPT_TOOL1_X_OFFSET      1018
+#define OPT_TOOL1_Y_OFFSET      1019
+#define OPT_TOOL0_X_OFFSET      1020
+#define OPT_TOOL0_Y_OFFSET      1021
+#define OPT_TOOL0_RETRACT_RATE  1022
+#define OPT_TOOL0_RETRACT_TIME  1023
+#define OPT_TOOL0_PUSHBACK_TIME 1024
+#define OPT_TOOL1_RETRACT_RATE  1025
+#define OPT_TOOL1_RETRACT_TIME  1026
+#define OPT_TOOL1_PUSHBACK_TIME 1027
 
 
 int main (int argc, char * const argv[])
@@ -111,28 +162,46 @@ int main (int argc, char * const argv[])
 
     int ch;
     const char *progName = argv[0];
-    const char * shortopts = "?d:f:F:hi:l:m:p:r:w:";
+    const char * shortopts = "?d:f:F:hi:l:m:n:p:r:w:";
     static struct option longopts[] = {
-	{"material",           required_argument, NULL, 'm'},
-	{"drive-gear-diam",    required_argument, NULL, 'd'},
-	{"filament-diam",      required_argument, NULL, 'f'},
-	{"filament-feed-rate", required_argument, NULL, 'F'},
-	{"infill",             required_argument, NULL, 'i'},
-	{"layer-thickness",    required_argument, NULL, 'l'},
-	{"perimater-shells",   required_argument, NULL, 'p'},
-	{"width-over-height",  required_argument, NULL, 'w'},
-	{"raft-layers",        required_argument, NULL, 'r'},
-	{"scale",              required_argument, NULL, OPT_SCALE},
-	{"rotate",             required_argument, NULL, OPT_ROTATE},
-	{"dump-prefix",        required_argument, NULL, OPT_DUMP_PREFIX},
-	{"threads",            required_argument, NULL, OPT_THREADS},
-	{"raft-outset",        required_argument, NULL, OPT_RAFT_OUTSET},
-	{"min-layer-time",     required_argument, NULL, OPT_MIN_LAYER_TIME},
-	{"flat-shells",        required_argument, NULL, OPT_FLAT_SHELLS},
-	{"shrinkage-ratio",    required_argument, NULL, OPT_SHRINKAGE_RATIO},
-	{"no-center",          no_argument,       NULL, OPT_NO_CENTER},
-	{"write-defaults",     no_argument,       NULL, OPT_WRITE_DEFAULTS},
-	{"write-material",     required_argument, NULL, OPT_WRITE_MATERIAL},
+	{"material",            required_argument, NULL, 'm'},
+	{"tool0-feed-rate",     required_argument, NULL, 'F'},
+	{"tool0-filament-diam", required_argument, NULL, 'f'},
+	{"tool0-gear-diam",     required_argument, NULL, 'd'},
+	{"tool0-nozzle-diam",   required_argument, NULL, 'n'},
+	{"tool0-temp",          required_argument, NULL, 't'},
+	{"tool0-x-offset",      required_argument, NULL, OPT_TOOL0_X_OFFSET},
+	{"tool0-y-offset",      required_argument, NULL, OPT_TOOL0_Y_OFFSET},
+	{"tool0-retract-rate",  required_argument, NULL, OPT_TOOL0_RETRACT_RATE},
+	{"tool0-retract-time",  required_argument, NULL, OPT_TOOL0_RETRACT_TIME},
+	{"tool0-pushback-time", required_argument, NULL, OPT_TOOL0_PUSHBACK_TIME},
+	{"tool1-feed-rate",     required_argument, NULL, OPT_TOOL1_FEED_RATE},
+	{"tool1-filament-diam", required_argument, NULL, OPT_TOOL1_FILAMENT_DIAM},
+	{"tool1-gear-diam",     required_argument, NULL, OPT_TOOL1_GEAR_DIAM},
+	{"tool1-nozzle-diam",   required_argument, NULL, OPT_TOOL1_NOZZLE_DIAM},
+	{"tool1-temp",          required_argument, NULL, OPT_TOOL1_TEMP},
+	{"tool1-x-offset",      required_argument, NULL, OPT_TOOL1_X_OFFSET},
+	{"tool1-y-offset",      required_argument, NULL, OPT_TOOL1_Y_OFFSET},
+	{"tool1-retract-rate",  required_argument, NULL, OPT_TOOL1_RETRACT_RATE},
+	{"tool1-retract-time",  required_argument, NULL, OPT_TOOL1_RETRACT_TIME},
+	{"tool1-pushback-time", required_argument, NULL, OPT_TOOL1_PUSHBACK_TIME},
+	{"support-tool",        required_argument, NULL, OPT_SUPPORT_TOOL},
+	{"infill",              required_argument, NULL, 'i'},
+	{"layer-thickness",     required_argument, NULL, 'l'},
+	{"perimeter-shells",    required_argument, NULL, 'p'},
+	{"width-over-height",   required_argument, NULL, 'w'},
+	{"raft-layers",         required_argument, NULL, 'r'},
+	{"platform-temp",       required_argument, NULL, 'T'},
+	{"scale",               required_argument, NULL, OPT_SCALE},
+	{"rotate",              required_argument, NULL, OPT_ROTATE},
+	{"dump-prefix",         required_argument, NULL, OPT_DUMP_PREFIX},
+	{"threads",             required_argument, NULL, OPT_THREADS},
+	{"raft-outset",         required_argument, NULL, OPT_RAFT_OUTSET},
+	{"min-layer-time",      required_argument, NULL, OPT_MIN_LAYER_TIME},
+	{"flat-shells",         required_argument, NULL, OPT_FLAT_SHELLS},
+	{"no-center",           no_argument,       NULL, OPT_NO_CENTER},
+	{"write-defaults",      no_argument,       NULL, OPT_WRITE_DEFAULTS},
+	{"write-material",      required_argument, NULL, OPT_WRITE_MATERIAL},
 	{0, 0, 0, 0}
     };
     
@@ -171,16 +240,28 @@ int main (int argc, char * const argv[])
             // We already parsed this one out.  Ignore.
             break;
 
-        case 'd':
-            ctx.driveGearDiameter = atof(optarg);
+        case 'F':
+            ctx.filamentFeedRate[0] = atof(optarg);
             break;
 
         case 'f':
-            ctx.filamentDiameter = atof(optarg);
+            ctx.filamentDiameter[0] = atof(optarg);
             break;
 
-        case 'F':
-            ctx.filamentFeedRate = atof(optarg);
+        case 'd':
+            ctx.driveGearDiameter[0] = atof(optarg);
+            break;
+
+        case 'n':
+            ctx.nozzleDiameter[0] = atof(optarg);
+            break;
+
+        case 't':
+            ctx.extruderTemp[0] = atof(optarg);
+            break;
+
+        case 'T':
+            ctx.platformTemp = atof(optarg);
             break;
 
         case 'i':
@@ -203,6 +284,66 @@ int main (int argc, char * const argv[])
             ctx.raftLayers = atoi(optarg);
             break;
 
+        case OPT_TOOL0_X_OFFSET:
+            ctx.xAxisOffset[0] = atof(optarg);
+            break;
+
+        case OPT_TOOL0_Y_OFFSET:
+            ctx.yAxisOffset[0] = atof(optarg);
+            break;
+
+        case OPT_TOOL0_RETRACT_RATE:
+            ctx.retractionRate[0] = atof(optarg);
+            break;
+
+        case OPT_TOOL0_RETRACT_TIME:
+            ctx.retractionTime[0] = atof(optarg);
+            break;
+
+        case OPT_TOOL0_PUSHBACK_TIME:
+            ctx.pushBackTime[0] = atof(optarg);
+            break;
+
+        case OPT_TOOL1_FEED_RATE:
+            ctx.filamentFeedRate[1] = atof(optarg);
+            break;
+
+        case OPT_TOOL1_FILAMENT_DIAM:
+            ctx.filamentDiameter[1] = atof(optarg);
+            break;
+
+        case OPT_TOOL1_GEAR_DIAM:
+            ctx.driveGearDiameter[1] = atof(optarg);
+            break;
+
+        case OPT_TOOL1_NOZZLE_DIAM:
+            ctx.nozzleDiameter[1] = atof(optarg);
+            break;
+
+        case OPT_TOOL1_TEMP:
+            ctx.extruderTemp[1] = atof(optarg);
+            break;
+
+        case OPT_TOOL1_X_OFFSET:
+            ctx.xAxisOffset[1] = atof(optarg);
+            break;
+
+        case OPT_TOOL1_Y_OFFSET:
+            ctx.yAxisOffset[1] = atof(optarg);
+            break;
+
+        case OPT_TOOL1_RETRACT_RATE:
+            ctx.retractionRate[1] = atof(optarg);
+            break;
+
+        case OPT_TOOL1_RETRACT_TIME:
+            ctx.retractionTime[1] = atof(optarg);
+            break;
+
+        case OPT_TOOL1_PUSHBACK_TIME:
+            ctx.pushBackTime[1] = atof(optarg);
+            break;
+
         case OPT_ROTATE:
             rotation = atof(optarg);
             break;
@@ -223,8 +364,8 @@ int main (int argc, char * const argv[])
             ctx.flatShells = atoi(optarg);
             break;
 
-        case OPT_SHRINKAGE_RATIO:
-            ctx.shrinkageRatio = atoi(optarg);
+        case OPT_SUPPORT_TOOL:
+            ctx.supportTool = atoi(optarg);
             break;
 
         case OPT_NO_CENTER:

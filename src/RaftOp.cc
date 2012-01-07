@@ -50,7 +50,7 @@ void RaftOp::main()
     double baseExtWidth = context->standardExtrusionWidth() * 1.5;
 
     // Interface lines are extruded small and fast for easier part removal
-    double ifaceExtWidth = context->standardExtrusionWidth() * 0.5;
+    double ifaceExtWidth = context->standardExtrusionWidth() * 0.75;
 
     // Build up list of base raft lines.
     offset = baseExtWidth * 1.25; // provides space between lines.

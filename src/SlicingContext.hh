@@ -18,15 +18,26 @@
 using namespace std;
 using namespace BGL;
 
+#define MAX_TOOLS 2
 
 class SlicingContext {
 public:
-    double filamentFeedRate;
-    double filamentDiameter;
-    double driveGearDiameter;
+    double filamentFeedRate[MAX_TOOLS];
+    double filamentDiameter[MAX_TOOLS];
+    double driveGearDiameter[MAX_TOOLS];
+    double nozzleDiameter[MAX_TOOLS];
+    double extruderTemp[MAX_TOOLS];
+    double retractionRate[MAX_TOOLS];
+    double retractionTime[MAX_TOOLS];
+    double pushBackTime[MAX_TOOLS];
+    double xAxisOffset[MAX_TOOLS];
+    double yAxisOffset[MAX_TOOLS];
+
+    double platformTemp;
+    int    supportTool;
+
     double layerThickness;
     double widthOverHeightRatio;
-    double shrinkageRatio;
     double infillDensity;
     int    perimeterShells;
     int    flatShells;
@@ -38,6 +49,7 @@ public:
     double svgHeight;
     double svgXOff;
     double svgYOff;
+
     string dumpPrefix;
     
     Mesh3d mesh;
@@ -48,10 +60,10 @@ public:
     void loadSettingsFromFile(const char *fileName);
     void saveSettingsToFile(const char *fileName);
     void calculateSvgOffsets();
-    double standardFeedRate();
+    double standardFeedRate(int tool);
     double standardExtrusionWidth();
     double ratioForWidth(double extrusionWidth);
-    double feedRateForWidth(double extrusionWidth);
+    double feedRateForWidth(int tool, double extrusionWidth);
 
     CarvedSlice* allocSlice(double Z);
 };

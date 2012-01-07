@@ -27,57 +27,72 @@ GCodeExportOp::~GCodeExportOp()
 
 
 
-static double prevFilamentRate = -1;
-
-ostream &pathToGcode(Path& path, double zHeight, double speedMult, SlicingContext &ctx, ostream& out)
+ostream &pathToGcode(Path& path, double zHeight, double speedMult, int tool, SlicingContext &ctx, ostream& out)
 {
+    if (path.size() == 0) {
+        return out;
+    }
+
     Lines::iterator line = path.segments.begin();
-    double feed = ctx.feedRateForWidth(line->extrusionWidth) * speedMult;
+    double feed = ctx.feedRateForWidth(tool, line->extrusionWidth) * speedMult;
 
     out.setf(ios::fixed);
     out.precision(2);
 
     // Move to the starting position...
-    out << "G1 X" << line->startPt.x
-        << " Y" << line->startPt.y
+    out << "G1 X" << line->startPt.x - ctx.xAxisOffset[tool]
+        << " Y" << line->startPt.y - ctx.yAxisOffset[tool]
         << " Z" << zHeight
 	<< " F" << feed
         << endl;
 
-    double filamentFeed = ctx.filamentFeedRate * speedMult;
-    if (fabs(filamentFeed - prevFilamentRate) > 1e-3) {
-	// set extrusion speed
-	out << "M108 R" << filamentFeed << endl;
-	prevFilamentRate = filamentFeed;
-    }
+    double filamentFeed = ctx.filamentFeedRate[tool] * speedMult;
+    double retractionRate = ctx.retractionRate[tool];
+
+    // undo reversal
+    out << "M108 R" << retractionRate << " T" << tool << " (extrusion speed)" << endl;
+    out << "M101 T" << tool << " (extrusion forward)" << endl;
+    out.precision(0);
+    out << "G4 P" << ctx.pushBackTime[tool] << " (Pause)" << endl;
+    out.precision(2);
+
+    // set filament speed
+    out << "M108 R" << filamentFeed << " T" << tool << " (extrusion speed)" << endl;
 
     // start extruding
-    out << "M101" << endl;
+    out << "M101 T" << tool << " (extrusion forward)" << endl;
 
     for ( ; line != path.segments.end(); line++) {
-	feed = ctx.feedRateForWidth(line->extrusionWidth) * speedMult;
+	feed = ctx.feedRateForWidth(tool, line->extrusionWidth) * speedMult;
 
 	// Move to next point in polyline
-        out << "G1 X" << line->endPt.x
-            << " Y" << line->endPt.y
+        out << "G1 X" << line->endPt.x - ctx.xAxisOffset[tool]
+            << " Y" << line->endPt.y - ctx.yAxisOffset[tool]
             << " Z" << zHeight
             << " F" << feed
             << endl;
     }
 
+    // reversal
+    out << "M102 T" << tool << " (extrusion backward)" << endl;
+    out << "M108 R" << retractionRate << " T" << tool << " (extrusion speed)" << endl;
+    out.precision(0);
+    out << "G4 P" << ctx.retractionTime[tool] << " (Pause)" << endl;
+    out.precision(2);
+
     // stop extruding
-    out << "M103" << endl;
+    out << "M103 T" << tool << " (extrusion stop)" << endl;
 
     return out;
 }
 
 
 
-ostream &pathsToGcode(Paths& paths, double zHeight, double speedMult, SlicingContext &ctx, ostream& out) {
+ostream &pathsToGcode(Paths& paths, double zHeight, double speedMult, int tool, SlicingContext &ctx, ostream& out) {
     // TODO: inner paths?
     Paths::iterator pit;
     for ( pit = paths.begin(); pit != paths.end(); pit++) {
-        pathToGcode((*pit), zHeight, speedMult, ctx, out);
+        pathToGcode((*pit), zHeight, speedMult, tool, ctx, out);
     }
 
     return out;
@@ -85,17 +100,17 @@ ostream &pathsToGcode(Paths& paths, double zHeight, double speedMult, SlicingCon
 
 
 
-ostream &simpleRegionsToGcode(SimpleRegions& regions, double zHeight, double speedMult, SlicingContext ctx, ostream& out) {
+ostream &simpleRegionsToGcode(SimpleRegions& regions, double zHeight, double speedMult, int tool, SlicingContext ctx, ostream& out) {
     SimpleRegions::iterator perimeter;
     for (
         perimeter = regions.begin();
         perimeter != regions.end();
         perimeter++
     ) {
-        pathToGcode(perimeter->outerPath, zHeight, speedMult, ctx, out);
+        pathToGcode(perimeter->outerPath, zHeight, speedMult, tool, ctx, out);
 
         // TODO: inner paths?
-        pathsToGcode(perimeter->subpaths, zHeight, speedMult, ctx, out);
+        pathsToGcode(perimeter->subpaths, zHeight, speedMult, tool, ctx, out);
     }
 
     return out;
@@ -108,6 +123,9 @@ void GCodeExportOp::main()
     if ( isCancelled ) return;
     if ( NULL == context ) return;
 
+    int mainTool = 0;
+    int supportTool = context->supportTool;
+
     // For each slice, write out code.
     cout << "Layer count: " << context->slices.size() << endl;
 
@@ -119,6 +137,23 @@ void GCodeExportOp::main()
         return;
     }
 
+    fout.setf(ios::fixed);
+    fout.precision(0);
+    fout << "G21 (Metric)" << endl;
+    fout << "G90 (Absolute positioning)" << endl;
+    fout << "M107 T0 (Fan off)" << endl;
+    fout << "M103 T0 (Extruder motor off)" << endl;
+    fout << "M104 T0 S" << context->extruderTemp[mainTool]
+         << " (Set extruder temp)" << endl;
+    if (supportTool != mainTool) {
+	fout << "M103 T" << supportTool << " (Extruder motor off)" << endl;
+	fout << "M104 T" << supportTool
+	     << " S" << context->extruderTemp[supportTool]
+	     << " (Set extruder temp)" << endl;
+    }
+    fout << "M109 T0 S" << context->platformTemp
+         << " (Set platform temp)" << endl;
+
     // For each layer....
     for (it = context->slices.begin(); it != context->slices.end(); it++) {
         fout << "(new layer)" << endl;
@@ -127,16 +162,34 @@ void GCodeExportOp::main()
 
         fout << "(perimeter)" << endl;
 
-        //simpleRegionsToGcode(slice->perimeter.subregions, slice->zLayer, slice->speedMult, *context, fout);
+	int layerTool = mainTool;
+	if (slice->zLayer <= 0.005 + context->raftLayers * context->layerThickness) {
+	    layerTool = supportTool;
+	}
+
 	CompoundRegions::reverse_iterator cit;
 	for (cit = slice->shells.rbegin(); cit != slice->shells.rend(); cit++) {
-	    simpleRegionsToGcode(cit->subregions, slice->zLayer, slice->speedMult, *context, fout);
+	    simpleRegionsToGcode(cit->subregions, slice->zLayer, slice->speedMult, layerTool, *context, fout);
 	}
 
         fout << "(infill)" << endl;
 
-        pathsToGcode(slice->infill, slice->zLayer, slice->speedMult, *context, fout);
+        pathsToGcode(slice->infill, slice->zLayer, slice->speedMult, layerTool, *context, fout);
+        pathsToGcode(slice->supportPaths, slice->zLayer, slice->speedMult, supportTool, *context, fout);
     }
+
+    fout << "M109 T0 S0 (Platform heater off)" << endl;
+    fout << "M104 T0 S0 (Extruder heater off)" << endl;
+    fout << "M103 T0 (Extruder motor off)" << endl;
+    if (supportTool != mainTool) {
+	fout << "M104 S0 T" << supportTool << " (Extruder heater off)" << endl;
+	fout << "M103 T" << supportTool << " (Extruder motor off)" << endl;
+    }
+    fout << "G91 (incremental mode)" << endl;
+    fout << "G0 Z1.0 (raise head slightly)" << endl;
+    fout << "G90 (absolute mode)" << endl;
+    fout << "G0 X0.0 Y50.0 (Move platform forward)" << endl;
+    fout << "M18 (turn off steppers)" << endl;
 
     fout.close();
 

@@ -14,18 +14,29 @@
 // default constructor
 SlicingContext::SlicingContext()
 {
-    filamentFeedRate     = DEFAULT_FILAMENT_FEED_RATE;
-    filamentDiameter     = DEFAULT_FILAMENT_DIAMETER;
-    driveGearDiameter    = DEFAULT_DRIVE_GEAR_DIAMETER;
     layerThickness       = DEFAULT_LAYER_THICKNESS;
     widthOverHeightRatio = DEFAULT_WIDTH_OVER_HEIGHT;
-    shrinkageRatio       = DEFAULT_SHRINKAGE_RATIO;
     infillDensity        = DEFAULT_INFILL_DENSITY;
     perimeterShells      = DEFAULT_PERIMETER_SHELLS;
     flatShells           = DEFAULT_FLAT_SHELLS;
     raftLayers           = DEFAULT_RAFT_LAYERS;
     raftOutset           = DEFAULT_RAFT_OUTSET;
     minLayerTime         = DEFAULT_MIN_LAYER_TIME;
+
+    for (int tool = 0; tool < MAX_TOOLS; tool++) {
+	filamentFeedRate[tool]  = DEFAULT_FILAMENT_FEED_RATE;
+	filamentDiameter[tool]  = DEFAULT_FILAMENT_DIAMETER;
+	driveGearDiameter[tool] = DEFAULT_DRIVE_GEAR_DIAMETER;
+	nozzleDiameter[tool]    = DEFAULT_NOZZLE_DIAMETER;
+	extruderTemp[tool]      = DEFAULT_EXTRUDER_TEMP;
+	retractionRate[tool]    = DEFAULT_RETRACTION_RATE;
+	retractionTime[tool]    = DEFAULT_RETRACTION_TIME;
+	pushBackTime[tool]      = DEFAULT_PUSH_BACK_TIME;
+	xAxisOffset[tool]       = DEFAULT_X_AXIS_OFFSET;
+	yAxisOffset[tool]       = DEFAULT_Y_AXIS_OFFSET;
+    }
+    platformTemp         = DEFAULT_PLATFORM_TEMP;
+    supportTool         = DEFAULT_SUPPORT_TOOL;
     
     calculateSvgOffsets();
 }
@@ -95,7 +106,7 @@ void SlicingContext::loadSettingsFromFile(const char *fileName)
 	value = ptr;
 
 	// Find end of value string.
-	while (isalnum(*ptr) || *ptr == '.') ptr++;
+	while (isalnum(*ptr) || *ptr == '.' || *ptr == '-') ptr++;
 
 	// Null out spaces after value string.
 	while (isspace(*ptr)) {
@@ -109,31 +120,78 @@ void SlicingContext::loadSettingsFromFile(const char *fileName)
 	    continue;
 	}
 
-	if (!strcasecmp(optname, "filamentFeedRate")) {
-	    filamentFeedRate = strtod(value, &ptr);
-	} else if (!strcasecmp(optname, "filamentDiameter")) {
-	    filamentDiameter = strtod(value, &ptr);
-	} else if (!strcasecmp(optname, "driveGearDiameter")) {
-	    driveGearDiameter = strtod(value, &ptr);
-	} else if (!strcasecmp(optname, "layerThickness")) {
-	    layerThickness = strtod(value, &ptr);
-	} else if (!strcasecmp(optname, "widthOverHeightRatio")) {
-	    widthOverHeightRatio = strtod(value, &ptr);
-	} else if (!strcasecmp(optname, "shrinkageRatio")) {
-	    shrinkageRatio = strtod(value, &ptr);
-	} else if (!strcasecmp(optname, "infillDensity")) {
-	    infillDensity = strtod(value, &ptr);
-	} else if (!strcasecmp(optname, "perimeterShells")) {
-	    perimeterShells = strtol(value, &ptr, 10);
-	} else if (!strcasecmp(optname, "flatShells")) {
-	    flatShells = strtol(value, &ptr, 10);
-	} else if (!strcasecmp(optname, "raftLayers")) {
-	    raftLayers = strtol(value, &ptr, 10);
-	} else if (!strcasecmp(optname, "raftOutset")) {
-	    raftOutset = strtod(value, &ptr);
+	bool foundSetting = false;
+	// Extruder settings
+	for (int tool = 0; tool < MAX_TOOLS; tool++) {
+	    if (!strncasecmp(optname, "filamentFeedRate", 16) && optname[16] == ('0'+tool)) {
+		filamentFeedRate[tool] = strtod(value, &ptr);
+		foundSetting = true;
+	    } else if (!strncasecmp(optname, "driveGearDiameter", 17) && optname[17] == ('0'+tool)) {
+		driveGearDiameter[tool] = strtod(value, &ptr);
+		foundSetting = true;
+	    } else if (!strncasecmp(optname, "extruderTemp", 12) && optname[12] == ('0'+tool)) {
+		extruderTemp[tool] = strtod(value, &ptr);
+		foundSetting = true;
+	    } else if (!strncasecmp(optname, "nozzleDiameter", 14) && optname[14] == ('0'+tool)) {
+		nozzleDiameter[tool] = strtod(value, &ptr);
+		foundSetting = true;
+	    } else if (!strncasecmp(optname, "filamentDiameter", 16) && optname[16] == ('0'+tool)) {
+		filamentDiameter[tool] = strtod(value, &ptr);
+		foundSetting = true;
+	    } else if (!strncasecmp(optname, "retractionRate", 14) && optname[14] == ('0'+tool)) {
+		retractionRate[tool] = strtod(value, &ptr);
+		foundSetting = true;
+	    } else if (!strncasecmp(optname, "retractionTime", 14) && optname[14] == ('0'+tool)) {
+		retractionTime[tool] = strtod(value, &ptr);
+		foundSetting = true;
+	    } else if (!strncasecmp(optname, "pushBackTime", 12) && optname[12] == ('0'+tool)) {
+		pushBackTime[tool] = strtod(value, &ptr);
+		foundSetting = true;
+	    } else if (!strncasecmp(optname, "xAxisOffset", 11) && optname[11] == ('0'+tool)) {
+		xAxisOffset[tool] = strtod(value, &ptr);
+		foundSetting = true;
+	    } else if (!strncasecmp(optname, "yAxisOffset", 11) && optname[11] == ('0'+tool)) {
+		yAxisOffset[tool] = strtod(value, &ptr);
+		foundSetting = true;
+	    }
+	}
+	if (!strcasecmp(optname, "supportTool")) {
+	    supportTool = strtol(value, &ptr, 10);
+	    foundSetting = true;
+
+        // Machine settings
+	} else if (!strcasecmp(optname, "platformTemp")) {
+	    platformTemp = strtod(value, &ptr);
+	    foundSetting = true;
 	} else if (!strcasecmp(optname, "minLayerTime")) {
 	    minLayerTime = strtod(value, &ptr);
-	} else {
+	    foundSetting = true;
+
+        // Build settings
+	} else if (!strcasecmp(optname, "layerThickness")) {
+	    layerThickness = strtod(value, &ptr);
+	    foundSetting = true;
+	} else if (!strcasecmp(optname, "widthOverHeightRatio")) {
+	    widthOverHeightRatio = strtod(value, &ptr);
+	    foundSetting = true;
+	} else if (!strcasecmp(optname, "infillDensity")) {
+	    infillDensity = strtod(value, &ptr);
+	    foundSetting = true;
+	} else if (!strcasecmp(optname, "perimeterShells")) {
+	    perimeterShells = strtol(value, &ptr, 10);
+	    foundSetting = true;
+	} else if (!strcasecmp(optname, "flatShells")) {
+	    flatShells = strtol(value, &ptr, 10);
+	    foundSetting = true;
+	} else if (!strcasecmp(optname, "raftLayers")) {
+	    raftLayers = strtol(value, &ptr, 10);
+	    foundSetting = true;
+	} else if (!strcasecmp(optname, "raftOutset")) {
+	    raftOutset = strtod(value, &ptr);
+	    foundSetting = true;
+
+	}
+	if (!foundSetting) {
 	    cerr << "Bad option '" << optname
 	         << "' on line " << linenum
 	         << " of " << fileName << endl;
@@ -164,24 +222,68 @@ void SlicingContext::saveSettingsToFile(const char *fileName)
 
     fout.setf(ios::fixed, ios::floatfield);
 
-    fout.precision(2);
-    fout << "# Rate to feed the filament, in RPM." << endl;
-    fout << "filamentFeedRate: " << filamentFeedRate     << endl;
-    fout << endl;
+    for (int tool = 0; tool < MAX_TOOLS; tool++) {
+	fout.precision(2);
+	fout << "# Rate to feed the filament, in RPM, for Tool" << tool << endl;
+	fout << "filamentFeedRate" << tool << ": " << filamentFeedRate[tool] << endl;
+	fout << endl;
 
-    fout.precision(3);
-    fout << "# Diameter of the filament stock in millimeters." << endl;
-    fout << "filamentDiameter: " << filamentDiameter     << endl;
-    fout << endl;
+	fout.precision(3);
+	fout << "# Diameter of the filament, in millimeters, for Tool" << tool << endl;
+	fout << "filamentDiameter" << tool << ": " << filamentDiameter[tool] << endl;
+	fout << endl;
 
-    fout.precision(2);
-    fout << "# Diameter of the gear used to drive the filament, in millimeters." << endl;
-    fout << "driveGearDiameter: " << driveGearDiameter     << endl;
+	fout.precision(2);
+	fout << "# Diameter of the filament drive gear, in millimeters, for Tool" << tool << endl;
+	fout << "driveGearDiameter" << tool << ": " << driveGearDiameter[tool] << endl;
+	fout << endl;
+
+	fout.precision(2);
+	fout << "# Diameter of the nozzle hole, in millimeters, for Tool" << tool << endl;
+	fout << "nozzleDiameter" << tool << ": " << nozzleDiameter[tool] << endl;
+	fout << endl;
+
+	fout.precision(0);
+	fout << "# Temperature of the extruder, in celsius, for Tool" << tool << endl;
+	fout << "extruderTemp" << tool << ": " << extruderTemp[tool] << endl;
+	fout << endl;
+
+	fout.precision(0);
+	fout << "# Speed to retract filament, in RPM, for Tool" << tool << endl;
+	fout << "retractionRate" << tool << ": " << retractionRate[tool] << endl;
+	fout << endl;
+
+	fout.precision(0);
+	fout << "# Time to retract filament, in milliseconds, for Tool" << tool << endl;
+	fout << "retractionTime" << tool << ": " << retractionTime[tool] << endl;
+	fout << endl;
+
+	fout.precision(0);
+	fout << "# Time to push back filament, in milliseconds, for Tool" << tool << endl;
+	fout << "pushBackTime" << tool << ": " << pushBackTime[tool] << endl;
+	fout << endl;
+
+	fout.precision(3);
+	fout << "# Nozzle offset from center X, in millimeters, for Tool" << tool << endl;
+	fout << "xAxisOffset" << tool << ": " << xAxisOffset[tool] << endl;
+	fout << endl;
+
+	fout.precision(3);
+	fout << "# Nozzle offset from center Y, in millimeters, for Tool" << tool << endl;
+	fout << "yAxisOffset" << tool << ": " << yAxisOffset[tool] << endl;
+	fout << endl;
+
+	fout << endl;
+	fout << endl;
+    }
+
+    fout << "# The tool to use when printing rafts and supports." << endl;
+    fout << "supportTool: " << supportTool << endl;
     fout << endl;
 
     fout.precision(3);
     fout << "# Layer thickness, in millimeters." << endl;
-    fout << "layerThickness: " << layerThickness       << endl;
+    fout << "layerThickness: " << layerThickness << endl;
     fout << endl;
 
     fout.precision(3);
@@ -190,35 +292,30 @@ void SlicingContext::saveSettingsToFile(const char *fileName)
     fout << endl;
 
     fout.precision(3);
-    fout << "# The ratio that the part is expected to shrink by when it cools." << endl;
-    fout << "shrinkageRatio: " << shrinkageRatio       << endl;
-    fout << endl;
-
-    fout.precision(3);
     fout << "# The density ratio to be used when infilling." << endl;
-    fout << "infillDensity: " << infillDensity        << endl;
+    fout << "infillDensity: " << infillDensity << endl;
     fout << endl;
 
     fout << "# The number of perimeter shell layers to use." << endl;
-    fout << "perimeterShells: " << perimeterShells      << endl;
+    fout << "perimeterShells: " << perimeterShells << endl;
     fout << endl;
 
     fout << "# The number of layers used to seal tops and bottoms." << endl;
-    fout << "flatShells: " << flatShells           << endl;
+    fout << "flatShells: " << flatShells << endl;
     fout << endl;
 
     fout << "# Number of raft layers to set down. 0=No raft. >1 adds interface layers." << endl;
-    fout << "raftLayers: " << raftLayers           << endl;
+    fout << "raftLayers: " << raftLayers << endl;
     fout << endl;
 
     fout.precision(2);
     fout << "# How far to outset raft, in millimeters." << endl;
-    fout << "raftOutset: " << raftOutset           << endl;
+    fout << "raftOutset: " << raftOutset << endl;
     fout << endl;
 
     fout.precision(1);
     fout << "# Minimum time to spend on a layer. Slows down printing of small layers." << endl;
-    fout << "minLayerTime: " << minLayerTime         << endl;
+    fout << "minLayerTime: " << minLayerTime << endl;
     fout << endl;
 
     fout.close();
@@ -227,11 +324,11 @@ void SlicingContext::saveSettingsToFile(const char *fileName)
 
 
 
-double SlicingContext::standardFeedRate()
+double SlicingContext::standardFeedRate(int tool)
 {
-    double filamentRadius = 0.5f * filamentDiameter;
-    double filamentFeedMmPerSec = (filamentFeedRate/60)*driveGearDiameter*M_PI;
-    return (4*filamentFeedMmPerSec*filamentRadius*filamentRadius) / (widthOverHeightRatio*layerThickness*layerThickness);
+    double filamentRadius = 0.5f * filamentDiameter[tool];
+    double filamentFeedMmPerMin = filamentFeedRate[tool]*driveGearDiameter[tool]*M_PI;
+    return (4*filamentFeedMmPerMin*filamentRadius*filamentRadius) / (widthOverHeightRatio*layerThickness*layerThickness);
 }
 
 
@@ -250,11 +347,11 @@ double SlicingContext::ratioForWidth(double extrusionWidth)
 
 
 
-double SlicingContext::feedRateForWidth(double extrusionWidth)
+double SlicingContext::feedRateForWidth(int tool, double extrusionWidth)
 {
-    double filamentRadius = 0.5f * filamentDiameter;
-    double filamentFeedMmPerSec = (filamentFeedRate/60)*driveGearDiameter*M_PI;
-    return (4*filamentFeedMmPerSec*filamentRadius*filamentRadius) / (extrusionWidth*layerThickness);
+    double filamentRadius = 0.5f * filamentDiameter[tool];
+    double filamentFeedMmPerMin = filamentFeedRate[tool]*driveGearDiameter[tool]*M_PI;
+    return (4*filamentFeedMmPerMin*filamentRadius*filamentRadius) / (extrusionWidth*layerThickness);
 }
 
 
