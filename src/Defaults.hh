@@ -9,6 +9,7 @@
 
 #define DEFAULT_FILAMENT_FEED_RATE    2.00    /* rev/sec */
 #define DEFAULT_FILAMENT_DIAMETER     1.75    /* mm */
+#define DEFAULT_DRIVE_GEAR_DIAMETER  10.58    /* mm */
 #define DEFAULT_LAYER_THICKNESS       0.30    /* mm */
 #define DEFAULT_WIDTH_OVER_HEIGHT     1.75    /* Width of extruded filament, divided by height */
 #define DEFAULT_SHRINKAGE_RATIO       0.98    /* Ratio of hot part to cooled part size. */

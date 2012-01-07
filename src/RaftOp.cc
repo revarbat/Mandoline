@@ -40,13 +40,20 @@ void RaftOp::main()
 
     if ( isCancelled ) return;
 
-    double minX = context->mesh.minX - context->raftOutset;;
-    double maxX = context->mesh.maxX + context->raftOutset;;
-    double minY = context->mesh.minY - context->raftOutset;;
-    double maxY = context->mesh.maxY + context->raftOutset;;
-    double offset = context->standardExtrusionWidth() * 2.0;
+    double minX = context->mesh.minX - context->raftOutset;
+    double maxX = context->mesh.maxX + context->raftOutset;
+    double minY = context->mesh.minY - context->raftOutset;
+    double maxY = context->mesh.maxY + context->raftOutset;
+    double offset;
+
+    // Raft base is extruded wider and slower for better platform adhesion.
+    double baseExtWidth = context->standardExtrusionWidth() * 1.5;
+
+    // Interface lines are extruded small and fast for easier part removal
+    double ifaceExtWidth = context->standardExtrusionWidth() * 0.5;
 
     // Build up list of base raft lines.
+    offset = baseExtWidth * 1.25; // provides space between lines.
     BGL::Lines raftLines;
     for (double raftY = minY; raftY < maxY; raftY += offset) {
 	BGL::Line tempLn(BGL::Point(minX, raftY), BGL::Point(maxX, raftY));
@@ -57,7 +64,7 @@ void RaftOp::main()
     BGL::Lines::iterator it;
     BGL::Paths tempPaths;
     for (it = raftLines.begin(); it != raftLines.end(); it++) {
-	it->extrusionWidth = context->standardExtrusionWidth();
+	it->extrusionWidth = baseExtWidth;;
         tempPaths.push_back(BGL::Path(*it));
     }
     baseSlice->perimeter.joinSubPathsInside(offset*3.0, tempPaths, baseSlice->infill);
@@ -69,7 +76,9 @@ void RaftOp::main()
     ifaceSlice->perimeter = baseSlice->perimeter;
     ifaceSlice->infillMask = baseSlice->perimeter;
 
+
     // Build up list of interface raft lines.
+    offset = ifaceExtWidth * 1.5; // provides space between lines.
     BGL::Lines ifaceLines;
     for (double ifaceX = minX; ifaceX < maxX; ifaceX += offset) {
 	BGL::Line tempLn(BGL::Point(ifaceX, minY), BGL::Point(ifaceX, maxY));
@@ -79,7 +88,7 @@ void RaftOp::main()
     // Convert lines to simple paths for later path optimization.
     BGL::Paths tempPaths2;
     for (it = ifaceLines.begin(); it != ifaceLines.end(); it++) {
-	it->extrusionWidth = context->standardExtrusionWidth();
+	it->extrusionWidth = ifaceExtWidth;
         tempPaths2.push_back(BGL::Path(*it));
     }
     ifaceSlice->perimeter.joinSubPathsInside(offset*3.0, tempPaths2, ifaceSlice->infill);

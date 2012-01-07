@@ -23,6 +23,7 @@ class SlicingContext {
 public:
     double filamentFeedRate;
     double filamentDiameter;
+    double driveGearDiameter;
     double layerThickness;
     double widthOverHeightRatio;
     double shrinkageRatio;
@@ -44,7 +45,8 @@ public:
     
     SlicingContext();
 
-    void loadDefaultsFromFile(const char *fileName);
+    void loadSettingsFromFile(const char *fileName);
+    void saveSettingsToFile(const char *fileName);
     void calculateSvgOffsets();
     double standardFeedRate();
     double standardExtrusionWidth();

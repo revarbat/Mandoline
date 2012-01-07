@@ -34,6 +34,9 @@ ostream &pathToGcode(Path& path, double zHeight, double speedMult, SlicingContex
     Lines::iterator line = path.segments.begin();
     double feed = ctx.feedRateForWidth(line->extrusionWidth) * speedMult;
 
+    out.setf(ios::fixed);
+    out.precision(2);
+
     // Move to the starting position...
     out << "G1 X" << line->startPt.x
         << " Y" << line->startPt.y

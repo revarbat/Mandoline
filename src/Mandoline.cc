@@ -33,24 +33,72 @@ enum ExportTypes {
 
 void usage(const char* arg0, SlicingContext& ctx)
 {
-    fprintf(stderr, "Usage: %s [OPTIONS] FILE\n", arg0);
-    fprintf(stderr, "Or   : %s -m MATERIAL [OPTIONS] FILE\n", arg0);
-    fprintf(stderr, "\t[-m STRING]   Extruded material. (default ABS)\n");
-    fprintf(stderr, "\t[-f FLOAT]    Filament diameter. (default %.1f mm)\n", ctx.filamentDiameter);
-    fprintf(stderr, "\t[-F FLOAT]    Filament feedrate. (default %.3f mm/s)\n", ctx.filamentFeedRate);
-    fprintf(stderr, "\t[-i FLOAT]    Infill density. (default %.2f)\n", ctx.infillDensity);
-    fprintf(stderr, "\t[-l FLOAT]    Slicing layer thickness. (default %.2f mm)\n", ctx.layerThickness);
-    fprintf(stderr, "\t[-p INT]      Number of perimeter shell layers. (default %d)\n", ctx.perimeterShells);
-    fprintf(stderr, "\t[-r INT]      Number of Raft layers. (default %d)\n", ctx.raftLayers);
-    fprintf(stderr, "\t[-w FLOAT]    Extrusion width over thickness ratio. (default %.2f)\n", ctx.widthOverHeightRatio);
-    fprintf(stderr, "\t[-c]          DON'T center model on platform before slicing.\n");
-    fprintf(stderr, "\t[-S FLOAT]    Scale model.  (default %.4gx)\n", scaling);
-    fprintf(stderr, "\t[-R FLOAT]    Rotate model about Z.  (default %.4g deg)\n", rotation);
-    fprintf(stderr, "\t[-d PREFIX]   Dump layers to SVG files with names like PREFIX-12.34.svg.\n");
-    fprintf(stderr, "\t[-t INT]      Number of threads to slice with. (default %d)\n", threadcount);
+    fprintf(stderr, "Usage: %s [OPTIONS] [FILE]\n", arg0);
+    fprintf(stderr, "Or   : %s -m MATERIAL [OPTIONS] [FILE]\n", arg0);
+    fprintf(stderr, "\t-m STRING\n");
+    fprintf(stderr, "\t--material STRING\n");
+    fprintf(stderr, "\t            Loads settings for given material. (default ABS)\n");
+    fprintf(stderr, "\t-f FLOAT\n");
+    fprintf(stderr, "\t--filament-diam FLOAT\n");
+    fprintf(stderr, "\t            Filament diameter. (default %.1f mm)\n", ctx.filamentDiameter);
+    fprintf(stderr, "\t-F FLOAT\n");
+    fprintf(stderr, "\t--filament-feed-rate FLOAT\n");
+    fprintf(stderr, "\t            Filament feedrate. (default %.3f RPM)\n", ctx.filamentFeedRate);
+    fprintf(stderr, "\t-d FLOAT\n");
+    fprintf(stderr, "\t--drive-gear-diam FLOAT\n");
+    fprintf(stderr, "\t            Drive gear diameter. (default %.1f mm)\n", ctx.driveGearDiameter);
+    fprintf(stderr, "\t-i FLOAT\n");
+    fprintf(stderr, "\t--infill FLOAT\n");
+    fprintf(stderr, "\t            Infill density. (default %.2f)\n", ctx.infillDensity);
+    fprintf(stderr, "\t-l FLOAT\n");
+    fprintf(stderr, "\t--layer-thickness FLOAT\n");
+    fprintf(stderr, "\t            Slicing layer thickness. (default %.2f mm)\n", ctx.layerThickness);
+    fprintf(stderr, "\t-p INT\n");
+    fprintf(stderr, "\t--perimeter-shells INT\n");
+    fprintf(stderr, "\t            Number of perimeter shell layers. (default %d)\n", ctx.perimeterShells);
+    fprintf(stderr, "\t-r INT\n");
+    fprintf(stderr, "\t--raft-layers INT\n");
+    fprintf(stderr, "\t            Number of Raft layers. (default %d)\n", ctx.raftLayers);
+    fprintf(stderr, "\t-w FLOAT\n");
+    fprintf(stderr, "\t--width-over-thickness FLOAT\n");
+    fprintf(stderr, "\t            Extrusion width over thickness ratio. (default %.2f)\n", ctx.widthOverHeightRatio);
+    fprintf(stderr, "\t--flat-shells INT\n");
+    fprintf(stderr, "\t            Number of layers to infill solidly on top and bottom. (default %d)\n", ctx.flatShells);
+    fprintf(stderr, "\t--raft-outset FLOAT\n");
+    fprintf(stderr, "\t            Millimeters to outset raft around model. (default %.1f).\n", ctx.raftOutset);
+    fprintf(stderr, "\t--min-layer-time FLOAT\n");
+    fprintf(stderr, "\t            Minimum seconds per layer. (default %.1f).\n", ctx.minLayerTime);
+    fprintf(stderr, "\t--shrinkage-ratio FLOAT\n");
+    fprintf(stderr, "\t            Ratio of how much the part will shrink when cooled. (default %.3f).\n", ctx.shrinkageRatio);
+    fprintf(stderr, "\t--no-center\n");
+    fprintf(stderr, "\t            DON'T center model on platform before slicing.\n");
+    fprintf(stderr, "\t--scale FLOAT\n");
+    fprintf(stderr, "\t            Scale model.  (default %.4gx)\n", scaling);
+    fprintf(stderr, "\t--rotate FLOAT\n");
+    fprintf(stderr, "\t            Rotate model about Z axis.  (default %.4g deg)\n", rotation);
+    fprintf(stderr, "\t--threads INT\n");
+    fprintf(stderr, "\t            Number of threads to slice with. (default %d)\n", threadcount);
+    fprintf(stderr, "\t--dump-prefix PREFIX\n");
+    fprintf(stderr, "\t            Dump layers to SVG files with names like PREFIX-12.34.svg.\n");
+    fprintf(stderr, "\t--write-defaults\n");
+    fprintf(stderr, "\t            Writes out global settings, as modified, to the defaults file.\n");
+    fprintf(stderr, "\t--write-material STRING\n");
+    fprintf(stderr, "\t            Writes out material settings, as modified, to the given material file.\n");
     exit(-1);
 }
 
+
+#define OPT_RAFT_OUTSET       1001
+#define OPT_MIN_LAYER_TIME    1002
+#define OPT_FLAT_SHELLS       1003
+#define OPT_SHRINKAGE_RATIO   1004
+#define OPT_WRITE_DEFAULTS    1005
+#define OPT_WRITE_MATERIAL    1006
+#define OPT_NO_CENTER         1007
+#define OPT_THREADS           1008
+#define OPT_DUMP_PREFIX       1009
+#define OPT_SCALE             1010
+#define OPT_ROTATE            1011
 
 
 int main (int argc, char * const argv[])
@@ -63,21 +111,28 @@ int main (int argc, char * const argv[])
 
     int ch;
     const char *progName = argv[0];
-    const char * shortopts = "?cd:f:F:hi:l:m:o:p:r:t:w:R:S:";
+    const char * shortopts = "?d:f:F:hi:l:m:p:r:w:";
     static struct option longopts[] = {
-	{"material", required_argument, NULL, 'm'},
-	{"diameter", required_argument, NULL, 'f'},
-	{"feedrate", required_argument, NULL, 'F'},
-	{"infill", required_argument, NULL, 'i'},
-	{"layer", required_argument, NULL, 'l'},
-	{"shells", required_argument, NULL, 'p'},
-	{"ratio", required_argument, NULL, 'w'},
-	{"raftlayers", required_argument, NULL, 'r'},
-	{"nocenter", required_argument, NULL, 'c'},
-	{"scale", required_argument, NULL, 'S'},
-	{"rotatex", required_argument, NULL, 'R'},
-	{"dumpprefix", required_argument, NULL, 'd'},
-	{"threads", required_argument, NULL, 't'},
+	{"material",           required_argument, NULL, 'm'},
+	{"drive-gear-diam",    required_argument, NULL, 'd'},
+	{"filament-diam",      required_argument, NULL, 'f'},
+	{"filament-feed-rate", required_argument, NULL, 'F'},
+	{"infill",             required_argument, NULL, 'i'},
+	{"layer-thickness",    required_argument, NULL, 'l'},
+	{"perimater-shells",   required_argument, NULL, 'p'},
+	{"width-over-height",  required_argument, NULL, 'w'},
+	{"raft-layers",        required_argument, NULL, 'r'},
+	{"scale",              required_argument, NULL, OPT_SCALE},
+	{"rotate",             required_argument, NULL, OPT_ROTATE},
+	{"dump-prefix",        required_argument, NULL, OPT_DUMP_PREFIX},
+	{"threads",            required_argument, NULL, OPT_THREADS},
+	{"raft-outset",        required_argument, NULL, OPT_RAFT_OUTSET},
+	{"min-layer-time",     required_argument, NULL, OPT_MIN_LAYER_TIME},
+	{"flat-shells",        required_argument, NULL, OPT_FLAT_SHELLS},
+	{"shrinkage-ratio",    required_argument, NULL, OPT_SHRINKAGE_RATIO},
+	{"no-center",          no_argument,       NULL, OPT_NO_CENTER},
+	{"write-defaults",     no_argument,       NULL, OPT_WRITE_DEFAULTS},
+	{"write-material",     required_argument, NULL, OPT_WRITE_MATERIAL},
 	{0, 0, 0, 0}
     };
     
@@ -88,54 +143,95 @@ int main (int argc, char * const argv[])
 	}
     }
 
+    const char *homeDir = getenv("HOME");
+    if (!homeDir) {
+        homeDir = "";
+    }
+
+    // Load default settings.
+    // TODO: vary filename path per OS platform.
+    snprintf(buf, sizeof(buf), "%s/.mandoline/defaults.conf", homeDir);
+    ctx.loadSettingsFromFile(buf);
+
     // Load saved settings for the given material, if any.
-    snprintf(buf, sizeof(buf), "~/.mandoline/materials/%.128s.conf", material.c_str());
-    ctx.loadDefaultsFromFile(buf);
+    // TODO: vary filename path per OS platform.
+    snprintf(buf, sizeof(buf), "%s/.mandoline/materials/%.128s.conf", homeDir, material.c_str());
+    ctx.loadSettingsFromFile(buf);
 
-    // Process remainder of command-line arguments.
+    // Reset getopt_long so we can process the remainder of
+    // the command-line arguments.
     opterr = optind = 1;
-
 #if HAVE_DECL_OPTRESET
     optreset = 1;
 #endif
 
     while ((ch = getopt_long(argc, argv, shortopts, longopts, NULL)) != -1) {
         switch (ch) {
-        case 'c':
-            doCenter = false;
+        case 'm':
+            // We already parsed this one out.  Ignore.
             break;
+
         case 'd':
-            doDumpSVG = true;
-            ctx.dumpPrefix = optarg;
+            ctx.driveGearDiameter = atof(optarg);
             break;
+
         case 'f':
             ctx.filamentDiameter = atof(optarg);
             break;
+
         case 'F':
             ctx.filamentFeedRate = atof(optarg);
             break;
+
         case 'i':
             ctx.infillDensity = atof(optarg);
             break;
+
         case 'l':
             ctx.layerThickness = atof(optarg);
             break;
+
         case 'p':
             ctx.perimeterShells = atoi(optarg);
             break;
+
         case 'w':
             ctx.widthOverHeightRatio = atof(optarg);
             break;
+
         case 'r':
             ctx.raftLayers = atoi(optarg);
             break;
-        case 'R':
+
+        case OPT_ROTATE:
             rotation = atof(optarg);
             break;
-        case 'S':
+
+        case OPT_SCALE:
             scaling = atof(optarg);
             break;
-        case 't':
+
+        case OPT_RAFT_OUTSET:
+            ctx.raftOutset = atof(optarg);
+            break;
+
+        case OPT_MIN_LAYER_TIME:
+            ctx.minLayerTime = atof(optarg);
+            break;
+
+        case OPT_FLAT_SHELLS:
+            ctx.flatShells = atoi(optarg);
+            break;
+
+        case OPT_SHRINKAGE_RATIO:
+            ctx.shrinkageRatio = atoi(optarg);
+            break;
+
+        case OPT_NO_CENTER:
+            doCenter = false;
+            break;
+
+        case OPT_THREADS:
 	    {
 		int cnt = atoi(optarg);
 		if (cnt < 1) {
@@ -144,9 +240,26 @@ int main (int argc, char * const argv[])
 		threadcount = cnt;
 	    }
             break;
-        case 'm':
-            // We already parsed this one out.  Ignore.
+
+        case OPT_DUMP_PREFIX:
+            doDumpSVG = true;
+            ctx.dumpPrefix = optarg;
             break;
+
+        case OPT_WRITE_DEFAULTS:
+	    // TODO: vary filename path per OS platform.
+	    snprintf(buf, sizeof(buf), "%s/.mandoline/defaults.conf", homeDir);
+	    ctx.saveSettingsToFile(buf);
+	    cerr << "Wrote defaults to " << buf << endl;
+            break;
+
+        case OPT_WRITE_MATERIAL:
+	    // TODO: vary filename path per OS platform.
+	    snprintf(buf, sizeof(buf), "%s/.mandoline/materials/%.128s.conf", homeDir, optarg);
+	    ctx.saveSettingsToFile(buf);
+	    cerr << "Wrote material settings to " << buf << endl;
+            break;
+
         case '?':
         case 'h':
         default:
@@ -159,7 +272,8 @@ int main (int argc, char * const argv[])
         inFileName = string(argv[0]);
     }
     if (inFileName.length() < 1) {
-        usage(progName, ctx);
+	cerr << "No file to slice.  Exiting." << endl;
+	exit(0);
     }
     
     // Load the model from the file.
@@ -286,6 +400,7 @@ int main (int argc, char * const argv[])
     // All done!
     stopwatch.finish();
     
+    exit(0);
     return 0;
 }
 
