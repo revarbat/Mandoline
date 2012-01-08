@@ -15447,26 +15447,27 @@ _ACEOF
 if test ".$CFLAGS"="."; then :
    CFLAGS=""
 fi
+if test ".$CXXFLAGS"="."; then :
+   CXXFLAGS=""
+fi
 
 # Check whether --with-warn was given.
 if test "${with_warn+set}" = set; then :
-  withval=$with_warn; CFLAGS="$CFLAGS -Wall"
-else
-  CFLAGS="$CFLAGS -Wall"
+  withval=$with_warn; CFLAGS="$CFLAGS -Wall" ; CXXFLAGS="$CXXFLAGS -Wall"
 fi
 
 
 # Check whether --with-opt was given.
 if test "${with_opt+set}" = set; then :
-  withval=$with_opt; CFLAGS="$CFLAGS -${withval}"
+  withval=$with_opt; CFLAGS="$CFLAGS -${withval}" ; CXXFLAGS="$CXXFLAGS -${withval}"
 else
-  CFLAGS="$CFLAGS -O3"
+  CFLAGS="$CFLAGS -O2" ; CXXFLAGS="$CXXFLAGS -O2"
 fi
 
 
 # Check whether --with-gprof was given.
 if test "${with_gprof+set}" = set; then :
-  withval=$with_gprof; CFLAGS="$CFLAGS -pg"
+  withval=$with_gprof; CFLAGS="$CFLAGS -pg" ; CXXFLAGS="$CXXFLAGS -pg"
 fi
 
 

@@ -154,6 +154,19 @@ void GCodeExportOp::main()
     fout << "M109 T0 S" << context->platformTemp
          << " (Set platform temp)" << endl;
 
+    fout << "G92 X0 Y0 Z0  (Zero our position out.)" << endl;
+    fout << "G0 X-10 Y-10 Z5 (move back to make sure homing doesnt fail)" << endl;
+
+    // TODO: Remove this.  It's specific to the belfry fabber machine.
+    fout << "G161 Z (Home Z axis to bottom.)" << endl;
+    fout << "G92 X0 Y0 Z0  (Zero our position out.)" << endl;
+    fout << "G0 Z5 (Lift Z axis 5 mm)" << endl;
+    fout << "G162 X Y (Home X and Y axes to XY+ max)" << endl;
+    fout << "G92 X85 Y95 Z5  (Recalibrate positions.)" << endl;
+    fout << "G0 X0 Y0 (Move to center.)" << endl;
+    fout << "G0 Z0.5" << endl;
+    fout << "M6 T0 (Wait for tool to heat up)" << endl;
+
     // For each layer....
     for (it = context->slices.begin(); it != context->slices.end(); it++) {
         fout << "(new layer)" << endl;

@@ -80,6 +80,8 @@ void usage(const char* arg0, SlicingContext& ctx)
     fprintf(stderr, "\t            Tool0 retraction time. (default %.0f ms)\n", ctx.retractionTime[0]);
     fprintf(stderr, "\t--tool0-pushback-time FLOAT\n");
     fprintf(stderr, "\t            Tool0 pushback time. (default %.0f ms)\n", ctx.pushBackTime[0]);
+    fprintf(stderr, "\t--tool0-material-fudge FLOAT\n");
+    fprintf(stderr, "\t            Tool0 material shrinkage fudge factor. (default %.0f ms)\n", ctx.materialFudge[0]);
     fprintf(stderr, "\t--tool1-filament-diam FLOAT\n");
     fprintf(stderr, "\t            Tool1 filament diameter. (default %.2f mm)\n", ctx.filamentDiameter[1]);
     fprintf(stderr, "\t--tool1-feed-rate FLOAT\n");
@@ -100,6 +102,8 @@ void usage(const char* arg0, SlicingContext& ctx)
     fprintf(stderr, "\t            Tool1 retraction time. (default %.0f ms)\n", ctx.retractionTime[1]);
     fprintf(stderr, "\t--tool1-pushback-time FLOAT\n");
     fprintf(stderr, "\t            Tool1 pushback time. (default %.0f ms)\n", ctx.pushBackTime[1]);
+    fprintf(stderr, "\t--tool1-material-fudge FLOAT\n");
+    fprintf(stderr, "\t            Tool1 material shrinkage fudge factor. (default %.0f ms)\n", ctx.materialFudge[1]);
     fprintf(stderr, "\t--flat-shells INT\n");
     fprintf(stderr, "\t            Number of layers to infill solidly on top and bottom. (default %d)\n", ctx.flatShells);
     fprintf(stderr, "\t--raft-outset FLOAT\n");
@@ -124,32 +128,34 @@ void usage(const char* arg0, SlicingContext& ctx)
 }
 
 
-#define OPT_RAFT_OUTSET         1001
-#define OPT_MIN_LAYER_TIME      1002
-#define OPT_FLAT_SHELLS         1003
-#define OPT_WRITE_DEFAULTS      1005
-#define OPT_WRITE_MATERIAL      1006
-#define OPT_NO_CENTER           1007
-#define OPT_THREADS             1008
-#define OPT_DUMP_PREFIX         1009
-#define OPT_SCALE               1010
-#define OPT_ROTATE              1011
-#define OPT_TOOL1_FEED_RATE     1012
-#define OPT_TOOL1_FILAMENT_DIAM 1013
-#define OPT_TOOL1_GEAR_DIAM     1014
-#define OPT_TOOL1_NOZZLE_DIAM   1015
-#define OPT_TOOL1_TEMP          1016
-#define OPT_SUPPORT_TOOL        1017
-#define OPT_TOOL1_X_OFFSET      1018
-#define OPT_TOOL1_Y_OFFSET      1019
-#define OPT_TOOL0_X_OFFSET      1020
-#define OPT_TOOL0_Y_OFFSET      1021
-#define OPT_TOOL0_RETRACT_RATE  1022
-#define OPT_TOOL0_RETRACT_TIME  1023
-#define OPT_TOOL0_PUSHBACK_TIME 1024
-#define OPT_TOOL1_RETRACT_RATE  1025
-#define OPT_TOOL1_RETRACT_TIME  1026
-#define OPT_TOOL1_PUSHBACK_TIME 1027
+#define OPT_RAFT_OUTSET           1001
+#define OPT_MIN_LAYER_TIME        1002
+#define OPT_FLAT_SHELLS           1003
+#define OPT_WRITE_DEFAULTS        1005
+#define OPT_WRITE_MATERIAL        1006
+#define OPT_NO_CENTER             1007
+#define OPT_THREADS               1008
+#define OPT_DUMP_PREFIX           1009
+#define OPT_SCALE                 1010
+#define OPT_ROTATE                1011
+#define OPT_TOOL1_FEED_RATE       1012
+#define OPT_TOOL1_FILAMENT_DIAM   1013
+#define OPT_TOOL1_GEAR_DIAM       1014
+#define OPT_TOOL1_NOZZLE_DIAM     1015
+#define OPT_TOOL1_TEMP            1016
+#define OPT_SUPPORT_TOOL          1017
+#define OPT_TOOL1_X_OFFSET        1018
+#define OPT_TOOL1_Y_OFFSET        1019
+#define OPT_TOOL0_X_OFFSET        1020
+#define OPT_TOOL0_Y_OFFSET        1021
+#define OPT_TOOL0_RETRACT_RATE    1022
+#define OPT_TOOL0_RETRACT_TIME    1023
+#define OPT_TOOL0_PUSHBACK_TIME   1024
+#define OPT_TOOL1_RETRACT_RATE    1025
+#define OPT_TOOL1_RETRACT_TIME    1026
+#define OPT_TOOL1_PUSHBACK_TIME   1027
+#define OPT_TOOL0_MATERIAL_FUDGE  1028
+#define OPT_TOOL1_MATERIAL_FUDGE  1029
 
 
 int main (int argc, char * const argv[])
@@ -164,44 +170,46 @@ int main (int argc, char * const argv[])
     const char *progName = argv[0];
     const char * shortopts = "?d:f:F:hi:l:m:n:p:r:w:";
     static struct option longopts[] = {
-	{"material",            required_argument, NULL, 'm'},
-	{"tool0-feed-rate",     required_argument, NULL, 'F'},
-	{"tool0-filament-diam", required_argument, NULL, 'f'},
-	{"tool0-gear-diam",     required_argument, NULL, 'd'},
-	{"tool0-nozzle-diam",   required_argument, NULL, 'n'},
-	{"tool0-temp",          required_argument, NULL, 't'},
-	{"tool0-x-offset",      required_argument, NULL, OPT_TOOL0_X_OFFSET},
-	{"tool0-y-offset",      required_argument, NULL, OPT_TOOL0_Y_OFFSET},
-	{"tool0-retract-rate",  required_argument, NULL, OPT_TOOL0_RETRACT_RATE},
-	{"tool0-retract-time",  required_argument, NULL, OPT_TOOL0_RETRACT_TIME},
-	{"tool0-pushback-time", required_argument, NULL, OPT_TOOL0_PUSHBACK_TIME},
-	{"tool1-feed-rate",     required_argument, NULL, OPT_TOOL1_FEED_RATE},
-	{"tool1-filament-diam", required_argument, NULL, OPT_TOOL1_FILAMENT_DIAM},
-	{"tool1-gear-diam",     required_argument, NULL, OPT_TOOL1_GEAR_DIAM},
-	{"tool1-nozzle-diam",   required_argument, NULL, OPT_TOOL1_NOZZLE_DIAM},
-	{"tool1-temp",          required_argument, NULL, OPT_TOOL1_TEMP},
-	{"tool1-x-offset",      required_argument, NULL, OPT_TOOL1_X_OFFSET},
-	{"tool1-y-offset",      required_argument, NULL, OPT_TOOL1_Y_OFFSET},
-	{"tool1-retract-rate",  required_argument, NULL, OPT_TOOL1_RETRACT_RATE},
-	{"tool1-retract-time",  required_argument, NULL, OPT_TOOL1_RETRACT_TIME},
-	{"tool1-pushback-time", required_argument, NULL, OPT_TOOL1_PUSHBACK_TIME},
-	{"support-tool",        required_argument, NULL, OPT_SUPPORT_TOOL},
-	{"infill",              required_argument, NULL, 'i'},
-	{"layer-thickness",     required_argument, NULL, 'l'},
-	{"perimeter-shells",    required_argument, NULL, 'p'},
-	{"width-over-height",   required_argument, NULL, 'w'},
-	{"raft-layers",         required_argument, NULL, 'r'},
-	{"platform-temp",       required_argument, NULL, 'T'},
-	{"scale",               required_argument, NULL, OPT_SCALE},
-	{"rotate",              required_argument, NULL, OPT_ROTATE},
-	{"dump-prefix",         required_argument, NULL, OPT_DUMP_PREFIX},
-	{"threads",             required_argument, NULL, OPT_THREADS},
-	{"raft-outset",         required_argument, NULL, OPT_RAFT_OUTSET},
-	{"min-layer-time",      required_argument, NULL, OPT_MIN_LAYER_TIME},
-	{"flat-shells",         required_argument, NULL, OPT_FLAT_SHELLS},
-	{"no-center",           no_argument,       NULL, OPT_NO_CENTER},
-	{"write-defaults",      no_argument,       NULL, OPT_WRITE_DEFAULTS},
-	{"write-material",      required_argument, NULL, OPT_WRITE_MATERIAL},
+	{"material",             required_argument, NULL, 'm'},
+	{"tool0-feed-rate",      required_argument, NULL, 'F'},
+	{"tool0-filament-diam",  required_argument, NULL, 'f'},
+	{"tool0-gear-diam",      required_argument, NULL, 'd'},
+	{"tool0-nozzle-diam",    required_argument, NULL, 'n'},
+	{"tool0-temp",           required_argument, NULL, 't'},
+	{"tool0-x-offset",       required_argument, NULL, OPT_TOOL0_X_OFFSET},
+	{"tool0-y-offset",       required_argument, NULL, OPT_TOOL0_Y_OFFSET},
+	{"tool0-retract-rate",   required_argument, NULL, OPT_TOOL0_RETRACT_RATE},
+	{"tool0-retract-time",   required_argument, NULL, OPT_TOOL0_RETRACT_TIME},
+	{"tool0-pushback-time",  required_argument, NULL, OPT_TOOL0_PUSHBACK_TIME},
+	{"tool0-material-fudge", required_argument, NULL, OPT_TOOL0_MATERIAL_FUDGE},
+	{"tool1-feed-rate",      required_argument, NULL, OPT_TOOL1_FEED_RATE},
+	{"tool1-filament-diam",  required_argument, NULL, OPT_TOOL1_FILAMENT_DIAM},
+	{"tool1-gear-diam",      required_argument, NULL, OPT_TOOL1_GEAR_DIAM},
+	{"tool1-nozzle-diam",    required_argument, NULL, OPT_TOOL1_NOZZLE_DIAM},
+	{"tool1-temp",           required_argument, NULL, OPT_TOOL1_TEMP},
+	{"tool1-x-offset",       required_argument, NULL, OPT_TOOL1_X_OFFSET},
+	{"tool1-y-offset",       required_argument, NULL, OPT_TOOL1_Y_OFFSET},
+	{"tool1-retract-rate",   required_argument, NULL, OPT_TOOL1_RETRACT_RATE},
+	{"tool1-retract-time",   required_argument, NULL, OPT_TOOL1_RETRACT_TIME},
+	{"tool1-pushback-time",  required_argument, NULL, OPT_TOOL1_PUSHBACK_TIME},
+	{"tool1-material-fudge", required_argument, NULL, OPT_TOOL1_MATERIAL_FUDGE},
+	{"support-tool",         required_argument, NULL, OPT_SUPPORT_TOOL},
+	{"infill",               required_argument, NULL, 'i'},
+	{"layer-thickness",      required_argument, NULL, 'l'},
+	{"perimeter-shells",     required_argument, NULL, 'p'},
+	{"width-over-height",    required_argument, NULL, 'w'},
+	{"raft-layers",          required_argument, NULL, 'r'},
+	{"platform-temp",        required_argument, NULL, 'T'},
+	{"scale",                required_argument, NULL, OPT_SCALE},
+	{"rotate",               required_argument, NULL, OPT_ROTATE},
+	{"dump-prefix",          required_argument, NULL, OPT_DUMP_PREFIX},
+	{"threads",              required_argument, NULL, OPT_THREADS},
+	{"raft-outset",          required_argument, NULL, OPT_RAFT_OUTSET},
+	{"min-layer-time",       required_argument, NULL, OPT_MIN_LAYER_TIME},
+	{"flat-shells",          required_argument, NULL, OPT_FLAT_SHELLS},
+	{"no-center",            no_argument,       NULL, OPT_NO_CENTER},
+	{"write-defaults",       no_argument,       NULL, OPT_WRITE_DEFAULTS},
+	{"write-material",       required_argument, NULL, OPT_WRITE_MATERIAL},
 	{0, 0, 0, 0}
     };
     
@@ -304,6 +312,10 @@ int main (int argc, char * const argv[])
             ctx.pushBackTime[0] = atof(optarg);
             break;
 
+        case OPT_TOOL0_MATERIAL_FUDGE:
+            ctx.materialFudge[0] = atof(optarg);
+            break;
+
         case OPT_TOOL1_FEED_RATE:
             ctx.filamentFeedRate[1] = atof(optarg);
             break;
@@ -342,6 +354,10 @@ int main (int argc, char * const argv[])
 
         case OPT_TOOL1_PUSHBACK_TIME:
             ctx.pushBackTime[1] = atof(optarg);
+            break;
+
+        case OPT_TOOL1_MATERIAL_FUDGE:
+            ctx.materialFudge[1] = atof(optarg);
             break;
 
         case OPT_ROTATE:

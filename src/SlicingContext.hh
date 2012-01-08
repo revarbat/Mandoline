@@ -32,6 +32,7 @@ public:
     double pushBackTime[MAX_TOOLS];
     double xAxisOffset[MAX_TOOLS];
     double yAxisOffset[MAX_TOOLS];
+    double materialFudge[MAX_TOOLS];
 
     double platformTemp;
     int    supportTool;

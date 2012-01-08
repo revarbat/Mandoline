@@ -34,6 +34,7 @@ SlicingContext::SlicingContext()
 	pushBackTime[tool]      = DEFAULT_PUSH_BACK_TIME;
 	xAxisOffset[tool]       = DEFAULT_X_AXIS_OFFSET;
 	yAxisOffset[tool]       = DEFAULT_Y_AXIS_OFFSET;
+	materialFudge[tool]     = DEFAULT_MATERIAL_FUDGE;
     }
     platformTemp         = DEFAULT_PLATFORM_TEMP;
     supportTool         = DEFAULT_SUPPORT_TOOL;
@@ -152,6 +153,9 @@ void SlicingContext::loadSettingsFromFile(const char *fileName)
 		foundSetting = true;
 	    } else if (!strncasecmp(optname, "yAxisOffset", 11) && optname[11] == ('0'+tool)) {
 		yAxisOffset[tool] = strtod(value, &ptr);
+		foundSetting = true;
+	    } else if (!strncasecmp(optname, "materialFudge", 13) && optname[13] == ('0'+tool)) {
+		materialFudge[tool] = strtod(value, &ptr);
 		foundSetting = true;
 	    }
 	}
@@ -273,6 +277,11 @@ void SlicingContext::saveSettingsToFile(const char *fileName)
 	fout << "yAxisOffset" << tool << ": " << yAxisOffset[tool] << endl;
 	fout << endl;
 
+	fout.precision(3);
+	fout << "# Material shrinkage fudge factor ratio, for Tool" << tool << endl;
+	fout << "materialFudge" << tool << ": " << materialFudge[tool] << endl;
+	fout << endl;
+
 	fout << endl;
 	fout << endl;
     }
@@ -327,8 +336,22 @@ void SlicingContext::saveSettingsToFile(const char *fileName)
 double SlicingContext::standardFeedRate(int tool)
 {
     double filamentRadius = 0.5f * filamentDiameter[tool];
-    double filamentFeedMmPerMin = filamentFeedRate[tool]*driveGearDiameter[tool]*M_PI;
-    return (4*filamentFeedMmPerMin*filamentRadius*filamentRadius) / (widthOverHeightRatio*layerThickness*layerThickness);
+    double filamentFeedMmPerMin = filamentFeedRate[tool] * driveGearDiameter[tool] * M_PI;
+    double extrusionMm3PerMin = filamentFeedMmPerMin * M_PI * filamentRadius * filamentRadius;
+    double extrusionWidthMm = widthOverHeightRatio * layerThickness;
+    double extrusionSpeedMmPerMin = extrusionMm3PerMin / (extrusionWidthMm * layerThickness);
+    return extrusionSpeedMmPerMin * materialFudge[tool];
+}
+
+
+
+double SlicingContext::feedRateForWidth(int tool, double extrusionWidthMm)
+{
+    double filamentRadius = 0.5f * filamentDiameter[tool];
+    double filamentFeedMmPerMin = filamentFeedRate[tool] * driveGearDiameter[tool] * M_PI;
+    double extrusionMm3PerMin = filamentFeedMmPerMin * M_PI * filamentRadius * filamentRadius;
+    double extrusionSpeedMmPerMin = extrusionMm3PerMin / (extrusionWidthMm * layerThickness);
+    return extrusionSpeedMmPerMin * materialFudge[tool];
 }
 
 
@@ -343,15 +366,6 @@ double SlicingContext::standardExtrusionWidth()
 double SlicingContext::ratioForWidth(double extrusionWidth)
 {
     return extrusionWidth / layerThickness;
-}
-
-
-
-double SlicingContext::feedRateForWidth(int tool, double extrusionWidth)
-{
-    double filamentRadius = 0.5f * filamentDiameter[tool];
-    double filamentFeedMmPerMin = filamentFeedRate[tool]*driveGearDiameter[tool]*M_PI;
-    return (4*filamentFeedMmPerMin*filamentRadius*filamentRadius) / (extrusionWidth*layerThickness);
 }
 
 

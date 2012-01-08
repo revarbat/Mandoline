@@ -47,13 +47,13 @@ void RaftOp::main()
     double offset;
 
     // Raft base is extruded wider and slower for better platform adhesion.
-    double baseExtWidth = context->standardExtrusionWidth() * 1.5;
+    double baseExtWidth = context->standardExtrusionWidth() * 2.5;
 
     // Interface lines are extruded small and fast for easier part removal
-    double ifaceExtWidth = context->standardExtrusionWidth() * 0.75;
+    double ifaceExtWidth = context->standardExtrusionWidth() * 0.5;
 
     // Build up list of base raft lines.
-    offset = baseExtWidth * 1.25; // provides space between lines.
+    offset = baseExtWidth * 1.5; // provides space between lines.
     BGL::Lines raftLines;
     for (double raftY = minY; raftY < maxY; raftY += offset) {
 	BGL::Line tempLn(BGL::Point(minX, raftY), BGL::Point(maxX, raftY));
@@ -68,6 +68,7 @@ void RaftOp::main()
         tempPaths.push_back(BGL::Path(*it));
     }
     baseSlice->perimeter.joinSubPathsInside(offset*3.0, tempPaths, baseSlice->infill);
+    baseSlice->speedMult = 0.5;
     baseSlice->state = RAFTED;
 
     if ( isCancelled ) return;
@@ -78,7 +79,7 @@ void RaftOp::main()
 
 
     // Build up list of interface raft lines.
-    offset = ifaceExtWidth * 1.5; // provides space between lines.
+    offset = ifaceExtWidth * 1.75; // provides space between lines.
     BGL::Lines ifaceLines;
     for (double ifaceX = minX; ifaceX < maxX; ifaceX += offset) {
 	BGL::Line tempLn(BGL::Point(ifaceX, minY), BGL::Point(ifaceX, maxY));
