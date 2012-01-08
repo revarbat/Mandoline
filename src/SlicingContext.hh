@@ -45,6 +45,7 @@ public:
     int    raftLayers;
     double raftOutset;
     double minLayerTime;
+    InfillStyle infillStyle;
 
     double svgWidth;
     double svgHeight;

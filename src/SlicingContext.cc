@@ -22,6 +22,7 @@ SlicingContext::SlicingContext()
     raftLayers           = DEFAULT_RAFT_LAYERS;
     raftOutset           = DEFAULT_RAFT_OUTSET;
     minLayerTime         = DEFAULT_MIN_LAYER_TIME;
+    infillStyle          = DEFAULT_INFILL_STYLE;
 
     for (int tool = 0; tool < MAX_TOOLS; tool++) {
 	filamentFeedRate[tool]  = DEFAULT_FILAMENT_FEED_RATE;
@@ -193,8 +194,25 @@ void SlicingContext::loadSettingsFromFile(const char *fileName)
 	} else if (!strcasecmp(optname, "raftOutset")) {
 	    raftOutset = strtod(value, &ptr);
 	    foundSetting = true;
-
+	} else if (!strcasecmp(optname, "infillStyle")) {
+	    if (!strcasecmp(value,"none")) {
+		infillStyle = INFILL_NONE;
+	    } else if (!strcasecmp(value,"lines")) {
+		infillStyle = INFILL_LINES;
+	    } else if (!strcasecmp(value,"rectangular")) {
+		infillStyle = INFILL_RECTANGULAR;
+	    } else if (!strcasecmp(value,"hexagonal")) {
+		infillStyle = INFILL_HEXAGONAL;
+	    } else {
+		cerr << "Bad value '" << value
+		     << "' on line " << linenum
+		     << " of " << fileName << endl;
+		cerr << "Value should be one of 'none', 'lines', 'rectangular', or 'hexagonal'." << endl;
+		continue;
+	    }
+	    foundSetting = true;
 	}
+
 	if (!foundSetting) {
 	    cerr << "Bad option '" << optname
 	         << "' on line " << linenum
@@ -325,6 +343,24 @@ void SlicingContext::saveSettingsToFile(const char *fileName)
     fout.precision(1);
     fout << "# Minimum time to spend on a layer. Slows down printing of small layers." << endl;
     fout << "minLayerTime: " << minLayerTime << endl;
+    fout << endl;
+
+    fout << "# Infill pattern style. One of 'none', 'lines', 'rectangular', or 'hexagonal'." << endl;
+    fout << "infillStyle: ";
+    switch (infillStyle) {
+      case INFILL_NONE:
+        fout << "none" << endl;
+	break;
+      case INFILL_LINES:
+        fout << "lines" << endl;
+	break;
+      case INFILL_RECTANGULAR:
+        fout << "rectangular" << endl;
+	break;
+      case INFILL_HEXAGONAL:
+        fout << "hexagonal" << endl;
+	break;
+    }
     fout << endl;
 
     fout.close();

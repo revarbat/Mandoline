@@ -28,6 +28,8 @@
 #define DEFAULT_RAFT_OUTSET           5.0     /* mm to outset the raft. */
 #define DEFAULT_MIN_LAYER_TIME       20.0     /* Minimum seconds per layer. */
 #define DEFAULT_PLATFORM_TEMP       110.0     /* Build platform temperature in C. */
+#define DEFAULT_INFILL_STYLE  INFILL_RECTANGULAR   /* Infill pattern. */
 #define DEFAULT_SUPPORT_TOOL          0       /* Tool used to print supports. */
 #define DEFAULT_WORKER_THREADS        8       /* Number of threads to slice with. */
+
 

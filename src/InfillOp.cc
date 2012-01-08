@@ -44,9 +44,13 @@ void InfillOp::main()
     }
 
     double extrusionWidth = context->standardExtrusionWidth();
-    //double angle = slice->zLayer / context->layerThickness * M_PI * (2.0/3.0); // Rotate 120deg each layer
-    double angle = slice->zLayer / context->layerThickness * M_PI * 0.5; // Rotate 90deg each layer
-    slice->infillMask.infillPathsForRegionWithDensity(angle, INFILL_RECTANGULAR, context->infillDensity, extrusionWidth, slice->solidFillMask, slice->infill);
+    double angle;
+    if (context->infillStyle == INFILL_HEXAGONAL) {
+	angle = slice->zLayer / context->layerThickness * M_PI * (2.0/3.0); // Rotate 120deg each layer
+    } else {
+	angle = slice->zLayer / context->layerThickness * M_PI * 0.5; // Rotate 90deg each layer
+    }
+    slice->infillMask.infillPathsForRegionWithDensity(angle, context->infillStyle, context->infillDensity, extrusionWidth, slice->solidFillMask, slice->infill);
     slice->state = INFILLED;
 
     if ( isCancelled ) return;

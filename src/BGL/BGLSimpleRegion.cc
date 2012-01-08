@@ -820,6 +820,13 @@ Paths &SimpleRegion::infillPathsForRegionWithDensity(double angle, InfillStyle s
 	// If no solid infill was done in this cell width,
 	// then we fill with sparse zig-zag infill instead.
 	if (!hasSolid) {
+	    if (style == INFILL_LINES) {
+		double xoff1 = (((random() & 1023)/1024.0)-0.5) * spacing;
+		double xoff2 = (((random() & 1023)/1024.0)-0.5) * spacing;
+		Line tempLn2(Point(fillx+xoff1,-maxd),Point(fillx+xoff2,maxd));
+		tempLn2.rotate(angle);
+		path.segments.push_back(tempLn2);
+	    }
 	    if (style == INFILL_RECTANGULAR) {
 		for (int ycell = -cells; ycell < cells; ycell++) {
 		    double filly1 = ycell * spacing;

@@ -18,6 +18,7 @@ namespace BGL {
 
 typedef enum {
     INFILL_NONE,
+    INFILL_LINES,
     INFILL_RECTANGULAR,
     INFILL_HEXAGONAL
 } InfillStyle;

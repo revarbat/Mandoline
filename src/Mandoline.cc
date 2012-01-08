@@ -110,6 +110,14 @@ void usage(const char* arg0, SlicingContext& ctx)
     fprintf(stderr, "\t            Millimeters to outset raft around model. (default %.1f).\n", ctx.raftOutset);
     fprintf(stderr, "\t--min-layer-time FLOAT\n");
     fprintf(stderr, "\t            Minimum seconds per layer. (default %.1f).\n", ctx.minLayerTime);
+    fprintf(stderr, "\t--infill-none\n");
+    fprintf(stderr, "\t            Don't create infill structures.\n");
+    fprintf(stderr, "\t--infill-lines\n");
+    fprintf(stderr, "\t            Use randomized lines infill pattern.\n");
+    fprintf(stderr, "\t--infill-rectangular\n");
+    fprintf(stderr, "\t            Use rectangular infill patterns.\n");
+    fprintf(stderr, "\t--infill-hexagonal\n");
+    fprintf(stderr, "\t            Use hexagonal infill patterns.\n");
     fprintf(stderr, "\t--no-center\n");
     fprintf(stderr, "\t            DON'T center model on platform before slicing.\n");
     fprintf(stderr, "\t--scale FLOAT\n");
@@ -156,6 +164,10 @@ void usage(const char* arg0, SlicingContext& ctx)
 #define OPT_TOOL1_PUSHBACK_TIME   1027
 #define OPT_TOOL0_MATERIAL_FUDGE  1028
 #define OPT_TOOL1_MATERIAL_FUDGE  1029
+#define OPT_INFILL_NONE           1030
+#define OPT_INFILL_LINES          1031
+#define OPT_INFILL_RECTANGULAR    1032
+#define OPT_INFILL_HEXAGONAL      1033
 
 
 int main (int argc, char * const argv[])
@@ -200,6 +212,10 @@ int main (int argc, char * const argv[])
 	{"width-over-height",    required_argument, NULL, 'w'},
 	{"raft-layers",          required_argument, NULL, 'r'},
 	{"platform-temp",        required_argument, NULL, 'T'},
+	{"infill-none",          no_argument,       NULL, OPT_INFILL_NONE},
+	{"infill-lines",         no_argument,       NULL, OPT_INFILL_LINES},
+	{"infill-rectangular",   no_argument,       NULL, OPT_INFILL_RECTANGULAR},
+	{"infill-hexagonal",     no_argument,       NULL, OPT_INFILL_HEXAGONAL},
 	{"scale",                required_argument, NULL, OPT_SCALE},
 	{"rotate",               required_argument, NULL, OPT_ROTATE},
 	{"dump-prefix",          required_argument, NULL, OPT_DUMP_PREFIX},
@@ -360,14 +376,6 @@ int main (int argc, char * const argv[])
             ctx.materialFudge[1] = atof(optarg);
             break;
 
-        case OPT_ROTATE:
-            rotation = atof(optarg);
-            break;
-
-        case OPT_SCALE:
-            scaling = atof(optarg);
-            break;
-
         case OPT_RAFT_OUTSET:
             ctx.raftOutset = atof(optarg);
             break;
@@ -380,12 +388,36 @@ int main (int argc, char * const argv[])
             ctx.flatShells = atoi(optarg);
             break;
 
+        case OPT_INFILL_NONE:
+            ctx.infillStyle = INFILL_NONE;
+            break;
+
+        case OPT_INFILL_LINES:
+            ctx.infillStyle = INFILL_LINES;
+            break;
+
+        case OPT_INFILL_RECTANGULAR:
+            ctx.infillStyle = INFILL_RECTANGULAR;
+            break;
+
+        case OPT_INFILL_HEXAGONAL:
+            ctx.infillStyle = INFILL_HEXAGONAL;
+            break;
+
         case OPT_SUPPORT_TOOL:
             ctx.supportTool = atoi(optarg);
             break;
 
         case OPT_NO_CENTER:
             doCenter = false;
+            break;
+
+        case OPT_ROTATE:
+            rotation = atof(optarg);
+            break;
+
+        case OPT_SCALE:
+            scaling = atof(optarg);
             break;
 
         case OPT_THREADS:
