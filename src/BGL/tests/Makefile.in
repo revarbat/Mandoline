@@ -36,7 +36,9 @@ host_triplet = @host@
 check_PROGRAMS = G03_T001_path$(EXEEXT) G03_T002_path$(EXEEXT) \
 	G03_T003_path$(EXEEXT) G03_T004_path$(EXEEXT) \
 	G03_T005_path$(EXEEXT) G03_T006_path$(EXEEXT) \
-	G03_T007_path$(EXEEXT) G04_T001_simpleregion$(EXEEXT) \
+	G03_T007_path$(EXEEXT) G03_T008_path$(EXEEXT) \
+	G03_T009_path$(EXEEXT) G03_T010_path$(EXEEXT) \
+	G03_T011_path$(EXEEXT) G04_T001_simpleregion$(EXEEXT) \
 	G04_T002_simpleregion$(EXEEXT) \
 	G05_T001_compoundregion$(EXEEXT) \
 	G05_T002_compoundregion$(EXEEXT)
@@ -74,6 +76,18 @@ G03_T006_path_DEPENDENCIES = ../libBGL.la
 am_G03_T007_path_OBJECTS = G03_T007_path.$(OBJEXT)
 G03_T007_path_OBJECTS = $(am_G03_T007_path_OBJECTS)
 G03_T007_path_DEPENDENCIES = ../libBGL.la
+am_G03_T008_path_OBJECTS = G03_T008_path.$(OBJEXT)
+G03_T008_path_OBJECTS = $(am_G03_T008_path_OBJECTS)
+G03_T008_path_DEPENDENCIES = ../libBGL.la
+am_G03_T009_path_OBJECTS = G03_T009_path.$(OBJEXT)
+G03_T009_path_OBJECTS = $(am_G03_T009_path_OBJECTS)
+G03_T009_path_DEPENDENCIES = ../libBGL.la
+am_G03_T010_path_OBJECTS = G03_T010_path.$(OBJEXT)
+G03_T010_path_OBJECTS = $(am_G03_T010_path_OBJECTS)
+G03_T010_path_DEPENDENCIES = ../libBGL.la
+am_G03_T011_path_OBJECTS = G03_T011_path.$(OBJEXT)
+G03_T011_path_OBJECTS = $(am_G03_T011_path_OBJECTS)
+G03_T011_path_DEPENDENCIES = ../libBGL.la
 am_G04_T001_simpleregion_OBJECTS = G04_T001_simpleregion.$(OBJEXT)
 G04_T001_simpleregion_OBJECTS = $(am_G04_T001_simpleregion_OBJECTS)
 G04_T001_simpleregion_DEPENDENCIES = ../libBGL.la
@@ -106,14 +120,18 @@ CXXLINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 SOURCES = $(G03_T001_path_SOURCES) $(G03_T002_path_SOURCES) \
 	$(G03_T003_path_SOURCES) $(G03_T004_path_SOURCES) \
 	$(G03_T005_path_SOURCES) $(G03_T006_path_SOURCES) \
-	$(G03_T007_path_SOURCES) $(G04_T001_simpleregion_SOURCES) \
+	$(G03_T007_path_SOURCES) $(G03_T008_path_SOURCES) \
+	$(G03_T009_path_SOURCES) $(G03_T010_path_SOURCES) \
+	$(G03_T011_path_SOURCES) $(G04_T001_simpleregion_SOURCES) \
 	$(G04_T002_simpleregion_SOURCES) \
 	$(G05_T001_compoundregion_SOURCES) \
 	$(G05_T002_compoundregion_SOURCES)
 DIST_SOURCES = $(G03_T001_path_SOURCES) $(G03_T002_path_SOURCES) \
 	$(G03_T003_path_SOURCES) $(G03_T004_path_SOURCES) \
 	$(G03_T005_path_SOURCES) $(G03_T006_path_SOURCES) \
-	$(G03_T007_path_SOURCES) $(G04_T001_simpleregion_SOURCES) \
+	$(G03_T007_path_SOURCES) $(G03_T008_path_SOURCES) \
+	$(G03_T009_path_SOURCES) $(G03_T010_path_SOURCES) \
+	$(G03_T011_path_SOURCES) $(G04_T001_simpleregion_SOURCES) \
 	$(G04_T002_simpleregion_SOURCES) \
 	$(G05_T001_compoundregion_SOURCES) \
 	$(G05_T002_compoundregion_SOURCES)
@@ -274,6 +292,11 @@ TESTS = \
 	Test-G03-T007d.sh \
 	Test-G03-T007e.sh \
 	Test-G03-T007f.sh \
+	Test-G03-T008a.sh \
+	Test-G03-T009a.sh \
+	Test-G03-T010a.sh \
+	Test-G03-T010b.sh \
+	Test-G03-T011a.sh \
 	Test-G04-T001a.sh \
 	Test-G04-T001b.sh \
 	Test-G04-T001c.sh \
@@ -311,6 +334,14 @@ G03_T006_path_SOURCES = G03_T006_path.cc
 G03_T006_path_LDADD = ../libBGL.la
 G03_T007_path_SOURCES = G03_T007_path.cc
 G03_T007_path_LDADD = ../libBGL.la
+G03_T008_path_SOURCES = G03_T008_path.cc
+G03_T008_path_LDADD = ../libBGL.la
+G03_T009_path_SOURCES = G03_T009_path.cc
+G03_T009_path_LDADD = ../libBGL.la
+G03_T010_path_SOURCES = G03_T010_path.cc
+G03_T010_path_LDADD = ../libBGL.la
+G03_T011_path_SOURCES = G03_T011_path.cc
+G03_T011_path_LDADD = ../libBGL.la
 G04_T001_simpleregion_SOURCES = G04_T001_simpleregion.cc
 G04_T001_simpleregion_LDADD = ../libBGL.la
 G04_T002_simpleregion_SOURCES = G04_T002_simpleregion.cc
@@ -383,6 +414,18 @@ G03_T006_path$(EXEEXT): $(G03_T006_path_OBJECTS) $(G03_T006_path_DEPENDENCIES)
 G03_T007_path$(EXEEXT): $(G03_T007_path_OBJECTS) $(G03_T007_path_DEPENDENCIES) 
 	@rm -f G03_T007_path$(EXEEXT)
 	$(CXXLINK) $(G03_T007_path_OBJECTS) $(G03_T007_path_LDADD) $(LIBS)
+G03_T008_path$(EXEEXT): $(G03_T008_path_OBJECTS) $(G03_T008_path_DEPENDENCIES) 
+	@rm -f G03_T008_path$(EXEEXT)
+	$(CXXLINK) $(G03_T008_path_OBJECTS) $(G03_T008_path_LDADD) $(LIBS)
+G03_T009_path$(EXEEXT): $(G03_T009_path_OBJECTS) $(G03_T009_path_DEPENDENCIES) 
+	@rm -f G03_T009_path$(EXEEXT)
+	$(CXXLINK) $(G03_T009_path_OBJECTS) $(G03_T009_path_LDADD) $(LIBS)
+G03_T010_path$(EXEEXT): $(G03_T010_path_OBJECTS) $(G03_T010_path_DEPENDENCIES) 
+	@rm -f G03_T010_path$(EXEEXT)
+	$(CXXLINK) $(G03_T010_path_OBJECTS) $(G03_T010_path_LDADD) $(LIBS)
+G03_T011_path$(EXEEXT): $(G03_T011_path_OBJECTS) $(G03_T011_path_DEPENDENCIES) 
+	@rm -f G03_T011_path$(EXEEXT)
+	$(CXXLINK) $(G03_T011_path_OBJECTS) $(G03_T011_path_LDADD) $(LIBS)
 G04_T001_simpleregion$(EXEEXT): $(G04_T001_simpleregion_OBJECTS) $(G04_T001_simpleregion_DEPENDENCIES) 
 	@rm -f G04_T001_simpleregion$(EXEEXT)
 	$(CXXLINK) $(G04_T001_simpleregion_OBJECTS) $(G04_T001_simpleregion_LDADD) $(LIBS)
@@ -409,6 +452,10 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/G03_T005_path.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/G03_T006_path.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/G03_T007_path.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/G03_T008_path.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/G03_T009_path.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/G03_T010_path.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/G03_T011_path.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/G04_T001_simpleregion.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/G04_T002_simpleregion.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/G05_T001_compoundregion.Po@am__quote@

@@ -12,10 +12,10 @@ Line Intersection::line() const
 
 void Intersection::quantize(double quanta) {
     if (type != NONE) {
-	p1.quantize(quanta);
-	if (type != POINT) {
-	    p2.quantize(quanta);
-	}
+        p1.quantize(quanta);
+        if (type != POINT) {
+            p2.quantize(quanta);
+        }
     }
 }
 
@@ -23,13 +23,13 @@ void Intersection::quantize(double quanta) {
 
 void Intersection::quantize() {
     if (type != NONE) {
-	p1.quantize();
-	if (type != POINT) {
-	    p2.quantize();
-	}
+        p1.quantize();
+        if (type != POINT) {
+            p2.quantize();
+        }
     }
 }
 
 }
-
+// vim: set ts=4 sw=4 nowrap expandtab: settings
 

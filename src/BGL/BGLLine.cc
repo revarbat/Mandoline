@@ -17,11 +17,11 @@ namespace BGL {
 // Assignment operator
 Line& Line::operator=(const Line &rhs) {
     if (this != &rhs) {
-	startPt = rhs.startPt;
-	endPt = rhs.endPt;
-	flags = rhs.flags;
-	temperature = rhs.temperature;
-	extrusionWidth = rhs.extrusionWidth;
+        startPt = rhs.startPt;
+        endPt = rhs.endPt;
+        flags = rhs.flags;
+        temperature = rhs.temperature;
+        extrusionWidth = rhs.extrusionWidth;
     }
     return *this;
 }
@@ -117,7 +117,7 @@ const Line Line::operator/(const Point &rhs) const {
 // Comparison operators
 bool Line::operator==(const Line &rhs) const {
     return ((startPt == rhs.startPt && endPt == rhs.endPt) ||
-	(startPt == rhs.endPt && endPt == rhs.startPt));
+        (startPt == rhs.endPt && endPt == rhs.startPt));
 }
 
 
@@ -205,9 +205,9 @@ double Line::angle() const {
 double Line::angleDelta(const Line& ln) const {
     double delta = ln.angle() - angle();
     if (delta < -M_PI) {
-	delta += M_PI * 2.0f;
+        delta += M_PI * 2.0f;
     } else if (delta > M_PI) {
-	delta -= M_PI * 2.0f;
+        delta -= M_PI * 2.0f;
     }
     return delta;
 }
@@ -260,7 +260,7 @@ bool Line::hasInBounds(const Point &pt) const
 bool Line::contains(const Point &pt) const
 {
     if (hasInBounds(pt)) {
-	return (minimumSegmentDistanceFromPoint(pt) < EPSILON);
+        return (minimumSegmentDistanceFromPoint(pt) < EPSILON);
     }
     return false;
 }
@@ -335,24 +335,24 @@ Intersection Line::intersectionWithSegment(const Line &ln) const
     bool dodebug = false;
     /*
     if (startPt.distanceFrom(Point(20.500,27.188)) <= 0.001) {
-	if (ln.startPt.distanceFrom(Point(1.419,15.262)) <= 0.001) {
-	    dodebug = true;
-	}
+        if (ln.startPt.distanceFrom(Point(1.419,15.262)) <= 0.001) {
+            dodebug = true;
+        }
     }
     */
 
     if (startPt == endPt) {
-	// Line is actually a zero length directionless line. (AKA a point.)
-	if (dodebug) {
-	    cerr << "    exit A" << endl;
-	}
-	return Intersection();
+        // Line is actually a zero length directionless line. (AKA a point.)
+        if (dodebug) {
+            cerr << "    exit A" << endl;
+        }
+        return Intersection();
     } else if (ln.startPt == ln.endPt) {
-	// ln is actually a zero length directionless line. (AKA a point.)
-	if (dodebug) {
-	    cerr << "    exit B" << endl;
-	}
-	return Intersection();
+        // ln is actually a zero length directionless line. (AKA a point.)
+        if (dodebug) {
+            cerr << "    exit B" << endl;
+        }
+        return Intersection();
     }
 
     double x1 = startPt.x;
@@ -378,66 +378,66 @@ Intersection Line::intersectionWithSegment(const Line &ln) const
     double nb = dx1 * dy3 - dy1 * dx3;
     
     if (dodebug) {
-	cerr.precision(18);
-	cerr.setf(ios::fixed);
+        cerr.precision(18);
+        cerr.setf(ios::fixed);
 
-	cerr << "testing isect of " << *this << " and " << ln << endl;
-	cerr << "d = " << d << " for " << *this << " and " << ln << endl;
+        cerr << "testing isect of " << *this << " and " << ln << endl;
+        cerr << "d = " << d << " for " << *this << " and " << ln << endl;
     }
     if (fabs(d) <= EPSILON) {
-	if (dodebug) {
-	    cerr << "PARALLEL" << endl;
-	}
-	if (
-	    minimumExtendedLineDistanceFromPoint(ln.startPt) < EPSILON &&
-	    minimumExtendedLineDistanceFromPoint(ln.endPt) < EPSILON
-	) {
+        if (dodebug) {
+            cerr << "PARALLEL" << endl;
+        }
+        if (
+            minimumExtendedLineDistanceFromPoint(ln.startPt) < EPSILON &&
+            minimumExtendedLineDistanceFromPoint(ln.endPt) < EPSILON
+        ) {
             // Lines are coincident (or very close to).  Check for overlap.
-	    Points isects;
-	    if (ln.contains(startPt)) {
-		isects.push_back(startPt);
-	    }
-	    if (ln.contains(endPt)) {
-		isects.push_back(endPt);
-	    }
-	    if (contains(ln.startPt)) {
-		if (!hasEndPoint(ln.startPt)) {
-		    isects.push_back(ln.startPt);
-		}
-	    }
-	    if (contains(ln.endPt)) {
-		if (!hasEndPoint(ln.endPt)) {
-		    isects.push_back(ln.endPt);
-		}
-	    }
-	    int icnt = isects.size();
-	    if (icnt == 0) {
-		if (dodebug) {
-		    cerr << "    exit C" << endl;
-		}
-		return Intersection();
-	    } else if (icnt == 1) {
-		if (dodebug) {
-		    cerr << "    exit D" << endl;
-		}
+            Points isects;
+            if (ln.contains(startPt)) {
+                isects.push_back(startPt);
+            }
+            if (ln.contains(endPt)) {
+                isects.push_back(endPt);
+            }
+            if (contains(ln.startPt)) {
+                if (!hasEndPoint(ln.startPt)) {
+                    isects.push_back(ln.startPt);
+                }
+            }
+            if (contains(ln.endPt)) {
+                if (!hasEndPoint(ln.endPt)) {
+                    isects.push_back(ln.endPt);
+                }
+            }
+            int icnt = isects.size();
+            if (icnt == 0) {
+                if (dodebug) {
+                    cerr << "    exit C" << endl;
+                }
+                return Intersection();
+            } else if (icnt == 1) {
+                if (dodebug) {
+                    cerr << "    exit D" << endl;
+                }
                 return Intersection(isects.front(),0);
-	    } else  {
-		if (isects.front() == isects.back()) {
-		    if (dodebug) {
-			cerr << "    exit E" << endl;
-		    }
-		    return Intersection(isects.front(),0);
-		}
-		if (dodebug) {
-		    cerr << "    exit F" << endl;
-		}
+            } else  {
+                if (isects.front() == isects.back()) {
+                    if (dodebug) {
+                        cerr << "    exit E" << endl;
+                    }
+                    return Intersection(isects.front(),0);
+                }
+                if (dodebug) {
+                    cerr << "    exit F" << endl;
+                }
                 return Intersection(isects.front(),isects.back(),0);
             }
         }
-	if (dodebug) {
-	    cerr << "    exit G" << endl;
-	}
-	return Intersection();
+        if (dodebug) {
+            cerr << "    exit G" << endl;
+        }
+        return Intersection();
     }
     
     double ua = na / d;
@@ -447,27 +447,27 @@ Intersection Line::intersectionWithSegment(const Line &ln) const
     double yi = y1 + ua * dy1;
     
     if (dodebug) {
-	cerr << "    ua=" << ua << ", ub=" << ub << endl;
-	cerr << "    isect at " << xi << ", " << yi << endl;
+        cerr << "    ua=" << ua << ", ub=" << ub << endl;
+        cerr << "    isect at " << xi << ", " << yi << endl;
     }
     if (ua < 0.0 || ua > 1.0) {
         // Intersection wouldn't be inside first segment
-	return Intersection();
+        return Intersection();
     }
     
     if (ub < 0.0 || ub > 1.0) {
         // Intersection wouldn't be inside second segment
-	return Intersection();
+        return Intersection();
     }
     
     if (ua < 0.0) {
-	return Intersection(Point(x1,y1),0);
+        return Intersection(Point(x1,y1),0);
     } else if (ua > 1.0) {
-	return Intersection(Point(x2,y2),0);
+        return Intersection(Point(x2,y2),0);
     } else if (ub < 0.0) {
-	return Intersection(Point(x3,y3),0);
+        return Intersection(Point(x3,y3),0);
     } else if (ub > 1.0) {
-	return Intersection(Point(x4,y4),0);
+        return Intersection(Point(x4,y4),0);
     }
     return Intersection(Point(xi,yi),0);
 }
@@ -499,15 +499,15 @@ Intersection Line::intersectionWithExtendedLine(const Line &ln) const
     
     if (fabs(d) <= EPSILON) {
         if (
-	    minimumExtendedLineDistanceFromPoint(ln.startPt) < EPSILON &&
-	    minimumExtendedLineDistanceFromPoint(ln.endPt) < EPSILON
-	) {
-	    // Lines are coincident.
-	    return Intersection(0);
+            minimumExtendedLineDistanceFromPoint(ln.startPt) < EPSILON &&
+            minimumExtendedLineDistanceFromPoint(ln.endPt) < EPSILON
+        ) {
+            // Lines are coincident.
+            return Intersection(0);
         } else {
-	    // No intersection; lines are parallel
-	    return Intersection();
-	}
+            // No intersection; lines are parallel
+            return Intersection();
+        }
     }
     
     double ua = na / d;
@@ -540,4 +540,5 @@ ostream& operator <<(ostream &os, const Line &ln)
 
 
 }
+// vim: set ts=4 sw=4 nowrap expandtab: settings
 

@@ -29,7 +29,10 @@ void SvgDumpOp::main()
 
     // HACK: We should be doing stroke width per line segment, but we only really
     // vary extrusionWidth by layer at this point anyways, so this is good enough.
-    double extrusionWidth = slice->infill.front().segments.front().extrusionWidth;
+    double extrusionWidth = context->standardExtrusionWidth();
+    if (slice->infill.size() > 0 && slice->infill.front().segments.size() > 0) {
+        extrusionWidth = slice->infill.front().segments.front().extrusionWidth;
+    }
 
     char dumpFileName[512];
     snprintf(dumpFileName, sizeof(dumpFileName), "%.128s-%06.2f.svg", context->dumpPrefix.c_str(), slice->zLayer);
@@ -45,4 +48,5 @@ void SvgDumpOp::main()
     if ( isCancelled ) return;
 }
 
+// vim: set ts=4 sw=4 nowrap expandtab: settings
 

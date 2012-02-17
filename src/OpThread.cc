@@ -34,13 +34,13 @@ OpThread::~OpThread()
 void OpThread::doWork()
 {
     while (!terminating) {
-	setStatus(READY);
-	currentOp = parent->waitForOperation(this);
-	if (currentOp) {
-	    setStatus(BUSY);
-	    currentOp->main();
-	    parent->operationFinished(currentOp);
-	}
+        setStatus(READY);
+        currentOp = parent->waitForOperation(this);
+        if (currentOp) {
+            setStatus(BUSY);
+            currentOp->main();
+            parent->operationFinished(currentOp);
+        }
     }
 }
 
@@ -72,4 +72,5 @@ void OpThread::requestTermination()
 }
 
 
+// vim: set ts=4 sw=4 nowrap expandtab: settings
 

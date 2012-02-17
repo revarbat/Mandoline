@@ -3,6 +3,7 @@
 
 #include <list>
 #include <pthread.h>
+#include <errno.h>
 
 class OpThread;
 class Operation;
@@ -15,7 +16,7 @@ private:
 
     std::list<Operation*> running;
     std::list<Operation*> pending;
-    int max_threads;
+    unsigned int max_threads;
 
 public:
     OpQueue();
@@ -23,13 +24,17 @@ public:
 
     void addOperation(Operation *op);
     void waitUntilAllOperationsAreFinished();
-    void setMaxConcurrentOperationCount(int maxcnt);
+    int  waitUntilAllOperationsAreFinishedOrTimeout(int microstimeout);
+    void setMaxConcurrentOperationCount(unsigned int maxcnt);
 
     Operation* waitForOperation(OpThread* th);
     void operationFinished(Operation* op);
+    int  operationsRemaining();
 
 private:
     void growOrPrunePool();
 };
 
 #endif
+// vim: set ts=4 sw=4 nowrap expandtab: settings
+

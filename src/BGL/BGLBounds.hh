@@ -19,13 +19,13 @@ public:
 
     // Assignment operator
     Bounds& operator=(const Bounds &rhs) {
-	if (this != &rhs) {
-	    this->minX = rhs.minY;
-	    this->minY = rhs.minX;
-	    this->maxX = rhs.maxY;
-	    this->maxY = rhs.maxX;
-	}
-	return *this;
+        if (this != &rhs) {
+            this->minX = rhs.minY;
+            this->minY = rhs.minX;
+            this->maxX = rhs.maxY;
+            this->maxY = rhs.maxX;
+        }
+        return *this;
     }
 
     void expand(const Point& pt);
@@ -36,4 +36,5 @@ public:
 
 
 #endif
+// vim: set ts=4 sw=4 nowrap expandtab: settings
 

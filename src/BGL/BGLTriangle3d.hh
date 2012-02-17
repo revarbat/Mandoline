@@ -26,70 +26,70 @@ public:
 
     // Assignment operator
     Triangle3d& operator=(const Triangle3d &rhs) {
-	if (this != &rhs) {
-	    vertex1 = rhs.vertex1;
-	    vertex2 = rhs.vertex2;
-	    vertex3 = rhs.vertex3;
-	}
-	return *this;
+        if (this != &rhs) {
+            vertex1 = rhs.vertex1;
+            vertex2 = rhs.vertex2;
+            vertex3 = rhs.vertex3;
+        }
+        return *this;
     }
 
     // Compound assignment operators
     Triangle3d& operator+=(const Point3d &rhs) {
-	vertex1 += rhs;
-	vertex2 += rhs;
-	vertex3 += rhs;
-	return *this;
+        vertex1 += rhs;
+        vertex2 += rhs;
+        vertex3 += rhs;
+        return *this;
     }
     Triangle3d& operator-=(const Point3d &rhs) {
-	vertex1 -= rhs;
-	vertex2 -= rhs;
-	vertex3 -= rhs;
-	return *this;
+        vertex1 -= rhs;
+        vertex2 -= rhs;
+        vertex3 -= rhs;
+        return *this;
     }
     Triangle3d& operator*=(double rhs) {
-	vertex1 *= rhs;
-	vertex2 *= rhs;
-	vertex3 *= rhs;
-	return *this;
+        vertex1 *= rhs;
+        vertex2 *= rhs;
+        vertex3 *= rhs;
+        return *this;
     }
     Triangle3d& operator*=(const Point3d &rhs) {
-	vertex1 *= rhs;
-	vertex2 *= rhs;
-	vertex3 *= rhs;
-	return *this;
+        vertex1 *= rhs;
+        vertex2 *= rhs;
+        vertex3 *= rhs;
+        return *this;
     }
     Triangle3d& operator/=(double rhs) {
-	vertex1 /= rhs;
-	vertex2 /= rhs;
-	vertex3 /= rhs;
-	return *this;
+        vertex1 /= rhs;
+        vertex2 /= rhs;
+        vertex3 /= rhs;
+        return *this;
     }
     Triangle3d& operator/=(const Point3d &rhs) {
-	vertex1 /= rhs;
-	vertex2 /= rhs;
-	vertex3 /= rhs;
-	return *this;
+        vertex1 /= rhs;
+        vertex2 /= rhs;
+        vertex3 /= rhs;
+        return *this;
     }
 
     // Binary arithmetic operators
     const Triangle3d operator+(const Point3d &rhs) const {
-	return Triangle3d(*this) += rhs;
+        return Triangle3d(*this) += rhs;
     }
     const Triangle3d operator-(const Point3d &rhs) const {
-	return Triangle3d(*this) -= rhs;
+        return Triangle3d(*this) -= rhs;
     }
     const Triangle3d operator*(double rhs) const {
-	return Triangle3d(*this) *= rhs;
+        return Triangle3d(*this) *= rhs;
     }
     const Triangle3d operator*(const Point3d &rhs) const {
-	return Triangle3d(*this) *= rhs;
+        return Triangle3d(*this) *= rhs;
     }
     const Triangle3d operator/(double rhs) const {
-	return Triangle3d(*this) /= rhs;
+        return Triangle3d(*this) /= rhs;
     }
     const Triangle3d operator/(const Point3d &rhs) const {
-	return Triangle3d(*this) /= rhs;
+        return Triangle3d(*this) /= rhs;
     }
 
     // Comparison operators
@@ -97,7 +97,7 @@ public:
         return (pt == vertex1 || pt == vertex2 || pt == vertex3);
     }
     bool operator==(const Triangle3d &rhs) const {
-	return (hasVertex(rhs.vertex1) && hasVertex(rhs.vertex2) && hasVertex(rhs.vertex3));
+        return (hasVertex(rhs.vertex1) && hasVertex(rhs.vertex2) && hasVertex(rhs.vertex3));
     }
     bool operator!=(const Triangle3d &rhs) const {
         return !(*this == rhs);
@@ -119,28 +119,28 @@ public:
 
     // Transformations
     Triangle3d& translate(double dx, double dy, double dz) {
-	*this += Point3d(dx,dy,dz);
-	return *this;
+        *this += Point3d(dx,dy,dz);
+        return *this;
     }
     Triangle3d& scale(double scale) {
-	*this *= scale;
-	return *this;
+        *this *= scale;
+        return *this;
     }
     Triangle3d& scale(const Point3d& vect) {
-	*this *= vect;
-	return *this;
+        *this *= vect;
+        return *this;
     }
     Triangle3d& scaleAroundPoint(const Point3d& center, double scale) {
-	*this -= center;
-	*this *= scale;
-	*this += center;
-	return *this;
+        *this -= center;
+        *this *= scale;
+        *this += center;
+        return *this;
     }
     Triangle3d& scaleAroundPoint(const Point3d& center, const Point3d& vect) {
-	*this -= center;
-	*this *= vect;
-	*this += center;
-	return *this;
+        *this -= center;
+        *this *= vect;
+        *this += center;
+        return *this;
     }
     Triangle3d& rotateX(const Point3d& center, double rad);
     Triangle3d& rotateY(const Point3d& center, double rad);
@@ -158,4 +158,5 @@ typedef list<Triangle3d> Triangles3d;
 
 
 #endif
+// vim: set ts=4 sw=4 nowrap expandtab: settings
 

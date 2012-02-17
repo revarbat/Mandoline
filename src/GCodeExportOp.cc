@@ -27,14 +27,14 @@ GCodeExportOp::~GCodeExportOp()
 
 
 
-ostream &pathToGcode(Path& path, double zHeight, double speedMult, int tool, SlicingContext &ctx, ostream& out)
+ostream &pathToGcode(Path& path, double zHeight, double layerThick, double speedMult, int tool, SlicingContext &ctx, ostream& out)
 {
     if (path.size() == 0) {
         return out;
     }
 
     Lines::iterator line = path.segments.begin();
-    double feed = ctx.feedRateForWidth(tool, line->extrusionWidth) * speedMult;
+    double feed = ctx.feedRateForWidth(tool, line->extrusionWidth, layerThick) * speedMult;
 
     out.setf(ios::fixed);
     out.precision(2);
@@ -43,7 +43,7 @@ ostream &pathToGcode(Path& path, double zHeight, double speedMult, int tool, Sli
     out << "G1 X" << line->startPt.x - ctx.xAxisOffset[tool]
         << " Y" << line->startPt.y - ctx.yAxisOffset[tool]
         << " Z" << zHeight
-	<< " F" << feed
+        << " F" << feed
         << endl;
 
     double filamentFeed = ctx.filamentFeedRate[tool] * speedMult;
@@ -63,9 +63,9 @@ ostream &pathToGcode(Path& path, double zHeight, double speedMult, int tool, Sli
     out << "M101 T" << tool << " (extrusion forward)" << endl;
 
     for ( ; line != path.segments.end(); line++) {
-	feed = ctx.feedRateForWidth(tool, line->extrusionWidth) * speedMult;
+        feed = ctx.feedRateForWidth(tool, line->extrusionWidth, layerThick) * speedMult;
 
-	// Move to next point in polyline
+        // Move to next point in polyline
         out << "G1 X" << line->endPt.x - ctx.xAxisOffset[tool]
             << " Y" << line->endPt.y - ctx.yAxisOffset[tool]
             << " Z" << zHeight
@@ -88,11 +88,11 @@ ostream &pathToGcode(Path& path, double zHeight, double speedMult, int tool, Sli
 
 
 
-ostream &pathsToGcode(Paths& paths, double zHeight, double speedMult, int tool, SlicingContext &ctx, ostream& out) {
+ostream &pathsToGcode(Paths& paths, double zHeight, double layerThick, double speedMult, int tool, SlicingContext &ctx, ostream& out) {
     // TODO: inner paths?
     Paths::iterator pit;
     for ( pit = paths.begin(); pit != paths.end(); pit++) {
-        pathToGcode((*pit), zHeight, speedMult, tool, ctx, out);
+        pathToGcode((*pit), zHeight, layerThick, speedMult, tool, ctx, out);
     }
 
     return out;
@@ -100,17 +100,17 @@ ostream &pathsToGcode(Paths& paths, double zHeight, double speedMult, int tool, 
 
 
 
-ostream &simpleRegionsToGcode(SimpleRegions& regions, double zHeight, double speedMult, int tool, SlicingContext ctx, ostream& out) {
+ostream &simpleRegionsToGcode(SimpleRegions& regions, double zHeight, double layerThick, double speedMult, int tool, SlicingContext ctx, ostream& out) {
     SimpleRegions::iterator perimeter;
     for (
         perimeter = regions.begin();
         perimeter != regions.end();
         perimeter++
     ) {
-        pathToGcode(perimeter->outerPath, zHeight, speedMult, tool, ctx, out);
+        pathToGcode(perimeter->outerPath, zHeight, layerThick, speedMult, tool, ctx, out);
 
         // TODO: inner paths?
-        pathsToGcode(perimeter->subpaths, zHeight, speedMult, tool, ctx, out);
+        pathsToGcode(perimeter->subpaths, zHeight, layerThick, speedMult, tool, ctx, out);
     }
 
     return out;
@@ -125,9 +125,7 @@ void GCodeExportOp::main()
 
     int mainTool = 0;
     int supportTool = context->supportTool;
-
-    // For each slice, write out code.
-    cout << "Layer count: " << context->slices.size() << endl;
+    context->processedLayers = 0;
 
     list<CarvedSlice>::iterator it;
 
@@ -146,10 +144,10 @@ void GCodeExportOp::main()
     fout << "M104 T0 S" << context->extruderTemp[mainTool]
          << " (Set extruder temp)" << endl;
     if (supportTool != mainTool) {
-	fout << "M103 T" << supportTool << " (Extruder motor off)" << endl;
-	fout << "M104 T" << supportTool
-	     << " S" << context->extruderTemp[supportTool]
-	     << " (Set extruder temp)" << endl;
+        fout << "M103 T" << supportTool << " (Extruder motor off)" << endl;
+        fout << "M104 T" << supportTool
+             << " S" << context->extruderTemp[supportTool]
+             << " (Set extruder temp)" << endl;
     }
     fout << "M109 T0 S" << context->platformTemp
          << " (Set platform temp)" << endl;
@@ -175,28 +173,29 @@ void GCodeExportOp::main()
 
         fout << "(perimeter)" << endl;
 
-	int layerTool = mainTool;
-	if (slice->zLayer <= 0.005 + context->raftLayers * context->layerThickness) {
-	    layerTool = supportTool;
-	}
+        int layerTool = mainTool;
+        if (slice->isRaft) {
+            layerTool = supportTool;
+        }
 
-	CompoundRegions::reverse_iterator cit;
-	for (cit = slice->shells.rbegin(); cit != slice->shells.rend(); cit++) {
-	    simpleRegionsToGcode(cit->subregions, slice->zLayer, slice->speedMult, layerTool, *context, fout);
-	}
+        CompoundRegions::reverse_iterator cit;
+        for (cit = slice->shells.rbegin(); cit != slice->shells.rend(); cit++) {
+            simpleRegionsToGcode(cit->subregions, slice->zLayer, slice->layerThickness, slice->speedMult, layerTool, *context, fout);
+        }
 
         fout << "(infill)" << endl;
 
-        pathsToGcode(slice->infill, slice->zLayer, slice->speedMult, layerTool, *context, fout);
-        pathsToGcode(slice->supportPaths, slice->zLayer, slice->speedMult, supportTool, *context, fout);
+        pathsToGcode(slice->infill, slice->zLayer, slice->layerThickness, slice->speedMult, layerTool, *context, fout);
+        pathsToGcode(slice->supportPaths, slice->zLayer, slice->layerThickness, slice->speedMult, supportTool, *context, fout);
+        context->processedLayers++;
     }
 
     fout << "M109 T0 S0 (Platform heater off)" << endl;
     fout << "M104 T0 S0 (Extruder heater off)" << endl;
     fout << "M103 T0 (Extruder motor off)" << endl;
     if (supportTool != mainTool) {
-	fout << "M104 S0 T" << supportTool << " (Extruder heater off)" << endl;
-	fout << "M103 T" << supportTool << " (Extruder motor off)" << endl;
+        fout << "M104 S0 T" << supportTool << " (Extruder heater off)" << endl;
+        fout << "M103 T" << supportTool << " (Extruder motor off)" << endl;
     }
     fout << "G91 (incremental mode)" << endl;
     fout << "G0 Z1.0 (raise head slightly)" << endl;
@@ -210,4 +209,5 @@ void GCodeExportOp::main()
 }
 
 
+// vim: set ts=4 sw=4 nowrap expandtab: settings
 

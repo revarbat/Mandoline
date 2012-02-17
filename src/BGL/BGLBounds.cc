@@ -9,7 +9,7 @@ void Bounds::expand(const Point& pt)
     if (minX == NONE) {
         minX = maxX = pt.x;
         minY = maxY = pt.y;
-	return;
+        return;
     }
     if (pt.x < minX) {
         minX = pt.x;
@@ -27,6 +27,5 @@ void Bounds::expand(const Point& pt)
 
 
 }
-
-
+// vim: set ts=4 sw=4 nowrap expandtab: settings
 

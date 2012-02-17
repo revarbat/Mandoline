@@ -21,6 +21,11 @@ TESTS = \
 	Test-G03-T007d.sh \
 	Test-G03-T007e.sh \
 	Test-G03-T007f.sh \
+	Test-G03-T008a.sh \
+	Test-G03-T009a.sh \
+	Test-G03-T010a.sh \
+	Test-G03-T010b.sh \
+	Test-G03-T011a.sh \
 	Test-G04-T001a.sh \
 	Test-G04-T001b.sh \
 	Test-G04-T001c.sh \
@@ -50,6 +55,10 @@ check_PROGRAMS = \
 	G03_T005_path \
 	G03_T006_path \
 	G03_T007_path \
+	G03_T008_path \
+	G03_T009_path \
+	G03_T010_path \
+	G03_T011_path \
 	G04_T001_simpleregion \
 	G04_T002_simpleregion \
 	G05_T001_compoundregion \
@@ -78,6 +87,18 @@ G03_T006_path_LDADD = ../libBGL.la
 
 G03_T007_path_SOURCES = G03_T007_path.cc
 G03_T007_path_LDADD = ../libBGL.la
+
+G03_T008_path_SOURCES = G03_T008_path.cc
+G03_T008_path_LDADD = ../libBGL.la
+
+G03_T009_path_SOURCES = G03_T009_path.cc
+G03_T009_path_LDADD = ../libBGL.la
+
+G03_T010_path_SOURCES = G03_T010_path.cc
+G03_T010_path_LDADD = ../libBGL.la
+
+G03_T011_path_SOURCES = G03_T011_path.cc
+G03_T011_path_LDADD = ../libBGL.la
 
 
 G04_T001_simpleregion_SOURCES = G04_T001_simpleregion.cc

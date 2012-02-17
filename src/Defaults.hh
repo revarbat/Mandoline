@@ -32,4 +32,5 @@
 #define DEFAULT_SUPPORT_TOOL          0       /* Tool used to print supports. */
 #define DEFAULT_WORKER_THREADS        8       /* Number of threads to slice with. */
 
+// vim: set ts=4 sw=4 nowrap expandtab: settings
 

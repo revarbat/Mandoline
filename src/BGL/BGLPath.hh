@@ -147,6 +147,9 @@ public:
     void reorderByPoint(const Point &pt);
     void reverse();
 
+    bool insertVertexAttachedPath(const Path &inPath);
+    static void joinVertexAttachedPaths(Paths &inPaths);
+
     void untag();
     void tagSegmentsRelativeToClosedPath(const Path &path);
 
@@ -159,7 +162,7 @@ public:
     static Paths &intersectionOf(const Path &path1, const Path &path2, Paths &outPaths);
 
     static Paths &unionOf       (Paths &paths, Paths &outPaths);
-    static Paths &differenceOf  (Paths &paths1, Paths &paths2, Paths &outPaths);
+    static Paths &differenceOf  (Paths &inPath1, Paths &inPath2, Paths &outPaths);
 
     Lines &containedSegments(const Line &line, Lines &outSegs) const;
     Paths &containedSubpathsOfPath(Path &path, Paths outPaths) const;
@@ -178,4 +181,5 @@ public:
 }
 
 #endif
+// vim: set ts=4 sw=4 nowrap expandtab: settings
 

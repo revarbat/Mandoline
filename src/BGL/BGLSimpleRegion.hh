@@ -49,22 +49,22 @@ public:
 
     // Binary arithmetic operators
     const SimpleRegion operator+(const Point &rhs) const {
-	return SimpleRegion(*this) += rhs;
+        return SimpleRegion(*this) += rhs;
     }
     const SimpleRegion operator-(const Point &rhs) const {
-	return SimpleRegion(*this) -= rhs;
+        return SimpleRegion(*this) -= rhs;
     }
     const SimpleRegion operator*(double rhs) const {
-	return SimpleRegion(*this) *= rhs;
+        return SimpleRegion(*this) *= rhs;
     }
     const SimpleRegion operator*(const Point &rhs) const {
-	return SimpleRegion(*this) *= rhs;
+        return SimpleRegion(*this) *= rhs;
     }
     const SimpleRegion operator/(double rhs) const {
-	return SimpleRegion(*this) /= rhs;
+        return SimpleRegion(*this) /= rhs;
     }
     const SimpleRegion operator/(const Point &rhs) const {
-	return SimpleRegion(*this) /= rhs;
+        return SimpleRegion(*this) /= rhs;
     }
 
     int size();
@@ -102,7 +102,7 @@ public:
     Lines &containedSegmentsOfLine(Line &line, Lines &lnsref);
     Paths &containedSubpathsOfPath(const Path &path, Paths &pathsref);
 
-    Paths &joinSubPathsInside(double maxDist, const Paths &inPaths, Paths &outPaths);
+    Paths &joinSubPathsInside(double maxDist, double extWidth, const Paths &inPaths, Paths &outPaths);
     Paths &infillPathsForRegionWithDensity(double angle, InfillStyle style, double density, double extrusionWidth, CompoundRegion &solidMask, Paths &outPaths);
 };
 
@@ -110,4 +110,5 @@ public:
 }
 
 #endif
+// vim: set ts=4 sw=4 nowrap expandtab: settings
 

@@ -56,6 +56,7 @@ public:
     
     Mesh3d mesh;
     list<CarvedSlice> slices;
+    int processedLayers;
     
     SlicingContext();
 
@@ -67,8 +68,14 @@ public:
     double ratioForWidth(double extrusionWidth);
     double feedRateForWidth(int tool, double extrusionWidth);
 
+    double standardFeedRate(int tool, double layerThick);
+    double standardExtrusionWidth(double layerThick);
+    double ratioForWidth(double extrusionWidth, double layerThick);
+    double feedRateForWidth(int tool, double extrusionWidth, double layerThick);
+
     CarvedSlice* allocSlice(double Z);
 };
 
 #endif
+// vim: set ts=4 sw=4 nowrap expandtab: settings
 

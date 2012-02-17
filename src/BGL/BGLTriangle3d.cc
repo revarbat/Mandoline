@@ -104,59 +104,59 @@ bool Triangle3d::sliceAtZ(double Z, Line& lnref) const
 {
     double u, px, py, v, qx, qy;
     if (vertex1 > Z && vertex2 > Z && vertex3 > Z) {
-	// Triangle is above Z level.
+        // Triangle is above Z level.
         return false;
     }
     if (vertex1 < Z && vertex2 < Z && vertex3 < Z) {
-	// Triangle is below Z level.
+        // Triangle is below Z level.
         return false;
     }
     if (vertex1 == Z) {
-	if (vertex2 == Z) {
-	    if (vertex3 == Z) {
+        if (vertex2 == Z) {
+            if (vertex3 == Z) {
                 // flat face.  Ignore.
                 return false;
             }
-	    lnref = Line(Point(vertex1), Point(vertex2));
-	    return true;
+            lnref = Line(Point(vertex1), Point(vertex2));
+            return true;
         }
-	if (vertex3 == Z) {
-	    lnref = Line(Point(vertex1), Point(vertex3));
-	    return true;
+        if (vertex3 == Z) {
+            lnref = Line(Point(vertex1), Point(vertex3));
+            return true;
         }
-	if ((vertex2 > Z && vertex3 > Z) || (vertex2 < Z && vertex3 < Z)) {
+        if ((vertex2 > Z && vertex3 > Z) || (vertex2 < Z && vertex3 < Z)) {
             // only touches vertex1 tip.  Ignore.
             return false;
         }
         u = (Z-vertex2.z)/(vertex3.z-vertex2.z);
         px =  vertex2.x+u*(vertex3.x-vertex2.x);
         py =  vertex2.y+u*(vertex3.y-vertex2.y);
-	lnref = Line(Point(vertex1), Point(px,py));
-	return true;
+        lnref = Line(Point(vertex1), Point(px,py));
+        return true;
     } else if (vertex2 == Z) {
-	if (vertex3 == Z) {
-	    lnref = Line(Point(vertex2), Point(vertex3));
-	    return true;
+        if (vertex3 == Z) {
+            lnref = Line(Point(vertex2), Point(vertex3));
+            return true;
         }
-	if ((vertex1 > Z && vertex3 > Z) || (vertex1 < Z && vertex3 < Z)) {
+        if ((vertex1 > Z && vertex3 > Z) || (vertex1 < Z && vertex3 < Z)) {
             // only touches vertex2 tip.  Ignore.
             return false;
         }
         u = (Z-vertex1.z)/(vertex3.z-vertex1.z);
         px =  vertex1.x+u*(vertex3.x-vertex1.x);
         py =  vertex1.y+u*(vertex3.y-vertex1.y);
-	lnref = Line(Point(vertex2), Point(px,py));
-	return true;
+        lnref = Line(Point(vertex2), Point(px,py));
+        return true;
     } else if (vertex3 == Z) {
-	if ((vertex1 > Z && vertex2 > Z) || (vertex1 < Z && vertex2 < Z)) {
+        if ((vertex1 > Z && vertex2 > Z) || (vertex1 < Z && vertex2 < Z)) {
             // only touches vertex3 tip.  Ignore.
             return false;
         }
         u = (Z-vertex1.z)/(vertex2.z-vertex1.z);
         px =  vertex1.x+u*(vertex2.x-vertex1.x);
         py =  vertex1.y+u*(vertex2.y-vertex1.y);
-	lnref = Line(Point(vertex3), Point(px,py));
-	return true;
+        lnref = Line(Point(vertex3), Point(px,py));
+        return true;
     } else if ((vertex1 > Z && vertex2 > Z) || (vertex1 < Z && vertex2 < Z)) {
         u = (Z-vertex3.z)/(vertex1.z-vertex3.z);
         px =  vertex3.x+u*(vertex1.x-vertex3.x);
@@ -164,8 +164,8 @@ bool Triangle3d::sliceAtZ(double Z, Line& lnref) const
         v = (Z-vertex3.z)/(vertex2.z-vertex3.z);
         qx =  vertex3.x+v*(vertex2.x-vertex3.x);
         qy =  vertex3.y+v*(vertex2.y-vertex3.y);
-	lnref = Line(Point(px,py), Point(qx,qy));
-	return true;
+        lnref = Line(Point(px,py), Point(qx,qy));
+        return true;
     } else if ((vertex1 > Z && vertex3 > Z) || (vertex1 < Z && vertex3 < Z)) {
         u = (Z-vertex2.z)/(vertex1.z-vertex2.z);
         px =  vertex2.x+u*(vertex1.x-vertex2.x);
@@ -173,8 +173,8 @@ bool Triangle3d::sliceAtZ(double Z, Line& lnref) const
         v = (Z-vertex2.z)/(vertex3.z-vertex2.z);
         qx =  vertex2.x+v*(vertex3.x-vertex2.x);
         qy =  vertex2.y+v*(vertex3.y-vertex2.y);
-	lnref = Line(Point(px,py), Point(qx,qy));
-	return true;
+        lnref = Line(Point(px,py), Point(qx,qy));
+        return true;
     } else if ((vertex2 > Z && vertex3 > Z) || (vertex2 < Z && vertex3 < Z)) {
         u = (Z-vertex1.z)/(vertex2.z-vertex1.z);
         px =  vertex1.x+u*(vertex2.x-vertex1.x);
@@ -182,12 +182,13 @@ bool Triangle3d::sliceAtZ(double Z, Line& lnref) const
         v = (Z-vertex1.z)/(vertex3.z-vertex1.z);
         qx =  vertex1.x+v*(vertex3.x-vertex1.x);
         qy =  vertex1.y+v*(vertex3.y-vertex1.y);
-	lnref = Line(Point(px,py), Point(qx,qy));
-	return true;
+        lnref = Line(Point(px,py), Point(qx,qy));
+        return true;
     }
     return false;
 }
 
 
 }
+// vim: set ts=4 sw=4 nowrap expandtab: settings
 

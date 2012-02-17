@@ -56,29 +56,29 @@ void Mesh3d::recalculateBounds()
     minX = minY = minZ = 9e9;
     maxX = maxY = maxZ = -9e9;
     for ( ; it != triangles.end(); it++) {
-	Point3d &pt1 = it->vertex1;
-	Point3d &pt2 = it->vertex2;
-	Point3d &pt3 = it->vertex3;
+        Point3d &pt1 = it->vertex1;
+        Point3d &pt2 = it->vertex2;
+        Point3d &pt3 = it->vertex3;
 
-	if (pt1.x < minX) minX = pt1.x;
-	if (pt1.y < minY) minY = pt1.y;
-	if (pt1.z < minZ) minZ = pt1.z;
-	if (pt2.x < minX) minX = pt2.x;
-	if (pt2.y < minY) minY = pt2.y;
-	if (pt2.z < minZ) minZ = pt2.z;
-	if (pt3.x < minX) minX = pt3.x;
-	if (pt3.y < minY) minY = pt3.y;
-	if (pt3.z < minZ) minZ = pt3.z;
+        if (pt1.x < minX) minX = pt1.x;
+        if (pt1.y < minY) minY = pt1.y;
+        if (pt1.z < minZ) minZ = pt1.z;
+        if (pt2.x < minX) minX = pt2.x;
+        if (pt2.y < minY) minY = pt2.y;
+        if (pt2.z < minZ) minZ = pt2.z;
+        if (pt3.x < minX) minX = pt3.x;
+        if (pt3.y < minY) minY = pt3.y;
+        if (pt3.z < minZ) minZ = pt3.z;
 
-	if (pt1.x > maxX) maxX = pt1.x;
-	if (pt1.y > maxY) maxY = pt1.y;
-	if (pt1.z > maxZ) maxZ = pt1.z;
-	if (pt2.x > maxX) maxX = pt2.x;
-	if (pt2.y > maxY) maxY = pt2.y;
-	if (pt2.z > maxZ) maxZ = pt2.z;
-	if (pt3.x > maxX) maxX = pt3.x;
-	if (pt3.y > maxY) maxY = pt3.y;
-	if (pt3.z > maxZ) maxZ = pt3.z;
+        if (pt1.x > maxX) maxX = pt1.x;
+        if (pt1.y > maxY) maxY = pt1.y;
+        if (pt1.z > maxZ) maxZ = pt1.z;
+        if (pt2.x > maxX) maxX = pt2.x;
+        if (pt2.y > maxY) maxY = pt2.y;
+        if (pt2.z > maxZ) maxZ = pt2.z;
+        if (pt3.x > maxX) maxX = pt3.x;
+        if (pt3.y > maxY) maxY = pt3.y;
+        if (pt3.z > maxZ) maxZ = pt3.z;
     }
     if (minX == 9e9 || minY == 9e9 || minZ == 9e9) {
         minX = minY = minZ = maxX = maxY = maxZ = 0;
@@ -223,74 +223,74 @@ int Mesh3d::loadFromSTLFile(const char *fileName)
     uint8_t buf[512];
     FILE *f = fopen(fileName, "rb");
     if (!f) {
-	fprintf(stderr, "STL read failed to open\n");
-	return 0;
+        fprintf(stderr, "STL read failed to open\n");
+        return 0;
     }
     
     if (fread(buf, 1, 5, f) < 5) {
-	fprintf(stderr, "STL read failed read\n");
-	return 0;
+        fprintf(stderr, "STL read failed read\n");
+        return 0;
     }
     bool isBinary = true;
     if (!strncasecmp((const char*)buf, "solid", 5)) {
         isBinary = false;
     }
     if (isBinary) {
-	// Binary STL file
-	// Skip remainder of 80 character comment field
-	if (fread(buf, 1, 75, f) < 75) {
-	    fprintf(stderr, "STL read failed header read\n");
-	    return 0;
-	}
-	// Read in triangle count
-	if (fread(intdata.bytes, 1, 4, f) < 4) {
-	    fprintf(stderr, "STL read failed face count read\n");
-	    return 0;
-	}
-	convertFromLittleEndian32(intdata.bytes);
-	uint32_t tricount = intdata.intval;
-	while (!feof(f) && tricount-->0) {
-	    if (fread(tridata.bytes, 1, 3*4*4+2, f) < 3*4*4+2) {
-		break;
-	    }
-            for (int i = 0; i < 3*4; i++) {
-		convertFromLittleEndian32(tridata.bytes+i*4);
+        // Binary STL file
+        // Skip remainder of 80 character comment field
+        if (fread(buf, 1, 75, f) < 75) {
+            fprintf(stderr, "STL read failed header read\n");
+            return 0;
+        }
+        // Read in triangle count
+        if (fread(intdata.bytes, 1, 4, f) < 4) {
+            fprintf(stderr, "STL read failed face count read\n");
+            return 0;
+        }
+        convertFromLittleEndian32(intdata.bytes);
+        uint32_t tricount = intdata.intval;
+        while (!feof(f) && tricount-->0) {
+            if (fread(tridata.bytes, 1, 3*4*4+2, f) < 3*4*4+2) {
+                break;
             }
-	    convertFromLittleEndian16((uint8_t*)&tridata.vertexes.attrBytes);
+            for (int i = 0; i < 3*4; i++) {
+                convertFromLittleEndian32(tridata.bytes+i*4);
+            }
+            convertFromLittleEndian16((uint8_t*)&tridata.vertexes.attrBytes);
 
-	    vertexes_t &v = tridata.vertexes;
+            vertexes_t &v = tridata.vertexes;
             Point3d pt1(v.x1, v.y1, v.z1);
             Point3d pt2(v.x2, v.y2, v.z2);
             Point3d pt3(v.x3, v.y3, v.z3);
             triangles.push_back(Triangle3d(pt1, pt2, pt3));
-	    facecount++;
+            facecount++;
         }
-	fclose(f);
+        fclose(f);
     } else {
         // ASCII STL file
-	// Gobble remainder of solid name line.
-	fgets((char*)buf, sizeof(buf), f);
-	while (!feof(f)) {
-	    fscanf(f, "%80s", buf);
-	    if (!strcasecmp((char*)buf, "endsolid")) {
-	        break;
-	    }
-	    vertexes_t &v = tridata.vertexes;
-	    fscanf(f, "%*s %f %f %f", &v.nx, &v.ny, &v.nz);
-	    fscanf(f, "%*s %*s");
-	    fscanf(f, "%*s %f %f %f", &v.x1, &v.y1, &v.z1);
-	    fscanf(f, "%*s %f %f %f", &v.x2, &v.y2, &v.z2);
-	    fscanf(f, "%*s %f %f %f", &v.x3, &v.y3, &v.z3);
-	    fscanf(f, "%*s");
-	    fscanf(f, "%*s");
+        // Gobble remainder of solid name line.
+        fgets((char*)buf, sizeof(buf), f);
+        while (!feof(f)) {
+            fscanf(f, "%80s", buf);
+            if (!strcasecmp((char*)buf, "endsolid")) {
+                break;
+            }
+            vertexes_t &v = tridata.vertexes;
+            fscanf(f, "%*s %f %f %f", &v.nx, &v.ny, &v.nz);
+            fscanf(f, "%*s %*s");
+            fscanf(f, "%*s %f %f %f", &v.x1, &v.y1, &v.z1);
+            fscanf(f, "%*s %f %f %f", &v.x2, &v.y2, &v.z2);
+            fscanf(f, "%*s %f %f %f", &v.x3, &v.y3, &v.z3);
+            fscanf(f, "%*s");
+            fscanf(f, "%*s");
 
             Point3d pt1(v.x1, v.y1, v.z1);
             Point3d pt2(v.x2, v.y2, v.z2);
             Point3d pt3(v.x3, v.y3, v.z3);
             triangles.push_back(Triangle3d(pt1, pt2, pt3));
-	    facecount++;
-	}
-	fclose(f);
+            facecount++;
+        }
+        fclose(f);
     }
     recalculateBounds();
     return facecount;
@@ -303,9 +303,9 @@ CompoundRegion& Mesh3d::regionForSliceAtZ(double Z, CompoundRegion &outReg) cons
     Lines lines;
     Triangles3d::const_iterator trit;
     for (trit = triangles.begin(); trit != triangles.end(); trit++) {
-	Line ln;
-	if (trit->sliceAtZ(Z, ln)) {
-	    lines.push_back(ln);
+        Line ln;
+        if (trit->sliceAtZ(Z, ln)) {
+            lines.push_back(ln);
         }
     }
 
@@ -320,5 +320,5 @@ CompoundRegion& Mesh3d::regionForSliceAtZ(double Z, CompoundRegion &outReg) cons
 
 
 }
-
+// vim: set ts=4 sw=4 nowrap expandtab: settings
 

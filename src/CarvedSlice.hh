@@ -21,6 +21,9 @@ typedef enum {
 class CarvedSlice {
 public:
     double zLayer;
+    double layerThickness;
+    double speedMult;
+    bool   isRaft;
     CarveSliceStatus state;
     CompoundRegion perimeter;
     CompoundRegion infillMask;
@@ -28,18 +31,19 @@ public:
     CompoundRegions shells;
     Paths infill;
     Paths supportPaths;
-    double speedMult;
 
-    CarvedSlice() :
-    	zLayer(0.0),
-	state(INIT),
-	perimeter(),
-	infillMask(),
-	solidFillMask(),
-	shells(),
-	infill(),
-	supportPaths(),
-	speedMult(1.0)
+    CarvedSlice(double thickness) :
+        zLayer(0.0),
+        layerThickness(thickness),
+        state(INIT),
+        perimeter(),
+        infillMask(),
+        solidFillMask(),
+        shells(),
+        infill(),
+        supportPaths(),
+        isRaft(false),
+        speedMult(1.0)
     {
     }
 
@@ -48,4 +52,5 @@ public:
 
 
 #endif
+// vim: set ts=4 sw=4 nowrap expandtab: settings
 

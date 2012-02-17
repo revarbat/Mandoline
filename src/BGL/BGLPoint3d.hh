@@ -30,12 +30,12 @@ public:
 
     // Assignment operator
     Point3d& operator=(const Point3d &rhs) {
-	if (this != &rhs) {
-	    this->x = rhs.x;
-	    this->y = rhs.y;
-	    this->z = rhs.z;
-	}
-	return *this;
+        if (this != &rhs) {
+            this->x = rhs.x;
+            this->y = rhs.y;
+            this->z = rhs.z;
+        }
+        return *this;
     }
 
     // Compound assignment operators
@@ -43,57 +43,57 @@ public:
         this->x += rhs.x;
         this->y += rhs.y;
         this->z += rhs.z;
-	return *this;
+        return *this;
     }
     Point3d& operator-=(const Point3d &rhs) {
         this->x -= rhs.x;
         this->y -= rhs.y;
         this->z -= rhs.z;
-	return *this;
+        return *this;
     }
     Point3d& operator*=(double rhs) {
         this->x *= rhs;
         this->y *= rhs;
         this->z *= rhs;
-	return *this;
+        return *this;
     }
     Point3d& operator*=(const Point3d &rhs) {
         this->x *= rhs.x;
         this->y *= rhs.y;
         this->z *= rhs.z;
-	return *this;
+        return *this;
     }
     Point3d& operator/=(double rhs) {
         this->x /= rhs;
         this->y /= rhs;
         this->z /= rhs;
-	return *this;
+        return *this;
     }
     Point3d& operator/=(const Point3d &rhs) {
         this->x /= rhs.x;
         this->y /= rhs.y;
         this->z /= rhs.z;
-	return *this;
+        return *this;
     }
 
     // Binary arithmetic operators
     const Point3d operator+(const Point3d &rhs) const {
-	return Point3d(*this) += rhs;
+        return Point3d(*this) += rhs;
     }
     const Point3d operator-(const Point3d &rhs) const {
-	return Point3d(*this) -= rhs;
+        return Point3d(*this) -= rhs;
     }
     const Point3d operator*(double rhs) const {
-	return Point3d(*this) *= rhs;
+        return Point3d(*this) *= rhs;
     }
     const Point3d operator*(const Point3d &rhs) const {
-	return Point3d(*this) *= rhs;
+        return Point3d(*this) *= rhs;
     }
     const Point3d operator/(double rhs) const {
-	return Point3d(*this) /= rhs;
+        return Point3d(*this) /= rhs;
     }
     const Point3d operator/(const Point3d &rhs) const {
-	return Point3d(*this) /= rhs;
+        return Point3d(*this) /= rhs;
     }
 
     // Comparison operators
@@ -124,32 +124,32 @@ public:
 
     // Transformations
     Point3d& scale(double scale) {
-	*this *= scale;
-	return *this;
+        *this *= scale;
+        return *this;
     }
     Point3d& scale(const Point3d& vect) {
-	*this *= vect;
-	return *this;
+        *this *= vect;
+        return *this;
     }
     Point3d& scaleAroundPoint3d(const Point3d& center, double scale) {
-	*this -= center;
-	*this *= scale;
-	*this += center;
-	return *this;
+        *this -= center;
+        *this *= scale;
+        *this += center;
+        return *this;
     }
     Point3d& scaleAroundPoint3d(const Point3d& center, const Point3d& vect) {
-	*this -= center;
-	*this *= vect;
-	*this += center;
-	return *this;
+        *this -= center;
+        *this *= vect;
+        *this += center;
+        return *this;
     }
 
     // Calculations
     double distanceFrom(const Point3d& pt) const {
         Point3d vect(*this);
-	vect -= pt;
-	vect *= vect;
-	return sqrt(vect.x+vect.y+vect.z);
+        vect -= pt;
+        vect *= vect;
+        return sqrt(vect.x+vect.y+vect.z);
     }
 
     // Friend functions
@@ -160,4 +160,5 @@ public:
 }
 
 #endif
+// vim: set ts=4 sw=4 nowrap expandtab: settings
 

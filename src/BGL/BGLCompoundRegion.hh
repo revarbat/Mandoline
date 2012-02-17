@@ -28,9 +28,9 @@ public:
     CompoundRegion(const CompoundRegion &x) : subregions(x.subregions), zLevel(x.zLevel) {}
     CompoundRegion(const Paths &x) : subregions(), zLevel(0.0f) {
         Paths::const_iterator it;
-	for (it = x.begin(); it != x.end(); it++) {
-	    subregions.push_back(SimpleRegion(*it));
-	}
+        for (it = x.begin(); it != x.end(); it++) {
+            subregions.push_back(SimpleRegion(*it));
+        }
     }
 
     // Compound assignment operators
@@ -43,22 +43,22 @@ public:
 
     // Binary arithmetic operators
     const CompoundRegion operator+(const Point &rhs) const {
-	return CompoundRegion(*this) += rhs;
+        return CompoundRegion(*this) += rhs;
     }
     const CompoundRegion operator-(const Point &rhs) const {
-	return CompoundRegion(*this) -= rhs;
+        return CompoundRegion(*this) -= rhs;
     }
     const CompoundRegion operator*(double rhs) const {
-	return CompoundRegion(*this) *= rhs;
+        return CompoundRegion(*this) *= rhs;
     }
     const CompoundRegion operator*(const Point &rhs) const {
-	return CompoundRegion(*this) *= rhs;
+        return CompoundRegion(*this) *= rhs;
     }
     const CompoundRegion operator/(double rhs) const {
-	return CompoundRegion(*this) /= rhs;
+        return CompoundRegion(*this) /= rhs;
     }
     const CompoundRegion operator/(const Point &rhs) const {
-	return CompoundRegion(*this) /= rhs;
+        return CompoundRegion(*this) /= rhs;
     }
 
     int size() const;
@@ -99,7 +99,7 @@ public:
     Lines &containedSegmentsOfLine(Line &line, Lines &lnsref);
     Paths &containedSubpathsOfPath(Path &path, Paths &pathsref);
 
-    Paths &joinSubPathsInside(double maxDist, const Paths &inPaths, Paths &outPaths);
+    Paths &joinSubPathsInside(double maxDist, double extWidth, const Paths &inPaths, Paths &outPaths);
     Paths &infillPathsForRegionWithDensity(double angle, InfillStyle style, double density, double extrusionWidth, CompoundRegion &solidMask, Paths &outPaths);
 
 };
@@ -109,4 +109,5 @@ typedef list<CompoundRegion> CompoundRegions;
 }
 
 #endif
+// vim: set ts=4 sw=4 nowrap expandtab: settings
 

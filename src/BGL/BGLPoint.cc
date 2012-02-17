@@ -5,8 +5,8 @@ namespace BGL {
 /// Assignment operator
 Point& Point::operator=(const Point &rhs) {
     if (this != &rhs) {
-	this->x = rhs.x;
-	this->y = rhs.y;
+        this->x = rhs.x;
+        this->y = rhs.y;
     }
     return *this;
 }
@@ -119,17 +119,17 @@ const Point Point::operator/(const Point &rhs) const {
 
 // Comparison operators
 bool Point::operator==(const Point &rhs) const {
-    return (fabs(x-rhs.x) < EPSILON &&  fabs(y-rhs.y) < EPSILON);
+    return (fabs(x-rhs.x) < EPSILON && fabs(y-rhs.y) < EPSILON);
 }
 
 
 
 bool Point::operator>=(const Point &rhs) const {
     if (x < rhs.x + EPSILON) {
-	return false;
+        return false;
     }
     if (y < rhs.y + EPSILON) {
-	return false;
+        return false;
     }
     return true;
 }
@@ -138,10 +138,10 @@ bool Point::operator>=(const Point &rhs) const {
 
 bool Point::operator<=(const Point &rhs) const {
     if (x > rhs.x - EPSILON) {
-	return false;
+        return false;
     }
     if (y > rhs.y - EPSILON) {
-	return false;
+        return false;
     }
     return true;
 }
@@ -210,8 +210,8 @@ Point& Point::rotate(double angle) {
 
 
 void Point::quantize(double quanta) {
-    x = floor(x/quanta) * quanta;
-    y = floor(y/quanta) * quanta;
+    x = floor(x/quanta+0.5) * quanta;
+    y = floor(y/quanta+0.5) * quanta;
 }
 
 
@@ -247,7 +247,7 @@ Point &Point::polarOffset(double ang, double rad) {
 
 ostream& operator <<(ostream &os,const Point &pt)
 {
-    os.precision(3);
+    os.precision(12);
     os.setf(ios::fixed);
     os << "(" << pt.x << ", " << pt.y << ")";
     return os;
@@ -255,4 +255,5 @@ ostream& operator <<(ostream &os,const Point &pt)
 
 }
 
+// vim: set ts=4 sw=4 nowrap expandtab: settings
 
