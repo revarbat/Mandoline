@@ -10,7 +10,6 @@
 #define BGL_INTERSECTION_H
 
 #include <list>
-#include "config.h"
 #include "BGLCommon.hh"
 #include "BGLPoint.hh"
 
