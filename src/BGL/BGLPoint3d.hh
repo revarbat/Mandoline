@@ -11,7 +11,6 @@
 
 #include <math.h>
 #include <iostream>
-#include "config.h"
 #include "BGLCommon.hh"
 using namespace std;
 

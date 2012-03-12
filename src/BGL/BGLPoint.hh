@@ -12,7 +12,6 @@
 #include <math.h>
 #include <iostream>
 #include <list>
-#include "config.h"
 #include "BGLCommon.hh"
 #include "BGLAffine.hh"
 #include "BGLPoint3d.hh"

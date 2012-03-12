@@ -10,7 +10,6 @@
 #define BGL_TRIANGLE3D_H
 
 #include <list>
-#include "config.h"
 #include "BGLPoint3d.hh"
 #include "BGLLine.hh"
 
