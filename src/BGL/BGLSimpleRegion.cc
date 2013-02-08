@@ -6,6 +6,7 @@
 //  Copyright 2010 Belfry Software. All rights reserved.
 //
 
+#include "config.h"
 #include "BGLCommon.hh"
 #include "BGLBounds.hh"
 #include "BGLPoint.hh"

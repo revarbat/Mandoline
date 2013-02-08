@@ -10,7 +10,6 @@
 #ifndef BGL_REGION_H
 #define BGL_REGION_H
 
-#include "config.h"
 #include "BGLSimpleRegion.hh"
 #include "BGLPath.hh"
 #include "BGLLine.hh"

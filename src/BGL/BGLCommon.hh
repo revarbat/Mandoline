@@ -9,8 +9,6 @@
 #ifndef BGL_COMMON_H
 #define BGL_COMMON_H
 
-#include "config.h"
-
 namespace BGL {
 
 

@@ -10,7 +10,6 @@
 #define BGL_SVG_H
 
 #include <iostream>
-#include "config.h"
 
 using namespace std;
 

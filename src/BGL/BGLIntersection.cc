@@ -1,3 +1,4 @@
+#include "config.h"
 #include "BGLIntersection.hh"
 #include "BGLLine.hh"
 

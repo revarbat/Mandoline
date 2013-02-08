@@ -10,7 +10,6 @@
 #ifndef BGL_MESH3D_H
 #define BGL_MESH3D_H
 
-#include "config.h"
 #include "BGLPoint3d.hh"
 #include "BGLTriangle3d.hh"
 

@@ -7,6 +7,7 @@
 //
 
 
+#include "config.h"
 #include "BGLAffine.hh"
 
 namespace BGL {

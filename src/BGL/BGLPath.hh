@@ -10,7 +10,6 @@
 #define BGL_PATH_H
 
 #include <list>
-#include "config.h"
 #include "BGLCommon.hh"
 #include "BGLAffine.hh"
 #include "BGLBounds.hh"
