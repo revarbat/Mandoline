@@ -24,7 +24,6 @@ void CoolOp::main()
     if ( NULL == slice ) return;
 
     int mainTool = 0;
-    int supportTool = context->supportTool;
 
     double pathLen = 0.0;
     BGL::CompoundRegions::iterator cit;

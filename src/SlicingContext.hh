@@ -35,7 +35,9 @@ public:
     double materialFudge[MAX_TOOLS];
 
     double platformTemp;
+    int    mainTool;
     int    supportTool;
+    int    hbpTool;
 
     double layerThickness;
     double widthOverHeightRatio;

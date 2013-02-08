@@ -10,29 +10,23 @@
 #include "InfillOp.hh"
 #include "InsetOp.hh"
 #include "RaftOp.hh"
+#include "FindOverhangsOp.hh"
 #include "PathFinderOp.hh"
 #include "CoolOp.hh"
 #include "SvgDumpOp.hh"
 #include "GCodeExportOp.hh"
 
-static string inFileName  = "";
-static string material    = "ABS";
+static string inFileName   = "";
+static string outFile      = "";
+static string material     = "ABS";
 static double scaling      = 1.0f;
 static double rotation     = 0.0f;
 static bool   doCenter     = true;
 static bool   doDumpSVG    = false;
-static bool   doProgress   = false;
+static bool   doProgress   = true;
 static int    threadcount  = DEFAULT_WORKER_THREADS;
 
 const int PROGRESS_POLL_MICROS = 250000;
-
-
-enum ExportTypes {
-    NONE,
-    GCODE,
-    S3G
-} exportType = GCODE;
-
 
 
 void usage(const char* arg0, SlicingContext& ctx)
@@ -72,9 +66,16 @@ void usage(const char* arg0, SlicingContext& ctx)
     fprintf(stderr, "\t-w FLOAT\n");
     fprintf(stderr, "\t--width-over-height FLOAT\n");
     fprintf(stderr, "\t            Extrusion width over height ratio. (default %.2f)\n", ctx.widthOverHeightRatio);
+    fprintf(stderr, "\t-o FILENAME\n");
+    fprintf(stderr, "\t--outfile FILENAME\n");
+    fprintf(stderr, "\t            Writes the resulting output to the given file. (default <INFILE>.gcode)\n");
     fprintf(stderr, "\t-P\n");
-    fprintf(stderr, "\t--progress\n");
-    fprintf(stderr, "\t            Show percentage progress per slicing stage.\n");
+    fprintf(stderr, "\t--no-progress\n");
+    fprintf(stderr, "\t            Don't show percentage progress per slicing stage.\n");
+    fprintf(stderr, "\t--hbp-tool INT\n");
+    fprintf(stderr, "\t            Tool that heats the build platform . (default %d)\n", ctx.hbpTool);
+    fprintf(stderr, "\t--main-tool INT\n");
+    fprintf(stderr, "\t            Tool to use when printing the main object. (default %d)\n", ctx.mainTool);
     fprintf(stderr, "\t--support-tool INT\n");
     fprintf(stderr, "\t            Tool to use when printing rafts and supports. (default %d)\n", ctx.supportTool);
     fprintf(stderr, "\t--tool0-x-offset FLOAT\n");
@@ -148,8 +149,9 @@ typedef enum {
     OPT_HELP                = 'h',
     OPT_INFILL_DENSITY      = 'i',
     OPT_LAYER_THICKNESS     = 'l',
+    OPT_OUTFILE             = 'o',
     OPT_PERIMETER_SHELLS    = 'p',
-    OPT_PROGRESS            = 'P',
+    OPT_NO_PROGRESS         = 'P',
     OPT_PLATFORM_TEMP       = 'T',
     OPT_RAFT_LAYERS         = 'r',
     OPT_TOOL0_FEED_RATE     = 'F',
@@ -170,6 +172,8 @@ typedef enum {
     OPT_RAFT_OUTSET,
     OPT_ROTATE,
     OPT_SCALE,
+    OPT_MAIN_TOOL,
+    OPT_HBP_TOOL,
     OPT_SUPPORT_TOOL,
     OPT_THREADS,
     OPT_TOOL0_MATERIAL_FUDGE,
@@ -241,27 +245,43 @@ int main (int argc, char * const argv[])
     stopwatch.start();
     
     SlicingContext ctx;
+    string outFileName;
     char buf[512];
+
+    enum ImportTypes {
+        IMPORT_NONE,
+        IMPORT_STL,
+        IMPORT_OBJ
+    } importType = IMPORT_NONE;
+
+    enum ExportTypes {
+        EXPORT_NONE,
+        EXPORT_GCODE,
+        EXPORT_S3G
+    } exportType = EXPORT_GCODE;
 
     int ch;
     const char *progName = argv[0];
-    const char * shortopts = "?d:f:F:hi:l:m:n:p:Pr:w:";
+    const char * shortopts = "?d:f:F:hi:l:m:n:o:p:Pr:t:T:w:";
     static struct option longopts[] = {
         {"material",             required_argument, NULL, OPT_MATERIAL},
         {"dump-prefix",          required_argument, NULL, OPT_DUMP_PREFIX},
         {"flat-shells",          required_argument, NULL, OPT_FLAT_SHELLS},
+        {"hbp-tool",             required_argument, NULL, OPT_HBP_TOOL},
+        {"help",                 no_argument,       NULL, OPT_HELP},
         {"infill-density",       required_argument, NULL, OPT_INFILL_DENSITY},
         {"infill-hexagonal",     no_argument,       NULL, OPT_INFILL_HEXAGONAL},
         {"infill-lines",         no_argument,       NULL, OPT_INFILL_LINES},
         {"infill-none",          no_argument,       NULL, OPT_INFILL_NONE},
         {"infill-rectangular",   no_argument,       NULL, OPT_INFILL_RECTANGULAR},
         {"layer-thickness",      required_argument, NULL, OPT_LAYER_THICKNESS},
+        {"main-tool",            required_argument, NULL, OPT_MAIN_TOOL},
         {"min-layer-time",       required_argument, NULL, OPT_MIN_LAYER_TIME},
         {"no-center",            no_argument,       NULL, OPT_NO_CENTER},
-        {"help",                 no_argument,       NULL, OPT_HELP},
+        {"outfile",              required_argument, NULL, OPT_OUTFILE},
         {"perimeter-shells",     required_argument, NULL, OPT_PERIMETER_SHELLS},
-        {"progress",             no_argument,       NULL, OPT_PROGRESS},
         {"platform-temp",        required_argument, NULL, OPT_PLATFORM_TEMP},
+        {"no-progress",          no_argument,       NULL, OPT_NO_PROGRESS},
         {"raft-layers",          required_argument, NULL, OPT_RAFT_LAYERS},
         {"raft-outset",          required_argument, NULL, OPT_RAFT_OUTSET},
         {"rotate",               required_argument, NULL, OPT_ROTATE},
@@ -331,6 +351,10 @@ int main (int argc, char * const argv[])
             // We already parsed this one out.  Ignore.
             break;
 
+        case OPT_OUTFILE:
+            outFile = string(optarg);
+            break;
+
         case OPT_DUMP_PREFIX:
             doDumpSVG = true;
             ctx.dumpPrefix = optarg;
@@ -376,8 +400,8 @@ int main (int argc, char * const argv[])
             ctx.perimeterShells = atoi(optarg);
             break;
 
-        case OPT_PROGRESS:
-            doProgress = true;
+        case OPT_NO_PROGRESS:
+            doProgress = false;
             break;
 
         case OPT_PLATFORM_TEMP:
@@ -398,6 +422,14 @@ int main (int argc, char * const argv[])
 
         case OPT_SCALE:
             scaling = atof(optarg);
+            break;
+
+        case OPT_MAIN_TOOL:
+            ctx.mainTool = atoi(optarg);
+            break;
+
+        case OPT_HBP_TOOL:
+            ctx.hbpTool = atoi(optarg);
             break;
 
         case OPT_SUPPORT_TOOL:
@@ -531,26 +563,58 @@ int main (int argc, char * const argv[])
     if (argc > 0) {
         inFileName = string(argv[0]);
     }
+
+    size_t iflen = inFileName.length();
+    size_t endlen = iflen;
+    if (iflen > 4) {
+        if (!inFileName.substr(iflen-4,4).compare(".stl") || !inFileName.substr(iflen-4,4).compare(".STL")) {
+            importType = IMPORT_STL;
+            endlen -= 4;
+        } else if (!inFileName.substr(iflen-4,4).compare(".obj") || !inFileName.substr(iflen-4,4).compare(".OBJ")) {
+            importType = IMPORT_OBJ;
+            endlen -= 4;
+        }
+    }
+
     if (inFileName.length() < 1) {
-        cerr << "No file to slice.  Exiting." << endl;
+        // cerr << "No file to slice.  Exiting." << endl;
         exit(0);
+    } else if (importType == IMPORT_NONE) {
+        cerr << "Unrecognized input file format.  Exiting." << endl;
+        exit(0);
+    }
+
+    if (outFile.length() > 0) {
+        outFileName = outFile;
+    } else {
+        outFileName = inFileName.substr(0,endlen);
     }
     
     // Load the model from the file.
     BGL::Mesh3d &mesh = ctx.mesh;
-    mesh.loadFromSTLFile(inFileName.c_str());
+    switch (importType) {
+      case IMPORT_STL:
+        mesh.loadFromSTLFile(inFileName.c_str());
+        break;
+      case IMPORT_OBJ:
+        mesh.loadFromOBJFile(inFileName.c_str());
+        break;
+      case IMPORT_NONE:
+      default:
+        break;
+    }
     stopwatch.checkpoint("Model loaded from file");
     printf("  Found %d faces.\n", mesh.size());
     
     // Scale the model if requested.
     if (scaling != 1.0f) {
-        printf("  Scaling model by %.4gx\n", scaling);
+        printf("  Scaling model by %.4gx.\n", scaling);
         mesh.scale(scaling);
     }
 
     // Rotate the model if requested.
     if (rotation != 0.0f) {
-        printf("  Rotating model by %.4g degrees\n", rotation);
+        printf("  Rotating model by %.4g degrees.\n", rotation);
         mesh.rotateZ(rotation*M_PI/180.0f);
     }
 
@@ -569,11 +633,11 @@ int main (int argc, char * const argv[])
     ctx.calculateSvgOffsets();
     
     // Calculate first and last layer Zs
-    printf("  Layer Thickness=%.4g\n", ctx.layerThickness);
     double halfLayer = ctx.layerThickness/2.0;
     double z = halfLayer;
     double topZ = mesh.maxZ;
 
+    printf("  Layer Thickness=%.4g\n", ctx.layerThickness);
     printf("  Extrusion Width=%.4g\n", ctx.standardExtrusionWidth());
     
     // Set up Operations Queue and threadpool.
@@ -581,7 +645,6 @@ int main (int argc, char * const argv[])
     opQ.setMaxConcurrentOperationCount(threadcount);
 
     int expectedLayers = topZ / ctx.layerThickness + 0.5;
-    int remainingLayers = 0;
 
     // Carve model to find layer outlines
     while (z < topZ) {
@@ -621,6 +684,13 @@ int main (int argc, char * const argv[])
         expectedLayers += ctx.raftLayers;
     }
     
+    // Find overhangs
+    FindOverhangsOp* overhangsOp = new FindOverhangsOp(&ctx);
+    opQ.addOperation(overhangsOp);
+    showProcessedProgressUntilDone("Finding Overhangs", ctx, opQ, expectedLayers);
+    delete overhangsOp;
+    stopwatch.checkpoint("Found Overhangs");
+    
     // Find optimized path.
     PathFinderOp* pathOp = new PathFinderOp(&ctx);
     opQ.addOperation(pathOp);
@@ -649,8 +719,11 @@ int main (int argc, char * const argv[])
     // Export toolpaths to apropriate output format.
     Operation* expOp = NULL;
     switch (exportType) {
-    case GCODE:
-        expOp = new GCodeExportOp(&ctx);
+    case EXPORT_GCODE:
+        if (inFileName.substr(iflen-6,6).compare(".gcode") != 0) {
+            outFileName.append(".gcode");
+        }
+        expOp = new GCodeExportOp(&ctx, outFileName);
         break;
     default:
         break;

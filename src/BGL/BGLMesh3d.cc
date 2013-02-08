@@ -12,12 +12,9 @@
 #include "BGLPath.hh"
 #include "BGLCompoundRegion.hh"
 #include "BGLTriangle3d.hh"
-
-namespace BGL {
-
-
 #include <sys/param.h>
 #include <inttypes.h>
+#include <vector>
 
 #ifdef __BYTE_ORDER
 # if __BYTE_ORDER == __LITTLE_ENDIAN
@@ -31,6 +28,8 @@ namespace BGL {
 # endif
 #endif /* __BYTE_ORDER */
 
+
+namespace BGL {
 
 
 int Mesh3d::size()
@@ -53,8 +52,8 @@ Point3d Mesh3d::centerPoint() const
 void Mesh3d::recalculateBounds()
 {
     Triangles3d::iterator it = triangles.begin();
-    minX = minY = minZ = 9e9;
-    maxX = maxY = maxZ = -9e9;
+    minX = minY = minZ = 999999999.0;
+    maxX = maxY = maxZ = -999999999.0;
     for ( ; it != triangles.end(); it++) {
         Point3d &pt1 = it->vertex1;
         Point3d &pt2 = it->vertex2;
@@ -80,8 +79,8 @@ void Mesh3d::recalculateBounds()
         if (pt3.y > maxY) maxY = pt3.y;
         if (pt3.z > maxZ) maxZ = pt3.z;
     }
-    if (minX == 9e9 || minY == 9e9 || minZ == 9e9) {
-        minX = minY = minZ = maxX = maxY = maxZ = 0;
+    if (minX == 999999999.0 || minY == 99999999.0 || minZ == 99999999.0) {
+        minX = minY = minZ = maxX = maxY = maxZ = 0.0;
     }
 }
 
@@ -259,17 +258,24 @@ int Mesh3d::loadFromSTLFile(const char *fileName)
             convertFromLittleEndian16((uint8_t*)&tridata.vertexes.attrBytes);
 
             vertexes_t &v = tridata.vertexes;
+            Point3d norm(v.nx, v.ny, v.nz);
             Point3d pt1(v.x1, v.y1, v.z1);
             Point3d pt2(v.x2, v.y2, v.z2);
             Point3d pt3(v.x3, v.y3, v.z3);
-            triangles.push_back(Triangle3d(pt1, pt2, pt3));
-            facecount++;
+
+            if (pt1 != pt2 && pt2 != pt3 && pt3 != pt1) {
+                // Add triangle if none of its vertexes coincide.
+                triangles.push_back(Triangle3d(pt1, pt2, pt3, norm));
+                facecount++;
+            }
         }
         fclose(f);
     } else {
         // ASCII STL file
-        // Gobble remainder of solid name line.
+        // Gobble remainder of solid declaration line.
         fgets((char*)buf, sizeof(buf), f);
+
+        // Start reading triangles.
         while (!feof(f)) {
             fscanf(f, "%80s", buf);
             if (!strcasecmp((char*)buf, "endsolid")) {
@@ -284,15 +290,80 @@ int Mesh3d::loadFromSTLFile(const char *fileName)
             fscanf(f, "%*s");
             fscanf(f, "%*s");
 
+            Point3d norm(v.nx, v.ny, v.nz);
             Point3d pt1(v.x1, v.y1, v.z1);
             Point3d pt2(v.x2, v.y2, v.z2);
             Point3d pt3(v.x3, v.y3, v.z3);
-            triangles.push_back(Triangle3d(pt1, pt2, pt3));
-            facecount++;
+
+            if (pt1 != pt2 && pt2 != pt3 && pt3 != pt1) {
+                // Add triangle if none of its vertexes coincide.
+                triangles.push_back(Triangle3d(pt1, pt2, pt3, norm));
+                facecount++;
+            }
         }
         fclose(f);
     }
     recalculateBounds();
+    return facecount;
+}
+
+
+
+int Mesh3d::loadFromOBJFile(const char *fileName)
+{
+    int facecount = 0;
+    
+    char buf[512];
+    float x, y, z;
+    int v1, v2, v3;
+
+    FILE *f = fopen(fileName, "rb");
+    if (!f) {
+        fprintf(stderr, "OBJ file failed to open\n");
+        return 0;
+    }
+    
+    vector<Point3d> vertexes;
+    vertexes.reserve(65536); // Reduce how often we reallocate.
+
+    while (!feof(f)) {
+        if (fscanf(f, "%s", buf) < 0) {
+            break;
+        }
+        if (!strcasecmp((char*)buf,"v")) {
+            if (fscanf(f, "%f %f %f", &x, &y, &z) < 0) {
+                break;
+            }
+            vertexes.push_back(Point3d(x,y,z));
+        }
+        if (!strcasecmp((char*)buf,"f")) {
+            if (fscanf(f, "%s", buf) < 0) {
+                break;
+            }
+            v1 = atoi(buf);
+
+            if (fscanf(f, "%s", buf) < 0) {
+                break;
+            }
+            v2 = atoi(buf);
+            
+            if (fscanf(f, "%s", buf) < 0) {
+                break;
+            }
+            v3 = atoi(buf);
+
+            if (v1 != v2 && v2 != v3 && v3 != v1) {
+                // Add triangle if none of its vertexes coincide.
+                Triangle3d tri(vertexes[v1], vertexes[v2], vertexes[v3]);
+                triangles.push_back(tri);
+                facecount++;
+            }
+        }
+    }
+    fclose(f);
+
+    recalculateBounds();
+
     return facecount;
 }
 

@@ -41,6 +41,7 @@ public:
     void rotateZ(double rad);
 
     int loadFromSTLFile(const char *fileName);
+    int loadFromOBJFile(const char *fileName);
     CompoundRegion& regionForSliceAtZ(double Z, CompoundRegion &outReg) const;
 };
 

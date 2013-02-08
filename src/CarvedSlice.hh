@@ -28,6 +28,7 @@ public:
     CompoundRegion perimeter;
     CompoundRegion infillMask;
     CompoundRegion solidFillMask;
+    CompoundRegion supportMask;
     CompoundRegions shells;
     Paths infill;
     Paths supportPaths;
@@ -35,15 +36,16 @@ public:
     CarvedSlice(double thickness) :
         zLayer(0.0),
         layerThickness(thickness),
+        speedMult(1.0),
+        isRaft(false),
         state(INIT),
         perimeter(),
         infillMask(),
         solidFillMask(),
+        supportMask(),
         shells(),
         infill(),
-        supportPaths(),
-        isRaft(false),
-        speedMult(1.0)
+        supportPaths()
     {
     }
 

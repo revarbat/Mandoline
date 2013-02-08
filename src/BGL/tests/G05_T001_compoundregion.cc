@@ -239,7 +239,7 @@ int main(int argc, char**argv)
 	fout.close();
     }
 
-    synthesize_testfile_name(fname, sizeof(fname), argv[0], "intsetA-by5", "svg");
+    synthesize_testfile_name(fname, sizeof(fname), argv[0], "insetA-by5", "svg");
     fout.open(fname, fstream::out | fstream::trunc);
     if (fout.good()) {
 	svg.header(fout);
@@ -257,7 +257,7 @@ int main(int argc, char**argv)
 	fout.close();
     }
 
-    synthesize_testfile_name(fname, sizeof(fname), argv[0], "intsetA-by1", "svg");
+    synthesize_testfile_name(fname, sizeof(fname), argv[0], "insetA-by1", "svg");
     fout.open(fname, fstream::out | fstream::trunc);
     if (fout.good()) {
 	svg.header(fout);
@@ -275,7 +275,7 @@ int main(int argc, char**argv)
 	fout.close();
     }
 
-    synthesize_testfile_name(fname, sizeof(fname), argv[0], "intsetB-by5", "svg");
+    synthesize_testfile_name(fname, sizeof(fname), argv[0], "insetB-by5", "svg");
     fout.open(fname, fstream::out | fstream::trunc);
     if (fout.good()) {
 	svg.header(fout);
@@ -293,7 +293,7 @@ int main(int argc, char**argv)
 	fout.close();
     }
 
-    synthesize_testfile_name(fname, sizeof(fname), argv[0], "intsetB-by1", "svg");
+    synthesize_testfile_name(fname, sizeof(fname), argv[0], "insetB-by1", "svg");
     fout.open(fname, fstream::out | fstream::trunc);
     if (fout.good()) {
 	svg.header(fout);

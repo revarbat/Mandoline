@@ -108,6 +108,7 @@ public:
     bool couldAttach(const Path& path) const;
     bool attach(const Line& ln);
     bool attach(const Path& path);
+    bool attachWithoutFlipping(const Line& ln);
 
     Path& rotate(double scale);
 

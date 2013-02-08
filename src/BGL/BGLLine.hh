@@ -101,9 +101,13 @@ public:
     double length() const;
     double angle() const;
     double angleDelta(const Line& ln) const;
+    bool isLeftOf(const Point &pt) const;
+    bool isLeftOfNormal(const Point &pt) const;
 
     // Misc
     Line& reverse();
+    Line& reverseIfRightOfNormal(const Point &pt);
+
     bool isLinearWith(const Point& pt) const;
     bool hasInBounds(const Point &pt) const;
     bool contains(const Point &pt) const;

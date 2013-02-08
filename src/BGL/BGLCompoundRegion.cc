@@ -240,19 +240,23 @@ ostream &CompoundRegion::svgPathWithOffset(ostream& os, double dx, double dy) co
 
 CompoundRegion &CompoundRegion::unionWith(SimpleRegion &reg)
 {
-    SimpleRegion currReg(reg);
+    int currSet = 0;
+    SimpleRegions regSets[2];
+    regSets[1].push_back(reg);
+
     SimpleRegions::iterator rit;
     for (rit = subregions.begin(); rit != subregions.end(); ) {
+        SimpleRegion &currReg = regSets[1-currSet].back();
         if (currReg.intersects(*rit)) {
-            SimpleRegions tempRegs;
-            SimpleRegion::unionOf(currReg, *rit, tempRegs);
-            currReg = tempRegs.front();
+            regSets[currSet].clear();
+            SimpleRegion::unionOf(currReg, *rit, regSets[currSet]);
             rit = subregions.erase(rit);
+            currSet = 1 - currSet;
         } else {
             rit++;
         }
     }
-    subregions.push_back(currReg);
+    subregions.push_back(regSets[1-currSet].back());
     return *this;
 }
 

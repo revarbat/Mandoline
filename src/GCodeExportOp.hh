@@ -16,8 +16,9 @@
 class GCodeExportOp : public Operation {
 public:
     SlicingContext* context;
+    string fileName;
 
-    GCodeExportOp(SlicingContext* ctx);
+    GCodeExportOp(SlicingContext* ctx, const string &file);
     virtual ~GCodeExportOp();
     virtual void main();
 };

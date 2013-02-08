@@ -27,6 +27,8 @@ SlicingContext::SlicingContext()
     infillStyle          = DEFAULT_INFILL_STYLE;
     platformTemp         = DEFAULT_PLATFORM_TEMP;
     supportTool          = DEFAULT_SUPPORT_TOOL;
+    mainTool             = DEFAULT_MAIN_TOOL;
+    hbpTool              = DEFAULT_HBP_TOOL;
 
     for (int tool = 0; tool < MAX_TOOLS; tool++) {
         filamentFeedRate[tool]  = DEFAULT_FILAMENT_FEED_RATE;
@@ -170,8 +172,14 @@ void SlicingContext::loadSettingsFromFile(const char *fileName)
                 foundSetting = true;
             }
         }
-        if (!strcasecmp(optname, "supportTool")) {
+        if (!strcasecmp(optname, "mainTool")) {
+            mainTool = strtol(value, &ptr, 10);
+            foundSetting = true;
+        } else if (!strcasecmp(optname, "supportTool")) {
             supportTool = strtol(value, &ptr, 10);
+            foundSetting = true;
+        } else if (!strcasecmp(optname, "hbpTool")) {
+            hbpTool = strtol(value, &ptr, 10);
             foundSetting = true;
 
         // Machine settings
@@ -224,15 +232,17 @@ void SlicingContext::loadSettingsFromFile(const char *fileName)
         }
 
         if (!foundSetting) {
-            cerr << "Bad option '" << optname
+            cerr << "Unknown option '" << optname
                  << "' on line " << linenum
-                 << " of " << fileName << endl;
+                 << " of '" << fileName
+                 << "'.  Ignoring." << endl;
             continue;
         }
 
         if (*ptr != '\0') {
             cerr << "Cruft at end of line " << linenum
-                 << " of " << fileName << endl;
+                 << " of '" << fileName
+                 << "'.  Ignoring." << endl;
             continue;
         }
     }
@@ -314,8 +324,16 @@ void SlicingContext::saveSettingsToFile(const char *fileName)
         fout << endl;
     }
 
+    fout << "# The tool to use when printing the main object." << endl;
+    fout << "mainTool: " << mainTool << endl;
+    fout << endl;
+
     fout << "# The tool to use when printing rafts and supports." << endl;
     fout << "supportTool: " << supportTool << endl;
+    fout << endl;
+
+    fout << "# The tool that heats the build platform." << endl;
+    fout << "hbpTool: " << hbpTool << endl;
     fout << endl;
 
     fout.precision(3);

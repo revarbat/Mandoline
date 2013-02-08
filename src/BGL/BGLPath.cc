@@ -271,6 +271,25 @@ bool Path::attach(const Line& ln)
 
 
 
+bool Path::attachWithoutFlipping(const Line& ln)
+{
+    if (size() <= 0) {
+        segments.push_back(ln);
+        return true;
+    }
+    if (endPoint() == ln.startPt) {
+        segments.push_back(ln);
+        return true;
+    }
+    if (startPoint() == ln.endPt) {
+        segments.push_front(ln);
+        return true;
+    }
+    return false;
+}
+
+
+
 bool Path::attach(const Path& path)
 {
     if (hasEndPoint(path.startPoint())) {
@@ -577,23 +596,45 @@ Paths &Path::assemblePathsFromSegments(const Lines &segs, Paths &outPaths)
     Lines unhandled(segs);
     Path currPath;
     bool foundLink = false;
+
+    // Keep trying to attach segments, until none are left.
     while (unhandled.size() > 0) {
+
         if (currPath.size() == 0) {
+            // If current path is empty, arbitrarily attach first segment.
             Line ln = unhandled.front();
-            currPath.attach(ln);
+            currPath.attachWithoutFlipping(ln);
             unhandled.pop_front();
         }
         foundLink = false;
+
+        // Search for connecting segment with the same orientation.
         Lines::iterator itera = unhandled.begin();
         while (itera != unhandled.end()) {
-            if (currPath.attach(*itera)) {
+            if (currPath.attachWithoutFlipping(*itera)) {
                 itera = unhandled.erase(itera);
                 foundLink = true;
             } else {
                 itera++;
             }
         }
+
+        if (!foundLink) {
+            // If we could not find an attached segment oriented in the
+            // same direction, lets look again for reversed segments.
+            itera = unhandled.begin();
+            while (itera != unhandled.end()) {
+                if (currPath.attach(*itera)) {
+                    itera = unhandled.erase(itera);
+                    foundLink = true;
+                } else {
+                    itera++;
+                }
+            }
+        }
+
         if (!foundLink || unhandled.size() == 0) {
+            // We found no connecting segments. Remember this path.
             outPaths.push_back(currPath);
             currPath = Path();
         }
@@ -751,9 +792,6 @@ void Path::alignTo(const Path &path)
 
 void Path::splitSegmentsAtIntersectionsWithPath(const Path &path)
 {
-    alignTo(path);
-    return;
-
     bool dodebug = false;
 
     Lines::iterator itera;
@@ -1212,7 +1250,9 @@ Paths& Path::assembleTaggedPaths(const Path &inPath1, int flags1, const Path &in
     if (outPath->size() == 0) {
         // Drop final path if empty.
         finishedPaths.pop_back();
-        cerr << "pop it" << endl;
+        if (dodebug) {
+            cerr << "pop it" << endl;
+        }
     } else {
         if (dodebug) {
             cerr << (outPath->isClockwise()? "CW" : "CCW") << endl;
@@ -1524,8 +1564,8 @@ Paths &Path::inset(double insetBy, Paths& outPaths)
 {
     bool dodebug = false;
     const double minimum_arc_segment_length = 1.0;
-    const double minimum_arc_angle = M_PI_4 / 8.0;
-    const double maximum_arc_angle = M_PI / 3.0;
+    const double minimum_arc_angle = M_PI / 36.0; //  5deg
+    const double maximum_arc_angle = M_PI / 4.0;  // 45deg
 
     if (dodebug) {
         cerr << "Inset by " << insetBy << endl;
@@ -1535,6 +1575,11 @@ Paths &Path::inset(double insetBy, Paths& outPaths)
         if (dodebug) {
             cerr << "NOT CLOSED." << endl;
         }
+        return outPaths;
+    }
+
+    if (fabs(insetBy) <= CLOSEENOUGH) {
+        outPaths.push_back(*this);
         return outPaths;
     }
 
@@ -1554,7 +1599,6 @@ Paths &Path::inset(double insetBy, Paths& outPaths)
 
     Paths trimPaths;
     Paths::iterator pit;
-    Line offsetLine;
 
     // Check start-of-path segment against end-of-path segment
     Lines::iterator lit = segments.begin();
@@ -1570,10 +1614,6 @@ Paths &Path::inset(double insetBy, Paths& outPaths)
         }
         if (isConvex) {
             // Pointy angle.  Needs added segments to arc around the tip.
-            offsetLine = *prevlit;
-            offsetLine.leftOffset(leftOffset);
-            offsetLine.reverse();
-
             double sang = prevlit->angle() + M_PI_2;
             double eang = lit->angle() + M_PI_2;
             if (sang > M_PI) {
@@ -1593,8 +1633,6 @@ Paths &Path::inset(double insetBy, Paths& outPaths)
             // We don't want too many tiny arc steps.
             // Try to keep them about 1mm apart.
             // We need to circumscribe the ideal arc, not inscribe.
-            // y = r * sin(a)
-            // a = asin(y/r)
             double minstepang = maximum_arc_angle;
             if (fabs(insetBy) >= minimum_arc_segment_length) {
                 minstepang = asin(minimum_arc_segment_length/fabs(insetBy));
@@ -1604,27 +1642,34 @@ Paths &Path::inset(double insetBy, Paths& outPaths)
                     minstepang = maximum_arc_angle;
                 }
             }
-            // Actually add arc segment boxes.
-            double step = (eang-sang) / (floor(fabs(eang-sang) / minstepang)+1);
-            for (double ang = sang + step/2.0; fabs(ang-step/2.0-(eang+step)) > fabs(step/2); ang += step) {
-                offsetLine.endPt = offsetLine.startPt;
-                offsetLine.startPt = lit->startPt;
-                offsetLine.startPt.polarOffset(ang, leftOffset/cos(step/2.0));
 
-                trimPaths.push_back(Path());
-                Path &trimPath2 = trimPaths.back();
-                trimPath2.segments.push_back(Line(lit->startPt, offsetLine.startPt));
-                trimPath2.segments.push_back(offsetLine);
-                trimPath2.segments.push_back(Line(offsetLine.endPt, lit->startPt));
-                if (dodebug) {
-                    cerr << "arcTrim" << endl;
-                    trimPath2.svgPathWithOffset(cerr, 10, 10);
-                }
+            // Quantize step size
+            int    steps = ceil(fabs(eang-sang) / minstepang)+0.1;
+            double stepang = (eang-sang) / steps;
+            double rad = leftOffset / cos(stepang*0.5);
+
+            trimPaths.push_back(Path());
+            Path &trimPath2 = trimPaths.back();
+
+            // Create arced path
+            Point prevPt(prevlit->endPt);
+            for (int stepnum = 0; stepnum <= steps+1; stepnum++) {
+                double ang = stepang * (stepnum-0.5) + sang;
+                Point newPt(prevlit->endPt);
+                newPt.polarOffset(ang, rad);
+                trimPath2.segments.push_back(Line(prevPt,newPt));
+                prevPt = newPt;
+            }
+            trimPath2.segments.push_back(Line(prevPt,prevlit->endPt));
+
+            if (dodebug) {
+                cerr << "arcTrim" << endl;
+                trimPath2.svgPathWithOffset(cerr, 10, 10);
             }
         }
 
         // Add the box between the current segment and the offset line.
-        offsetLine = *lit;
+        Line offsetLine(*lit);
         offsetLine.leftOffset(leftOffset);
         offsetLine.reverse();
 
@@ -1643,7 +1688,7 @@ Paths &Path::inset(double insetBy, Paths& outPaths)
         prevlit = lit;
     }
 
-    if (true || dodebug) {
+    if (dodebug) {
         for (pit = trimPaths.begin(); pit != trimPaths.end(); pit++) {
             cerr << "Trimpath=" << *pit << endl;
         }

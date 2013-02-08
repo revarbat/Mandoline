@@ -17,6 +17,7 @@ mandoline_SOURCES = \
 	OpQueue.cc OpQueue.hh \
 	OpThread.cc OpThread.hh \
 	Operation.hh \
+	FindOverhangsOp.cc FindOverhangsOp.hh \
 	PathFinderOp.cc PathFinderOp.hh \
 	RaftOp.cc RaftOp.hh \
 	SlicingContext.cc SlicingContext.hh \

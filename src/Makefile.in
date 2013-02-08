@@ -58,7 +58,8 @@ PROGRAMS = $(bin_PROGRAMS)
 am_mandoline_OBJECTS = Mandoline.$(OBJEXT) CarveOp.$(OBJEXT) \
 	CarvedSlice.$(OBJEXT) CoolOp.$(OBJEXT) GCodeExportOp.$(OBJEXT) \
 	InfillOp.$(OBJEXT) InsetOp.$(OBJEXT) OpQueue.$(OBJEXT) \
-	OpThread.$(OBJEXT) PathFinderOp.$(OBJEXT) RaftOp.$(OBJEXT) \
+	OpThread.$(OBJEXT) FindOverhangsOp.$(OBJEXT) \
+	PathFinderOp.$(OBJEXT) RaftOp.$(OBJEXT) \
 	SlicingContext.$(OBJEXT) Stopwatch.$(OBJEXT) \
 	SvgDumpOp.$(OBJEXT)
 mandoline_OBJECTS = $(am_mandoline_OBJECTS)
@@ -277,6 +278,7 @@ mandoline_SOURCES = \
 	OpQueue.cc OpQueue.hh \
 	OpThread.cc OpThread.hh \
 	Operation.hh \
+	FindOverhangsOp.cc FindOverhangsOp.hh \
 	PathFinderOp.cc PathFinderOp.hh \
 	RaftOp.cc RaftOp.hh \
 	SlicingContext.cc SlicingContext.hh \
@@ -396,6 +398,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CarveOp.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CarvedSlice.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CoolOp.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FindOverhangsOp.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/GCodeExportOp.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/InfillOp.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/InsetOp.Po@am__quote@

@@ -13,6 +13,16 @@
 namespace BGL {
 
 
+Triangle3d::Triangle3d(const Point3d &p1, const Point3d &p2, const Point3d &p3) : vertex1(p1), vertex2(p2), vertex3(p3)
+{
+    Point3d u = p2 - p1;
+    Point3d v = p3 - p1;
+    normal = u.crossProduct(v);
+    normal.normalize();
+}
+
+
+
 Triangle3d& Triangle3d::rotateX(const Point3d& center, double rad)
 {
     double cr = cos(rad);
@@ -115,13 +125,16 @@ bool Triangle3d::sliceAtZ(double Z, Line& lnref) const
         if (vertex2 == Z) {
             if (vertex3 == Z) {
                 // flat face.  Ignore.
+                // Bug? Will bounding tri edges suffice?
                 return false;
             }
             lnref = Line(Point(vertex1), Point(vertex2));
+            lnref.reverseIfRightOfNormal(Point(normal.x,normal.y));
             return true;
         }
         if (vertex3 == Z) {
             lnref = Line(Point(vertex1), Point(vertex3));
+            lnref.reverseIfRightOfNormal(Point(normal.x,normal.y));
             return true;
         }
         if ((vertex2 > Z && vertex3 > Z) || (vertex2 < Z && vertex3 < Z)) {
@@ -132,10 +145,12 @@ bool Triangle3d::sliceAtZ(double Z, Line& lnref) const
         px =  vertex2.x+u*(vertex3.x-vertex2.x);
         py =  vertex2.y+u*(vertex3.y-vertex2.y);
         lnref = Line(Point(vertex1), Point(px,py));
+        lnref.reverseIfRightOfNormal(Point(normal.x,normal.y));
         return true;
     } else if (vertex2 == Z) {
         if (vertex3 == Z) {
             lnref = Line(Point(vertex2), Point(vertex3));
+            lnref.reverseIfRightOfNormal(Point(normal.x,normal.y));
             return true;
         }
         if ((vertex1 > Z && vertex3 > Z) || (vertex1 < Z && vertex3 < Z)) {
@@ -146,6 +161,7 @@ bool Triangle3d::sliceAtZ(double Z, Line& lnref) const
         px =  vertex1.x+u*(vertex3.x-vertex1.x);
         py =  vertex1.y+u*(vertex3.y-vertex1.y);
         lnref = Line(Point(vertex2), Point(px,py));
+        lnref.reverseIfRightOfNormal(Point(normal.x,normal.y));
         return true;
     } else if (vertex3 == Z) {
         if ((vertex1 > Z && vertex2 > Z) || (vertex1 < Z && vertex2 < Z)) {
@@ -156,6 +172,7 @@ bool Triangle3d::sliceAtZ(double Z, Line& lnref) const
         px =  vertex1.x+u*(vertex2.x-vertex1.x);
         py =  vertex1.y+u*(vertex2.y-vertex1.y);
         lnref = Line(Point(vertex3), Point(px,py));
+        lnref.reverseIfRightOfNormal(Point(normal.x,normal.y));
         return true;
     } else if ((vertex1 > Z && vertex2 > Z) || (vertex1 < Z && vertex2 < Z)) {
         u = (Z-vertex3.z)/(vertex1.z-vertex3.z);
@@ -165,6 +182,7 @@ bool Triangle3d::sliceAtZ(double Z, Line& lnref) const
         qx =  vertex3.x+v*(vertex2.x-vertex3.x);
         qy =  vertex3.y+v*(vertex2.y-vertex3.y);
         lnref = Line(Point(px,py), Point(qx,qy));
+        lnref.reverseIfRightOfNormal(Point(normal.x,normal.y));
         return true;
     } else if ((vertex1 > Z && vertex3 > Z) || (vertex1 < Z && vertex3 < Z)) {
         u = (Z-vertex2.z)/(vertex1.z-vertex2.z);
@@ -174,6 +192,7 @@ bool Triangle3d::sliceAtZ(double Z, Line& lnref) const
         qx =  vertex2.x+v*(vertex3.x-vertex2.x);
         qy =  vertex2.y+v*(vertex3.y-vertex2.y);
         lnref = Line(Point(px,py), Point(qx,qy));
+        lnref.reverseIfRightOfNormal(Point(normal.x,normal.y));
         return true;
     } else if ((vertex2 > Z && vertex3 > Z) || (vertex2 < Z && vertex3 < Z)) {
         u = (Z-vertex1.z)/(vertex2.z-vertex1.z);
@@ -183,6 +202,7 @@ bool Triangle3d::sliceAtZ(double Z, Line& lnref) const
         qx =  vertex1.x+v*(vertex3.x-vertex1.x);
         qy =  vertex1.y+v*(vertex3.y-vertex1.y);
         lnref = Line(Point(px,py), Point(qx,qy));
+        lnref.reverseIfRightOfNormal(Point(normal.x,normal.y));
         return true;
     }
     return false;

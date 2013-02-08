@@ -152,6 +152,26 @@ public:
         return sqrt(vect.x+vect.y+vect.z);
     }
 
+    Point3d crossProduct(const Point3d &v) const {
+        Point3d result;
+        result.x = (y * v.z) - (z * v.y);
+        result.y = (z * v.x) - (x * v.z);
+        result.z = (x * v.y) - (y * v.x);
+        return result;
+    }
+
+    Point3d& normalize() {
+        double len = sqrt(x*x+y*y+z*z);
+        if (len > 0.0) {
+            x /= len;
+            y /= len;
+            z /= len;
+        } else {
+            x = y = z = 0.0;
+        }
+        return *this;
+    }
+
     // Friend functions
     friend ostream& operator <<(ostream &os,const Point3d &pt);
 };

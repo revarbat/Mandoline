@@ -29,6 +29,10 @@ void CarvedSlice::svgPathWithSizeAndOffset(ostream &os, double width, double hei
     os << " stroke-width=\"" << 0.05 << "mm\"";
     os << " d=\"" << infillMask.svgPathWithOffset(dx,dy) << "\" />" << endl;
 
+    os << "<path class=\"support_mask\" fill=\"none\" stroke=\"#7777ff\"";
+    os << " stroke-width=\"" << 0.05 << "mm\"";
+    os << " d=\"" << supportMask.svgPathWithOffset(dx,dy) << "\" />" << endl;
+
     svg.footer(os);
 }
 

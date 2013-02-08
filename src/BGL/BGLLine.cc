@@ -214,11 +214,38 @@ double Line::angleDelta(const Line& ln) const {
 
 
 
+bool Line::isLeftOf(const Point &pt) const {
+    Line ln = Line(startPt,pt);
+    double ang = angleDelta(ln);
+    return (ang < 0.0);
+}
+
+
+
+
+bool Line::isLeftOfNormal(const Point &pt) const {
+    Line ln = Line(startPt,startPt+pt);
+    double ang = angleDelta(ln);
+    return (ang < 0.0);
+}
+
+
+
+
 // Misc
 Line& Line::reverse() {
     Point tmpPt = startPt;
     startPt = endPt;
     endPt = tmpPt;
+    return *this;
+}
+
+
+
+Line& Line::reverseIfRightOfNormal(const Point &pt) {
+    if (!isLeftOfNormal(pt)) {
+        reverse();
+    }
     return *this;
 }
 

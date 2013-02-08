@@ -19,10 +19,12 @@ namespace BGL {
 class Triangle3d {
 public:
     Point3d vertex1, vertex2, vertex3;
+    Point3d normal;
 
     // Constructors
-    Triangle3d() : vertex1(), vertex2(), vertex3() {}
-    Triangle3d(const Point3d &p1, const Point3d &p2, const Point3d &p3) : vertex1(p1), vertex2(p2), vertex3(p3) {}
+    Triangle3d() : vertex1(), vertex2(), vertex3(), normal() {}
+    Triangle3d(const Point3d &p1, const Point3d &p2, const Point3d &p3);
+    Triangle3d(const Point3d &p1, const Point3d &p2, const Point3d &p3, const Point3d &norm) : vertex1(p1), vertex2(p2), vertex3(p3), normal(norm) {}
 
     // Assignment operator
     Triangle3d& operator=(const Triangle3d &rhs) {
@@ -97,6 +99,7 @@ public:
         return (pt == vertex1 || pt == vertex2 || pt == vertex3);
     }
     bool operator==(const Triangle3d &rhs) const {
+        // BUG: This probably has a bug where super-slim tris will match one edge of a non-slim tri.
         return (hasVertex(rhs.vertex1) && hasVertex(rhs.vertex2) && hasVertex(rhs.vertex3));
     }
     bool operator!=(const Triangle3d &rhs) const {
