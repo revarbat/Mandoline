@@ -719,11 +719,18 @@ void Path::alignTo(const Path &path)
     Lines::iterator piter;
     Lines::const_iterator iterb;
 
+    // First, align path points to the other path exactly.
+    // Align to the other path's segment, then align to endpoint if close.
     piter = segments.end();
     piter--;
     for (itera = segments.begin(); itera != segments.end(); itera++) {
         for (iterb = path.segments.begin(); iterb != path.segments.end(); iterb++) {
 
+            if (iterb->minimumSegmentDistanceFromPoint(itera->startPt) <= CLOSEENOUGH) {
+                // start point is close to the line, shift it onto the line.
+                itera->startPt = iterb->closestSegmentPointTo(itera->startPt);
+                piter->endPt = itera->startPt;
+            }
             if (itera->startPt.distanceFrom(iterb->endPt) <= CLOSEENOUGH) {
                 // start point is close to other line's end point, jigger it to make it exact.
                 itera->startPt = iterb->endPt;
@@ -732,60 +739,65 @@ void Path::alignTo(const Path &path)
                 // start point is close to other line's start point, jigger it to make it exact.
                 itera->startPt = iterb->startPt;
                 piter->endPt = itera->startPt;
-            } else if (iterb->minimumSegmentDistanceFromPoint(itera->startPt) <= CLOSEENOUGH) {
-                // start point is close to the line, shift it onto the line.
-                itera->startPt = iterb->closestSegmentPointTo(itera->startPt);
-                piter->endPt = itera->startPt;
             }
-        }
-
-        if (piter->length() < EPSILON) {
-            piter = segments.erase(piter);
         }
         piter = itera;
     }
 
+    // Second, find where other path intersects this path, and split there.
     for (itera = segments.begin(); itera != segments.end(); itera++) {
         for (iterb = path.segments.begin(); iterb != path.segments.end(); iterb++) {
 
-            if (itera->minimumSegmentDistanceFromPoint(iterb->startPt) <= CLOSEENOUGH) {
-                // other segment's start point is on the current segment
-                if (iterb->startPt.distanceFrom(itera->startPt) > CLOSEENOUGH &&
-                    iterb->startPt.distanceFrom(itera->endPt) > CLOSEENOUGH
-                ) {
-                    // But is not at one end of the segment or the other. Split segment.
-                    Point midPt = itera->closestSegmentPointTo(iterb->startPt);
-                    Point firstPt = itera->startPt;
-                    itera->startPt = midPt;
-                    itera = segments.insert(itera, Line(firstPt, midPt));
-                }
-            }
-
+            // Check if other paths segment end point is ON this path's segment.
+            // Only bother checking against other path segment's end point.
+            // Start point will be caught by previous segment's end point.
             if (itera->minimumSegmentDistanceFromPoint(iterb->endPt) <= CLOSEENOUGH) {
-                // other segment's end point is on the current segment
+                // Other path segment's end point is ON this path's current segment
                 if (iterb->endPt.distanceFrom(itera->startPt) > CLOSEENOUGH &&
                     iterb->endPt.distanceFrom(itera->endPt) > CLOSEENOUGH
                 ) {
-                    // But is not at one end of the segment or the other. Split segment.
+                    // But is not at either end. Split this segment.
                     Point midPt = itera->closestSegmentPointTo(iterb->endPt);
                     Point firstPt = itera->startPt;
                     itera->startPt = midPt;
                     itera = segments.insert(itera, Line(firstPt, midPt));
+                    itera++; // Skip past the split segment parts.
                 }
+                continue;
             }
 
+            // Check if other path's segment intersects this segment.
             Intersection isect = itera->intersectionWithSegment(*iterb);
             if (isect.type == POINT) {
+                // Yes, they intersect and aren't colinear.
                 if (isect.p1.distanceFrom(itera->startPt) > CLOSEENOUGH &&
                     isect.p1.distanceFrom(itera->endPt) > CLOSEENOUGH
                 ) {
+                    // And intersection is not at either end. Split.
                     Point firstPt = itera->startPt;
                     itera->startPt = isect.p1;
                     itera = segments.insert(itera, Line(firstPt, isect.p1));
                 }
             }
-
         }
+    }
+
+    // Finally, eliminate any negligible length segments.
+    piter = segments.end();
+    piter--;
+    for (itera = segments.begin(); itera != segments.end(); itera++) {
+        while (itera->length() < EPSILON) {
+            itera = segments.erase(itera);
+            if (itera == segments.end()) {
+                iterb = segments.begin();
+                if (iterb != segments.end()) {
+                    piter->endPt = iterb->startPt;
+                }
+                break;
+            }
+            piter->endPt = itera->startPt;
+        }
+        piter = itera;
     }
 }
 
