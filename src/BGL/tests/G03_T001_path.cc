@@ -62,7 +62,7 @@ int main(int argc, char**argv)
 	}
 	fout << "</g>" << endl;
 
-	fout << "<g stroke=\"c00\" stroke-width=\"0.6\">" << endl;
+	fout << "<g stroke=\"#c00\" stroke-width=\"0.6\">" << endl;
 	squigglePath.svgPathWithOffset(fout, 10, 10);
 	fout << "</g>" << endl;
 
