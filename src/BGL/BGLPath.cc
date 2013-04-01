@@ -975,6 +975,7 @@ void Path::tagSegmentsRelativeToClosedPath(const Path &path)
 
 bool Path::insertVertexAttachedPath(const Path &inPath)
 {
+    const bool dodebug = false;
     Lines::iterator it1;
     Lines::iterator it2;
     Lines::iterator it3;
@@ -984,20 +985,35 @@ bool Path::insertVertexAttachedPath(const Path &inPath)
     }
     Path path(inPath);
 
-    bool doFwd = (isClockwise() == path.isClockwise());
-    it1 = path.begin();
-    Point midPt = (it1->startPt + it1->endPt)/2.0;
-    if (contains(midPt)) {
+    bool cwMe = isClockwise();
+    bool cwPath = path.isClockwise();
+    bool doFwd = (cwMe && cwPath) || (!cwMe && !cwPath);
+    if (dodebug) {
+        cerr << "winding1=" << (cwMe?"CW":"CCW") << endl;
+        cerr << "winding2=" << (cwPath?"CW":"CCW") << endl;
+    }
+    it1 = segments.begin();
+    Point midPt1 = (it1->startPt + it1->endPt)/2.0;
+    it2 = path.begin();
+    Point midPt2 = (it2->startPt + it2->endPt)/2.0;
+    if (path.contains(midPt1) || this->contains(midPt2)) {
+        if (dodebug) {
+            cerr << "path2 is inside us" << endl;
+        }
         doFwd = !doFwd;
     }
     if (!doFwd) {
-        //cerr << "revit" << endl;
+        if (dodebug) {
+            cerr << "revit" << endl;
+        }
         path.reverse();
     }
     for (it1 = segments.begin(); it1 != segments.end(); it1++) {
         for (it2 = path.segments.begin(); it2 != path.segments.end(); it2++) {
             if (it2->startPt == it1->startPt) {
-                //cerr << "joinit" << endl;
+                if (dodebug) {
+                    cerr << "joinit" << endl;
+                }
                 for (it3 = it2; it3 != path.segments.end(); it3++) {
                     it1 = segments.insert(it1, *it3);
                     it1++;
@@ -1035,7 +1051,7 @@ void Path::joinVertexAttachedPaths(Paths &paths)
 
 Paths& Path::assembleTaggedPaths(const Path &inPath1, int flags1, const Path &inPath2, int flags2, Paths &outPaths)
 {
-    const bool dodebug = true; // CURRDEBUG: set true
+    const bool dodebug = false; // CURRDEBUG: set true
 
     Path path1(inPath1);
     Path path2(inPath2);
@@ -1547,7 +1563,7 @@ Paths &Path::leftOffset(double offsetby, Paths& outPaths)
 // Outset is a negative inset.
 Paths &Path::inset(double insetBy, Paths& outPaths)
 {
-    const bool dodebug = true;
+    const bool dodebug = false;
     const double minimum_arc_segment_length = 1.0;
     const double minimum_arc_angle = M_PI / 36.0; //  5deg
     const double maximum_arc_angle = M_PI / 4.0;  // 45deg

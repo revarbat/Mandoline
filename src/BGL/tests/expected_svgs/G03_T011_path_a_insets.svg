@@ -1,1 +1,32 @@
-KNOWNBAD
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd" xmlns:xlink="http://www.w3.org/1999/xlink" width="250mm" height="250mm" stroke="black" stroke-width="0.254" fill="none">
+<style type="text/css">
+  path.inset_shell { stroke: black; }
+  path.infill_path { stroke: blue; }
+  path.model_outline { stroke: red; }
+</style>
+<g transform="scale(3.937)">
+<g stroke="#77f">
+<path d="M 120.000,  75.000
+    L 135.000,  45.000
+    L  45.000,  45.000
+    L  60.000,  75.000
+    L  45.000, 105.000
+    L 135.000, 105.000
+    Z" />
+</g>
+<path d="M  62.683,  73.658
+    L  49.854,  48.000
+    L 130.146,  48.000
+    L 117.108,  74.076
+    L 116.964,  75.000
+    L 117.108,  75.924
+    L 130.146, 102.000
+    L  49.854, 102.000
+    L  62.892,  75.924
+    L  63.036,  75.000
+    L  62.892,  74.076
+    Z" />
+</g>
+</svg>
