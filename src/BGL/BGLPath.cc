@@ -709,6 +709,83 @@ Paths &Path::repairUnclosedPaths(const Paths &paths, Paths &outPaths)
 
 
 
+void Path::splitSegmentsAtIntersectionsWithPath(const Path &path)
+{
+    const bool dodebug = false;
+
+    Lines::iterator itera;
+    Lines::iterator piter;
+    Lines::const_iterator iterb;
+
+    // Find where other path intersects this path, and split there.
+    for (iterb = path.segments.begin(); iterb != path.segments.end(); iterb++) {
+        for (itera = segments.begin(); itera != segments.end(); itera++) {
+
+            if (dodebug) {
+                cerr << "  " << *itera << " vs " << *iterb << "!  FIGHT!" << endl;
+            }
+
+            // Check if other paths segment end point is ON this path's segment.
+            // Only bother checking against other path segment's end point.
+            // Start point will be caught by previous segment's end point.
+            if (itera->minimumSegmentDistanceFromPoint(iterb->endPt) <= CLOSEENOUGH) {
+                // Other path segment's end point is ON this path's current segment
+                if (iterb->endPt.distanceFrom(itera->startPt) > CLOSEENOUGH &&
+                    iterb->endPt.distanceFrom(itera->endPt) > CLOSEENOUGH
+                ) {
+                    // But is not at either end. Split this segment.
+                    Point midPt = itera->closestSegmentPointTo(iterb->endPt);
+                    Point firstPt = itera->startPt;
+                    itera->startPt = midPt;
+                    itera = segments.insert(itera, Line(firstPt, midPt));
+                    if (dodebug) {
+                        cerr << "    Tip split at " << midPt << endl;
+                    }
+                    itera++; // Skip past the split segment parts.
+                }
+                continue;
+            }
+
+            // Check if other path's segment intersects this segment.
+            Intersection isect = itera->intersectionWithSegment(*iterb);
+            if (isect.type == POINT) {
+                // Yes, they intersect and aren't colinear.
+                if (isect.p1.distanceFrom(itera->startPt) > CLOSEENOUGH &&
+                    isect.p1.distanceFrom(itera->endPt) > CLOSEENOUGH
+                ) {
+                    // And intersection is not at either end. Split.
+                    Point firstPt = itera->startPt;
+                    itera->startPt = isect.p1;
+                    itera = segments.insert(itera, Line(firstPt, isect.p1));
+                    if (dodebug) {
+                        cerr << "    Mid split at " << isect.p1 << endl;
+                    }
+                }
+            }
+        }
+    }
+
+    // Finally, eliminate any negligible length segments.
+    piter = segments.end();
+    piter--;
+    for (itera = segments.begin(); itera != segments.end(); itera++) {
+        while (itera->length() < EPSILON) {
+            itera = segments.erase(itera);
+            if (itera == segments.end()) {
+                iterb = segments.begin();
+                if (iterb != segments.end()) {
+                    piter->endPt = iterb->startPt;
+                }
+                break;
+            }
+            piter->endPt = itera->startPt;
+        }
+        piter = itera;
+    }
+}
+
+
+
 // Aligns this path more exactly to match up with the other given path.
 // Will jigger segment endpoints to align with other path's endpoints.
 // Will split segments where the other path crosses them.
@@ -745,113 +822,8 @@ void Path::alignTo(const Path &path)
     }
 
     // Second, find where other path intersects this path, and split there.
-    for (iterb = path.segments.begin(); iterb != path.segments.end(); iterb++) {
-        for (itera = segments.begin(); itera != segments.end(); itera++) {
-
-            // Check if other paths segment end point is ON this path's segment.
-            // Only bother checking against other path segment's end point.
-            // Start point will be caught by previous segment's end point.
-            if (itera->minimumSegmentDistanceFromPoint(iterb->endPt) <= CLOSEENOUGH) {
-                // Other path segment's end point is ON this path's current segment
-                if (iterb->endPt.distanceFrom(itera->startPt) > CLOSEENOUGH &&
-                    iterb->endPt.distanceFrom(itera->endPt) > CLOSEENOUGH
-                ) {
-                    // But is not at either end. Split this segment.
-                    Point midPt = itera->closestSegmentPointTo(iterb->endPt);
-                    Point firstPt = itera->startPt;
-                    itera->startPt = midPt;
-                    itera = segments.insert(itera, Line(firstPt, midPt));
-                    itera++; // Skip past the split segment parts.
-                }
-                continue;
-            }
-
-            // Check if other path's segment intersects this segment.
-            Intersection isect = itera->intersectionWithSegment(*iterb);
-            if (isect.type == POINT) {
-                // Yes, they intersect and aren't colinear.
-                if (isect.p1.distanceFrom(itera->startPt) > CLOSEENOUGH &&
-                    isect.p1.distanceFrom(itera->endPt) > CLOSEENOUGH
-                ) {
-                    // And intersection is not at either end. Split.
-                    Point firstPt = itera->startPt;
-                    itera->startPt = isect.p1;
-                    itera = segments.insert(itera, Line(firstPt, isect.p1));
-                }
-            }
-        }
-    }
-
-    // Finally, eliminate any negligible length segments.
-    piter = segments.end();
-    piter--;
-    for (itera = segments.begin(); itera != segments.end(); itera++) {
-        while (itera->length() < EPSILON) {
-            itera = segments.erase(itera);
-            if (itera == segments.end()) {
-                iterb = segments.begin();
-                if (iterb != segments.end()) {
-                    piter->endPt = iterb->startPt;
-                }
-                break;
-            }
-            piter->endPt = itera->startPt;
-        }
-        piter = itera;
-    }
-}
-
-
-
-void Path::splitSegmentsAtIntersectionsWithPath(const Path &path)
-{
-    bool dodebug = false;
-
-    Lines::iterator itera;
-    Lines::const_iterator iterb;
-
-    for (itera = segments.begin(); itera != segments.end(); itera++) {
-        for (iterb = path.segments.begin(); iterb != path.segments.end(); iterb++) {
-            if (dodebug) {
-                cerr << "  " << *itera << " vs " << *iterb << "!  FIGHT!" << endl;
-            }
-            Points isects;
-            Intersection isect = itera->intersectionWithSegment(*iterb);
-            if (isect.type != NONE) {
-                if (!itera->hasEndPoint(isect.p1)) {
-                    isects.push_back(isect.p1);
-                    if (dodebug) {
-                        cerr << "    isect1 split itera at " << isect.p1 << endl;
-                    }
-                }
-                if (isect.type == SEGMENT) {
-                    if (!itera->hasEndPoint(isect.p2)) {
-                        if (isect.p1 != isect.p2) {
-                            double dist1 = itera->startPt.distanceFrom(isect.p1);
-                            double dist2 = itera->startPt.distanceFrom(isect.p2);
-                            if (dist2 > dist1) {
-                                isects.push_front(isect.p2);
-                            } else {
-                                isects.push_back(isect.p2);
-                            }
-                            if (dodebug) {
-                                cerr << "    isect2 split itera at " << isect.p2 << endl;
-                            }
-                        }
-                    }
-                }
-            }
-            Points::iterator iterc;
-            for (iterc = isects.begin(); iterc != isects.end(); iterc++) {
-                Point tempPt = itera->startPt;
-                itera->startPt = *iterc;
-                itera = segments.insert(itera, Line(tempPt, *iterc));
-                if (dodebug) {
-                    cerr << "    Actually split at " << *iterc << endl;
-                }
-            }
-        }
-    }
+    // Remove negligible length segments.
+    splitSegmentsAtIntersectionsWithPath(path);
 }
 
 
@@ -932,7 +904,7 @@ void Path::untag()
 void Path::tagSegmentsRelativeToClosedPath(const Path &path)
 {
     bool invert = (flags == INSIDE);
-    bool dodebug = false; // CURRDEBUG: set true
+    const bool dodebug = false; // CURRDEBUG: set true
 
     Point midpt;
     Lines::iterator itera = segments.begin();
@@ -1063,7 +1035,7 @@ void Path::joinVertexAttachedPaths(Paths &paths)
 
 Paths& Path::assembleTaggedPaths(const Path &inPath1, int flags1, const Path &inPath2, int flags2, Paths &outPaths)
 {
-    bool dodebug = false; // CURRDEBUG: set true
+    const bool dodebug = false; // CURRDEBUG: set true
 
     Path path1(inPath1);
     Path path2(inPath2);
@@ -1575,7 +1547,7 @@ Paths &Path::leftOffset(double offsetby, Paths& outPaths)
 // Outset is a negative inset.
 Paths &Path::inset(double insetBy, Paths& outPaths)
 {
-    bool dodebug = false;
+    const bool dodebug = false;
     const double minimum_arc_segment_length = 1.0;
     const double minimum_arc_angle = M_PI / 36.0; //  5deg
     const double maximum_arc_angle = M_PI / 4.0;  // 45deg
@@ -1618,6 +1590,12 @@ Paths &Path::inset(double insetBy, Paths& outPaths)
     Lines::iterator prevlit = segments.end();
 
     for (prevlit--; lit != segments.end(); lit++) {
+        if (dodebug) {
+            double deltang = prevlit->angleDelta(*lit);
+            cerr << std::setprecision(12);
+            cerr << std::fixed;
+            cerr << "delta ang=" << deltang << endl;
+        }
         bool isConvex = (prevlit->angleDelta(*lit) < 0.0);
         if (leftOffset < 0) {
             isConvex = !isConvex;
@@ -1648,18 +1626,40 @@ Paths &Path::inset(double insetBy, Paths& outPaths)
             // We need to circumscribe the ideal arc, not inscribe.
             double minstepang = maximum_arc_angle;
             if (fabs(insetBy) >= minimum_arc_segment_length) {
+                if (dodebug) {
+                    cerr << "prev minstepang=" << minstepang << endl;
+                }
                 minstepang = asin(minimum_arc_segment_length/fabs(insetBy));
                 if (minstepang < minimum_arc_angle) {
+                    if (dodebug) {
+                        cerr << "minarc" << endl;
+                    }
                     minstepang = minimum_arc_angle; // Don't go overboard with facets.
                 } else if (minstepang > maximum_arc_angle) {
+                    if (dodebug) {
+                        cerr << "maxarc" << endl;
+                    }
                     minstepang = maximum_arc_angle;
                 }
             }
 
+            if (dodebug) {
+                cerr << "minstepang=" << minstepang << endl;
+                cerr << "dang=" << fabs(eang-sang) << endl;
+            }
+
             // Quantize step size
             int    steps = ceil(fabs(eang-sang) / minstepang)+0.1;
+            if (steps < 1) {
+                steps = 1;
+            }
             double stepang = (eang-sang) / steps;
             double rad = leftOffset / cos(stepang*0.5);
+
+            if (dodebug) {
+                cerr << "steps=" << steps << endl;
+                cerr << "stepang=" << stepang << endl;
+            }
 
             trimPaths.push_back(Path());
             Path &trimPath2 = trimPaths.back();
@@ -1735,10 +1735,23 @@ Paths &Path::inset(double insetBy, Paths& outPaths)
 
 ostream& operator <<(ostream &os, const Path &path)
 {
+    bool isfirst = true;
     os << "{";
     Lines::const_iterator it = path.segments.begin();
     for ( ; it != path.segments.end(); it++) {
-        os << *it;
+        if (!isfirst) {
+            os << ", ";
+        } else {
+            isfirst = false;
+        }
+        os << it->startPt;
+    }
+    Lines::const_reverse_iterator rit = path.segments.rbegin();
+    if (rit != path.segments.rend()) {
+        if (!isfirst) {
+            os << ", ";
+        }
+        os << rit->endPt;
     }
     os << "}";
     return os;

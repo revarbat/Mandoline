@@ -248,9 +248,35 @@ Point &Point::polarOffset(double ang, double rad) {
 
 ostream& operator <<(ostream &os,const Point &pt)
 {
-    os.precision(12);
-    os.setf(ios::fixed);
-    os << "(" << pt.x << ", " << pt.y << ")";
+    char buf[128];
+    char *ptr, *last;
+
+    sprintf(buf, "%.12f", pt.x);
+    for (last = ptr = buf; *ptr && *ptr != '.'; ptr++) {
+        last = ptr;
+    }
+    for (; *ptr; ptr++) {
+        if (*ptr != '.' && *ptr != '0') {
+            last = ptr;
+        }
+    }
+    last++;
+    *last = '\0';
+    os << "(" << buf << ", ";
+
+    sprintf(buf, "%.12f", pt.y);
+    for (last = ptr = buf; *ptr && *ptr != '.'; ptr++) {
+        last = ptr;
+    }
+    for (; *ptr; ptr++) {
+        if (*ptr != '.' && *ptr != '0') {
+            last = ptr;
+        }
+    }
+    last++;
+    *last = '\0';
+    os << buf << ")";
+
     return os;
 }
 
