@@ -27,7 +27,6 @@ BGL::Point pointSet2[] = {
 int main(int argc, char**argv)
 {
     char fname[128];
-    double infillInset=1.410000;
 
     BGL::Path path1(sizeof(pointSet1)/sizeof(BGL::Point), pointSet1);
     BGL::Path path2(sizeof(pointSet2)/sizeof(BGL::Point), pointSet2);
