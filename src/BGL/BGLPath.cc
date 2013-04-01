@@ -745,8 +745,8 @@ void Path::alignTo(const Path &path)
     }
 
     // Second, find where other path intersects this path, and split there.
-    for (itera = segments.begin(); itera != segments.end(); itera++) {
-        for (iterb = path.segments.begin(); iterb != path.segments.end(); iterb++) {
+    for (iterb = path.segments.begin(); iterb != path.segments.end(); iterb++) {
+        for (itera = segments.begin(); itera != segments.end(); itera++) {
 
             // Check if other paths segment end point is ON this path's segment.
             // Only bother checking against other path segment's end point.
