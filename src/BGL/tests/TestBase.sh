@@ -7,7 +7,7 @@ if [ "${base}" = "TestBase" ] ; then
     exit 73
 fi
 
-export TIMEOUT=10
+export TIMEOUT=30
 
 groupnum=`echo ${base} | sed 's/^.*G\([0-9]*\)[^0-9].*$/\1/'`
 testnum=`echo ${base} | sed 's/^.*T\([0-9]*\)[^0-9]*$/\1/'`
