@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd" xmlns:xlink="http://www.w3.org/1999/xlink" width="250mm" height="250mm" stroke="black" stroke-width="0.254" fill="none">
+<style type="text/css">
+  path.inset_shell { stroke: black; }
+  path.infill_path { stroke: blue; }
+  path.model_outline { stroke: red; }
+</style>
+<g transform="scale(3.937)">
+<g stroke="#77f">
+<path d="M   4.230,  55.770
+    L   4.230,   4.230
+    L  55.770,   4.230
+    L  55.770,  55.770
+    Z" />
+</g>
+<g stroke="#f77">
+<path d="M   0.000,  60.000
+    L   0.450,  60.000
+    L   0.450,  55.770
+    L   0.000,  55.770
+    Z" />
+</g>
+<path d="M   4.230,  55.770
+    L   4.230,   4.230
+    L  55.770,   4.230
+    L  55.770,  55.770
+    Z" />
+</g>
+</svg>

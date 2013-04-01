@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd" xmlns:xlink="http://www.w3.org/1999/xlink" width="250mm" height="250mm" stroke="black" stroke-width="0.254" fill="none">
+<style type="text/css">
+  path.inset_shell { stroke: black; }
+  path.infill_path { stroke: blue; }
+  path.model_outline { stroke: red; }
+</style>
+<g transform="scale(3.937)">
+<g stroke="#77f">
+<path d="M  66.912,  74.926
+    L  66.887,  30.077
+    L  52.089,  30.000
+    L  36.464,  45.746
+    L  38.931,  48.583
+    L  42.017,  51.454
+    L  51.566,  41.539
+    L  56.168,  40.014
+    L  60.028,  45.043
+    L  60.044,  62.040
+    L  51.570,  80.627
+    L  30.000, 102.006
+    L  34.813, 107.095
+    Z" />
+</g>
+<g stroke="#7f7">
+<path d="M  66.912,  74.926
+    L  66.887,  30.077
+    L  66.572,  30.077
+    L  66.597,  74.926
+    Z" />
+</g>
+<path d="M  34.813, 107.095
+    L  30.000, 102.006
+    L  51.570,  80.627
+    L  60.044,  62.040
+    L  60.028,  45.043
+    L  56.168,  40.014
+    L  51.566,  41.539
+    L  42.017,  51.454
+    L  38.931,  48.583
+    L  36.464,  45.746
+    L  52.089,  30.000
+    L  66.887,  30.077
+    L  66.572,  30.077
+    L  66.597,  74.926
+    L  66.912,  74.926
+    Z" />
+</g>
+</svg>

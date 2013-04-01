@@ -64,8 +64,8 @@ check_PROGRAMS = \
 	G05_T001_compoundregion \
 	G05_T002_compoundregion
 
-CLEANFILES=G*.svg Log-*.txt
-DISTCLEANFILES=Test-G*-T*.sh
+CLEANFILES=result_svgs/*.svg logs/Log-*.txt
+DISTCLEANFILES=Test-G*-T*.sh result_svgs logs
 
 G03_T001_path_SOURCES = G03_T001_path.cc
 G03_T001_path_LDADD = ../libBGL.la

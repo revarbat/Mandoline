@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd" xmlns:xlink="http://www.w3.org/1999/xlink" width="250mm" height="250mm" stroke="black" stroke-width="0.254" fill="none">
+<style type="text/css">
+  path.inset_shell { stroke: black; }
+  path.infill_path { stroke: blue; }
+  path.model_outline { stroke: red; }
+</style>
+<g transform="scale(3.937)">
+<g stroke="#77f">
+<path fill="inherit" d="M  25.000,  25.000
+    L  25.000,  85.000
+    L 115.000,  85.000
+    L 115.000,  25.000
+    Z M  70.000,  32.500
+    L  70.000,  77.500
+    L  85.000,  77.500
+    L  85.000,  32.500
+    Z M 107.500,  32.500
+    L 107.500,  77.500
+    L  92.500,  77.500
+    L  92.500,  32.500
+    Z" />
+</g>
+<path fill="inherit" d="M  26.500,  26.500
+    L 113.500,  26.500
+    L 113.500,  83.500
+    L  26.500,  83.500
+    Z M 109.000,  32.098
+    L 108.598,  31.402
+    L 107.902,  31.000
+    L  92.098,  31.000
+    L  91.402,  31.402
+    L  91.000,  32.098
+    L  91.000,  77.902
+    L  91.402,  78.598
+    L  92.098,  79.000
+    L 107.902,  79.000
+    L 108.598,  78.598
+    L 109.000,  77.902
+    Z M  68.500,  32.098
+    L  68.902,  31.402
+    L  69.598,  31.000
+    L  85.402,  31.000
+    L  86.098,  31.402
+    L  86.500,  32.098
+    L  86.500,  77.902
+    L  86.098,  78.598
+    L  85.402,  79.000
+    L  69.598,  79.000
+    L  68.902,  78.598
+    L  68.500,  77.902
+    Z" />
+</g>
+</svg>

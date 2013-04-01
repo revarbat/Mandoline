@@ -318,8 +318,8 @@ TESTS = \
 	Test-G05-T002e.sh \
 	Test-G05-T002f.sh
 
-CLEANFILES = G*.svg Log-*.txt
-DISTCLEANFILES = Test-G*-T*.sh
+CLEANFILES = result_svgs/*.svg logs/Log-*.txt
+DISTCLEANFILES = Test-G*-T*.sh result_svgs logs
 G03_T001_path_SOURCES = G03_T001_path.cc
 G03_T001_path_LDADD = ../libBGL.la
 G03_T002_path_SOURCES = G03_T002_path.cc

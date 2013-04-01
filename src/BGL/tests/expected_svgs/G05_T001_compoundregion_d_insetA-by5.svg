@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd" xmlns:xlink="http://www.w3.org/1999/xlink" width="250.000mm" height="250.000mm" stroke="black" stroke-width="0.254" fill="none">
+<style type="text/css">
+  path.inset_shell { stroke: black; }
+  path.infill_path { stroke: blue; }
+  path.model_outline { stroke: red; }
+</style>
+<g transform="scale(3.937)">
+<g stroke="#77f">
+<path fill="inherit" d="M  20.000,  20.000
+    L  20.000,  60.000
+    L  80.000,  60.000
+    L  80.000,  20.000
+    Z M  50.000,  25.000
+    L  50.000,  55.000
+    L  60.000,  55.000
+    L  60.000,  25.000
+    Z M  75.000,  25.000
+    L  75.000,  55.000
+    L  65.000,  55.000
+    L  65.000,  25.000
+    ZM 120.000,  60.000
+    L  82.000,  40.000
+    L 120.000,  10.000
+    L 140.000,  10.000
+    L 140.000,  20.000
+    L 130.000,  20.000
+    L 130.000,  15.000
+    L 115.000,  30.000
+    L 170.000,  40.000
+    L 170.000,  60.000
+    Z" />
+</g>
+<path fill="inherit" d="M  21.000,  21.000
+    L  79.000,  21.000
+    L  79.000,  59.000
+    L  21.000,  59.000
+    Z M  76.000,  24.586
+    L  75.414,  24.000
+    L  64.586,  24.000
+    L  64.000,  24.586
+    L  64.000,  55.414
+    L  64.586,  56.000
+    L  75.414,  56.000
+    L  76.000,  55.414
+    Z M  49.000,  24.586
+    L  49.586,  24.000
+    L  60.414,  24.000
+    L  61.000,  24.586
+    L  61.000,  55.414
+    L  60.414,  56.000
+    L  49.586,  56.000
+    L  49.000,  55.414
+    ZM 131.000,  14.586
+    L 131.000,  19.000
+    L 139.000,  19.000
+    L 139.000,  11.000
+    L 120.347,  11.000
+    L  83.827,  39.832
+    L 120.247,  59.000
+    L 169.000,  59.000
+    L 169.000,  40.835
+    L 114.448,  30.916
+    L 113.979,  30.319
+    L 114.025,  29.561
+    L 129.586,  14.000
+    L 130.414,  14.000
+    Z" />
+</g>
+</svg>

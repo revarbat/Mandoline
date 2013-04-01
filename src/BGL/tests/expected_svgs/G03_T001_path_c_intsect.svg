@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd" xmlns:xlink="http://www.w3.org/1999/xlink" width="250.000mm" height="250.000mm" stroke="black" stroke-width="0.254" fill="none">
+<style type="text/css">
+  path.inset_shell { stroke: black; }
+  path.infill_path { stroke: blue; }
+  path.model_outline { stroke: red; }
+</style>
+<g transform="scale(3.937)">
+<g stroke="#000" stroke-width="1.2" fill="#ccf">
+<path fill="inherit" d="M  70.000,  85.000
+    L  55.000,  85.000
+    L  25.000,  65.000
+    L  25.000,  40.000
+    L  40.000,  25.000
+    L  62.500,  25.000
+    L  47.500,  40.000
+    L 115.000,  52.273
+    L 115.000,  85.000
+    L  92.500,  85.000
+    L  85.000,  70.000
+    L  81.250,  85.000
+    Z" />
+</g>
+<g stroke="#c00" stroke-width="0.6">
+<path d="M  55.000,  85.000
+    L  10.000,  55.000
+    L  55.000,  10.000
+    L  85.000,  10.000
+    L  85.000,  25.000
+    L  70.000,  25.000
+    L  70.000,  17.500
+    L  47.500,  40.000
+    L 130.000,  55.000
+    L 130.000,  85.000
+    Z" />
+</g>
+<g stroke="#0c0">
+<path d="M  25.000,  25.000
+    L  25.000,  85.000
+    L  70.000,  85.000
+    L  77.500, 100.000
+    L  85.000,  70.000
+    L  92.500,  85.000
+    L 115.000,  85.000
+    L 115.000,  25.000
+    Z" />
+</g>
+</g>
+</svg>

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd" xmlns:xlink="http://www.w3.org/1999/xlink" width="250.000mm" height="250.000mm" stroke="black" stroke-width="0.254" fill="none">
+<style type="text/css">
+  path.inset_shell { stroke: black; }
+  path.infill_path { stroke: blue; }
+  path.model_outline { stroke: red; }
+</style>
+<g transform="scale(3.937)">
+<g stroke="#77f">
+<path fill="inherit" d="M  25.000,  25.000
+    L  25.000,  85.000
+    L 115.000,  85.000
+    L 115.000,  25.000
+    Z M  70.000,  32.500
+    L  70.000,  77.500
+    L  85.000,  77.500
+    L  85.000,  32.500
+    Z M 107.500,  32.500
+    L 107.500,  77.500
+    L  92.500,  77.500
+    L  92.500,  32.500
+    Z" />
+</g>
+<path fill="inherit" d="M  28.000,  28.000
+    L 112.000,  28.000
+    L 112.000,  82.000
+    L  28.000,  82.000
+    Z M 110.206,  78.879
+    L 110.500,  77.975
+    L 110.500,  32.025
+    L 110.206,  31.121
+    L 109.648,  30.352
+    L 108.879,  29.794
+    L 107.975,  29.500
+    L  92.025,  29.500
+    L  91.121,  29.794
+    L  90.352,  30.352
+    L  89.794,  31.121
+    L  89.500,  32.025
+    L  89.500,  77.975
+    L  89.794,  78.879
+    L  90.352,  79.648
+    L  91.121,  80.206
+    L  92.025,  80.500
+    L 107.975,  80.500
+    L 108.879,  80.206
+    L 109.648,  79.648
+    Z M  67.294,  78.879
+    L  67.000,  77.975
+    L  67.000,  32.025
+    L  67.294,  31.121
+    L  67.852,  30.352
+    L  68.621,  29.794
+    L  69.525,  29.500
+    L  85.475,  29.500
+    L  86.379,  29.794
+    L  87.148,  30.352
+    L  87.706,  31.121
+    L  88.000,  32.025
+    L  88.000,  77.975
+    L  87.706,  78.879
+    L  87.148,  79.648
+    L  86.379,  80.206
+    L  85.475,  80.500
+    L  69.525,  80.500
+    L  68.621,  80.206
+    L  67.852,  79.648
+    Z" />
+</g>
+</svg>

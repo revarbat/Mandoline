@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd" xmlns:xlink="http://www.w3.org/1999/xlink" width="250.000mm" height="250.000mm" stroke="black" stroke-width="0.254" fill="none">
+<style type="text/css">
+  path.inset_shell { stroke: black; }
+  path.infill_path { stroke: blue; }
+  path.model_outline { stroke: red; }
+</style>
+<g transform="scale(3.937)">
+<g stroke="#77f">
+<path fill="inherit" d="M  20.000,  20.000
+    L  20.000,  60.000
+    L  80.000,  60.000
+    L  80.000,  20.000
+    Z M  50.000,  25.000
+    L  50.000,  55.000
+    L  60.000,  55.000
+    L  60.000,  25.000
+    Z M  75.000,  25.000
+    L  75.000,  55.000
+    L  65.000,  55.000
+    L  65.000,  25.000
+    ZM 120.000,  60.000
+    L  82.000,  40.000
+    L 120.000,  10.000
+    L 140.000,  10.000
+    L 140.000,  20.000
+    L 130.000,  20.000
+    L 130.000,  15.000
+    L 115.000,  30.000
+    L 170.000,  40.000
+    L 170.000,  60.000
+    Z" />
+</g>
+<path fill="inherit" d="M  22.000,  22.000
+    L  78.000,  22.000
+    L  78.000,  58.000
+    L  22.000,  58.000
+    Z M  77.000,  24.464
+    L  76.464,  23.536
+    L  75.536,  23.000
+    L  64.464,  23.000
+    L  63.536,  23.536
+    L  63.000,  24.464
+    L  63.000,  55.536
+    L  63.536,  56.464
+    L  64.464,  57.000
+    L  75.536,  57.000
+    L  76.464,  56.464
+    L  77.000,  55.536
+    Z M  48.000,  24.464
+    L  48.536,  23.536
+    L  49.464,  23.000
+    L  60.536,  23.000
+    L  61.464,  23.536
+    L  62.000,  24.464
+    L  62.000,  55.536
+    L  61.464,  56.464
+    L  60.536,  57.000
+    L  49.464,  57.000
+    L  48.536,  56.464
+    L  48.000,  55.536
+    ZM 128.925,  13.246
+    L 129.839,  12.950
+    L 130.787,  13.100
+    L 131.564,  13.664
+    L 132.000,  14.520
+    L 132.000,  18.000
+    L 138.000,  18.000
+    L 138.000,  12.000
+    L 120.694,  12.000
+    L  85.654,  39.663
+    L 120.494,  58.000
+    L 168.000,  58.000
+    L 168.000,  41.669
+    L 114.207,  31.889
+    L 113.485,  31.378
+    L 113.045,  30.611
+    L 112.970,  29.729
+    L 113.273,  28.899
+    Z" />
+</g>
+</svg>

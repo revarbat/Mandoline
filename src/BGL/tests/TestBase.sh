@@ -15,12 +15,22 @@ subtest=`echo ${base} | sed 's/^.*T[0-9]*\([^0-9]\).*$/\1/'`
 
 TESTROOT="G${groupnum}_T${testnum}"
 
-SVGROOT="${TESTROOT}_*_${subtest}_"
-SVGFILE="${SVGROOT}*.svg"
+EXPECTEDDIR="expected_svgs"
+RESULTDIR="result_svgs"
+LOGDIR="logs"
+
+alldirs="${EXPECTEDDIR} ${RESULTDIR} ${LOGDIR}"
+for d in ${alldirs} ; do
+    if [ ! -d $d ]; then
+	mkdir -p $d
+    fi
+done
+
+SVGPAT="${TESTROOT}_*_${subtest}_*.svg"
+
+LOGFILE="${LOGDIR}/Log-${TESTROOT}.txt"
 
 TESTBIN="./${TESTROOT}_*"
-LOGFILE="Log-${TESTROOT}.txt"
-
 ${TESTBIN} > ${LOGFILE} 2>&1 &
 PRODPID=$!
 
@@ -68,12 +78,19 @@ if [ $resval -ne 0 ] ; then
     exit -1
 fi
 
-SVGFILE=`ls -1 $SVGFILE`
-md5raw=`md5 $SVGFILE`
-md5val=`echo ${md5raw} | sed 's/^.* = //'`
-expected=`grep '^MD5 ('${SVGFILE} ExpectedResults.txt | tail -1 | sed 's/^.* = //'`
+EXPECTEDSVG=`ls -1 ${EXPECTEDDIR}/${SVGPAT}`
+RESULTSSVG=`ls -1 ${RESULTDIR}/${SVGPAT}`
 
-if [ "${md5val}x" != "${expected}x" ] ; then
+if [ ! -e "${EXPECTEDSVG}" ] ; then
+    exit -1
+fi
+
+if [ ! -e "${RESULTSSVG}" ] ; then
+    exit -1
+fi
+
+cmp -s "${EXPECTEDSVG}" "${RESULTSSVG}"
+if [ $? -ne  0 ]; then
     exit -1
 fi
 exit 0

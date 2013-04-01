@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd" xmlns:xlink="http://www.w3.org/1999/xlink" width="250.000mm" height="250.000mm" stroke="black" stroke-width="0.254" fill="none">
+<style type="text/css">
+  path.inset_shell { stroke: black; }
+  path.infill_path { stroke: blue; }
+  path.model_outline { stroke: red; }
+</style>
+<g transform="scale(3.937)">
+<g stroke="#000" stroke-width="1.2" fill="#ccf">
+<path fill="inherit" d="M  25.000,  25.000
+    L  25.000,  45.625
+    L  58.000,  25.000
+    Z" />
+<path fill="inherit" d="M  25.000,  85.000
+    L  25.000,  64.375
+    L  58.000,  85.000
+    Z" />
+<path fill="inherit" d="M 115.000,  64.375
+    L 115.000,  85.000
+    L  82.000,  85.000
+    L  94.000,  77.500
+    L 107.500,  77.500
+    L 107.500,  69.062
+    Z" />
+<path fill="inherit" d="M  82.000,  25.000
+    L 115.000,  25.000
+    L 115.000,  45.625
+    L 107.500,  40.938
+    L 107.500,  32.500
+    L  94.000,  32.500
+    Z" />
+<path fill="inherit" d="M  25.000,  51.250
+    L  25.000,  58.750
+    L  32.500,  62.500
+    L  32.500,  47.500
+    Z" />
+<path fill="inherit" d="M  40.000,  62.500
+    L  40.000,  47.500
+    L  55.000,  47.500
+    L  55.000,  62.500
+    Z" />
+<path fill="inherit" d="M 107.500,  49.000
+    L 107.500,  61.000
+    L 115.000,  58.000
+    L 115.000,  52.000
+    Z" />
+<path fill="inherit" d="M  70.000,  49.375
+    L  70.000,  60.625
+    L  64.375,  55.000
+    Z" />
+</g>
+<g stroke="c00" stroke-width="0.6">
+<path fill="inherit" d="M  25.000,  25.000
+    L  25.000,  85.000
+    L 115.000,  85.000
+    L 115.000,  25.000
+    Z M  70.000,  32.500
+    L  70.000,  77.500
+    L  85.000,  77.500
+    L  85.000,  32.500
+    Z M 107.500,  32.500
+    L 107.500,  77.500
+    L  92.500,  77.500
+    L  92.500,  32.500
+    Z" />
+</g>
+<g stroke="#0c0">
+<path fill="inherit" d="M  10.000,  55.000
+    L  70.000,  92.500
+    L 130.000,  55.000
+    L  70.000,  17.500
+    Z M  17.500,  55.000
+    L  32.500,  62.500
+    L  32.500,  47.500
+    Z M  40.000,  62.500
+    L  40.000,  47.500
+    L  55.000,  47.500
+    L  55.000,  62.500
+    Z M 103.750,  62.500
+    L 122.500,  55.000
+    L 103.750,  47.500
+    Z M  96.250,  47.500
+    L  96.250,  62.500
+    L 100.000,  62.500
+    L 100.000,  47.500
+    Z M  70.000,  49.375
+    L  70.000,  60.625
+    L  64.375,  55.000
+    Z M  85.000,  49.375
+    L  85.000,  60.625
+    L  79.375,  55.000
+    Z" />
+</g>
+</g>
+</svg>
