@@ -1035,7 +1035,7 @@ void Path::joinVertexAttachedPaths(Paths &paths)
 
 Paths& Path::assembleTaggedPaths(const Path &inPath1, int flags1, const Path &inPath2, int flags2, Paths &outPaths)
 {
-    const bool dodebug = false; // CURRDEBUG: set true
+    const bool dodebug = true; // CURRDEBUG: set true
 
     Path path1(inPath1);
     Path path2(inPath2);
@@ -1547,12 +1547,14 @@ Paths &Path::leftOffset(double offsetby, Paths& outPaths)
 // Outset is a negative inset.
 Paths &Path::inset(double insetBy, Paths& outPaths)
 {
-    const bool dodebug = false;
+    const bool dodebug = true;
     const double minimum_arc_segment_length = 1.0;
     const double minimum_arc_angle = M_PI / 36.0; //  5deg
     const double maximum_arc_angle = M_PI / 4.0;  // 45deg
 
     if (dodebug) {
+        cerr << "Path to inset: " << endl;
+        this->svgPathWithOffset(cerr, 0, 0);
         cerr << "Inset by " << insetBy << endl;
     }
 
@@ -1677,7 +1679,7 @@ Paths &Path::inset(double insetBy, Paths& outPaths)
 
             if (dodebug) {
                 cerr << "arcTrim" << endl;
-                trimPath2.svgPathWithOffset(cerr, 10, 10);
+                trimPath2.svgPathWithOffset(cerr, 0, 0);
             }
         }
 
@@ -1695,7 +1697,7 @@ Paths &Path::inset(double insetBy, Paths& outPaths)
 
         if (dodebug) {
             cerr << "rectTrim" << endl;
-            trimPath.svgPathWithOffset(cerr, 10, 10);
+            trimPath.svgPathWithOffset(cerr, 0, 0);
         }
 
         prevlit = lit;
