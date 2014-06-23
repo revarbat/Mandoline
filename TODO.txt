@@ -1,10 +1,13 @@
 TODO: 
-  Come up with a good calibration scheme.
-  Optimize the Inset code for speed.
-  Support.  I want to have it handle multiple tool heads, or same-material
-    support structures.
-  PathFinder.  (with Comb) Join and optimize the isolated paths into
-    contiguous tool paths.
 
+  * Come up with a good calibration scheme.
+
+  * Optimize the Inset code for speed.
+
+  * Support.  I want to have it handle multiple tool heads, or same-material
+    support structures.
+
+  * PathFinder.  (with Comb) Join and optimize the isolated paths into
+    contiguous tool paths.
 
 
