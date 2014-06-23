@@ -1,5 +1,5 @@
 Mandoline: A faster way to slice 3D models.
-Copyright 2010 Belfry Software.  All rights reserved.
+Copyright 2010-2014 Belfry Software.  All rights reserved.
 
 Licensing:
   Released under the BSD "2-clause" license.
@@ -13,10 +13,10 @@ Description:
 
 Compilation and Installation:
   UNIX, Linux and OS X:
-      cd src
-      ./configure
-      make
-      sudo make install
+    cd src
+    ./configure
+    make
+    sudo make install
 
   Windows:
     At this point, there is not yet a GUI wrapper for Mandoline.
@@ -26,19 +26,12 @@ Compilation and Installation:
       ./configure
       make
     Then install the mandoline.exe file someplace useful.
-
     //TODO: verify that it compiles and works under Cygwin.
 
 Calibration:
   Mandoline comes with reasonable starting defaults for slicing files for
   printing on a MakerBot Thingomatic with a Mk7 extruder.  Machines vary a
   lot, though, so you'll need to calibrate for your machine.
-
-
-Debugging:
-You can dump SVG files for each layer, for debugging purposes. What is implemented is the basic carve and interior infill. And that's buggy. It won't do cooling or comb or filament retraction yet.
-
-What is implemented, though, is pretty fast.  Don't take my word for it. Download the code and compile it, and slice a complex STL file with it. If comparing it to another slicer, compare the Carve, Inset, Infill and Raft times.
 
 Usage:
   mandoline [OPTIONS] FILE
@@ -59,13 +52,8 @@ Options include:
     -d PREFIX   Dump layers to SVG files with names like PREFIX-12.34.svg.
     -t INT      Number of threads to slice with. (default 8)
 
-
-
-TODO: 
-  Come up with a good calibration scheme.
-  Optimize the Inset code for speed.
-  Support.  I want to have it handle multiple tool heads, or same-material support structures.
-  PathFinder.  (with Comb) Join and optimize the isolated paths into contiguous tool paths.
-  Implement .s3g file Export option.
-
+Debugging:
+  You can dump SVG files for each layer, for debugging purposes. What is
+  implemented is the basic carve and interior infill. And that's buggy.
+  It won't do cooling or comb or filament retraction yet.
 
